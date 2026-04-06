@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Assessment History — AutismRecog</title>
+  <link rel="stylesheet" href="../css/main.css"/>
+  <style>
+    .hpage{max-width:var(--max);margin:0 auto;padding:44px 44px 80px}
+    .page-hdr{background:linear-gradient(135deg,#f0faf3,var(--bg));border-radius:var(--r);padding:32px;margin-bottom:32px;border:1px solid var(--border)}
+    .page-hdr h1{font-family:var(--font-d);font-size:2rem;margin-bottom:8px}
+    .page-hdr p{color:var(--muted);font-size:.92rem}
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+    .h-stat{background:var(--card);border-radius:var(--r);padding:20px;border:1px solid var(--border);text-align:center}
+    .h-stat .num{font-family:var(--font-d);font-size:2rem;margin-bottom:4px}
+    .h-stat .lbl{font-size:.76rem;color:var(--muted);font-weight:500}
+    .filter-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+    .filter-row select,.filter-row input{padding:8px 14px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:.84rem;background:var(--bg);color:var(--text);outline:none}
+    .filter-row select:focus,.filter-row input:focus{border-color:var(--primary)}
+    .history-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+    .hcard{background:var(--card);border-radius:var(--r);padding:22px;border:1.5px solid var(--border);transition:all .22s;cursor:pointer}
+    .hcard:hover{box-shadow:var(--shadow-md);transform:translateY(-3px);border-color:var(--primary-l)}
+    .hcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .hcard-date{font-size:.74rem;color:var(--muted)}
+    .hcard-scores{display:flex;gap:14px;margin-bottom:14px}
+    .hs{text-align:center;flex:1}
+    .hs .v{font-size:1.6rem;font-weight:700}
+    .hs .l{font-size:.7rem;color:var(--muted)}
+    .mini-bar{height:6px;background:var(--bg);border-radius:50px;overflow:hidden;margin-top:10px}
+    .mini-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--primary-l),var(--primary));transition:width .6s ease}
+    .risk-chip{padding:4px 12px;border-radius:50px;font-size:.76rem;font-weight:700}
+    .rc-High{background:var(--orange-bg);color:#c44b1b}
+    .rc-Moderate{background:var(--yellow-bg);color:#7a5c00}
+    .rc-Low,.rc-Minimal{background:var(--green-bg);color:var(--primary)}
+    .del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;padding:3px 6px;border-radius:6px}
+    .del-btn:hover{color:#c44b1b;background:var(--orange-bg)}
+    .empty{text-align:center;padding:60px 20px;grid-column:1/-1}
+    .trend-canvas{width:100%;height:140px;display:block}
+    @media(max-width:900px){.hpage{padding:20px 16px 60px}.stats-row{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+<div id="nav-ph"></div>
+
+<div class="hpage">
+  <div class="page-hdr">
+    <div class="section-tag">History</div>
+    <h1>📊 My Assessment History</h1>
+    <p>All your AQ-10 results saved to Firebase — track your screening history over time.</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="h-stat"><div class="num" id="statTotal" style="color:var(--primary)">—</div><div class="lbl">Total Assessments</div></div>
+    <div class="h-stat"><div class="num" id="statHigh"  style="color:#c44b1b">—</div><div class="lbl">High Risk</div></div>
+    <div class="h-stat"><div class="num" id="statAvgProb" style="color:var(--accent)">—</div><div class="lbl">Avg Probability</div></div>
+    <div class="h-stat"><div class="num" id="statAvgAQ" style="color:#4361ee">—</div><div class="lbl">Avg AQ-10 Score</div></div>
+  </div>
+
+  <!-- Trend chart -->
+  <div class="card" style="margin-bottom:24px;padding:22px">
+    <div style="font-size:.9rem;font-weight:700;margin-bottom:14px">📈 ASD Probability Trend</div>
+    <canvas id="trendChart" class="trend-canvas"></canvas>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-row">
+    <select id="filterRisk" onchange="applyFilters()">
+      <option value="">All Risk Levels</option>
+      <option value="High">High Risk</option>
+      <option value="Moderate">Moderate Risk</option>
+      <option value="Low">Low Risk</option>
+      <option value="Minimal">Minimal Risk</option>
+    </select>
+    <select id="filterSort" onchange="applyFilters()">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="highest">Highest Probability</option>
+      <option value="lowest">Lowest Probability</option>
+    </select>
+    <span id="filterCount" style="font-size:.82rem;color:var(--muted);margin-left:auto"></span>
+  </div>
+
+  <!-- Cards grid -->
+  <div class="history-grid" id="histGrid">
+    <div class="empty">Loading your assessments…</div>
+  </div>
+</div>
+
+<div id="footer-ph"></div>
+
+<script type="module">
+import { getUserAssessments, deleteAssessment, watchAssessments } from '../js/mongodb.js';
+import '../js/shared.js';
+
+let allAssessments = [];
+
+const user = await requireAuth();
+
+// Real-time listener
+watchAssessments(user.uid, (records) => {
+  allAssessments = records;
+  updateStats(records);
+  drawTrend(records);
+  applyFilters();
+});
+
+window.applyFilters = () => {
+  const risk = document.getElementById('filterRisk').value;
+  const sort = document.getElementById('filterSort').value;
+  let filtered = [...allAssessments];
+  if (risk) filtered = filtered.filter(a => a.risk_level === risk);
+  if (sort === 'oldest')  filtered.sort((a,b) => a.createdAt?.seconds - b.createdAt?.seconds);
+  if (sort === 'highest') filtered.sort((a,b) => (b.probability||0) - (a.probability||0));
+  if (sort === 'lowest')  filtered.sort((a,b) => (a.probability||0) - (b.probability||0));
+  document.getElementById('filterCount').textContent = `${filtered.length} results`;
+  renderGrid(filtered);
+};
+
+function updateStats(records) {
+  if (records.length === 0) {
+    ['statTotal','statHigh','statAvgProb','statAvgAQ'].forEach(id => document.getElementById(id).textContent = '0');
+    return;
+  }
+  document.getElementById('statTotal').textContent   = records.length;
+  document.getElementById('statHigh').textContent    = records.filter(r => r.risk_level === 'High').length;
+  document.getElementById('statAvgProb').textContent = Math.round(records.reduce((s,r) => s + (r.probability||0), 0) / records.length) + '%';
+  document.getElementById('statAvgAQ').textContent   = (records.reduce((s,r) => s + (r.aq10_sum||0), 0) / records.length).toFixed(1);
+}
+
+function drawTrend(records) {
+  const canvas = document.getElementById('trendChart');
+  const ctx    = canvas.getContext('2d');
+  canvas.width  = canvas.offsetWidth * 2;
+  canvas.height = 280;
+  const dpr = window.devicePixelRatio || 1;
+
+  if (records.length < 2) {
+    ctx.fillStyle = '#aaa';
+    ctx.font = '24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Add more assessments to see your trend', canvas.width/2, 80);
+    return;
+  }
+
+  const sorted  = [...records].reverse();
+  const values  = sorted.map(r => r.probability || 0);
+  const maxVal  = Math.max(...values, 100);
+  const W = canvas.width, H = canvas.height;
+  const pad = 40;
+
+  ctx.clearRect(0,0,W,H);
+
+  // Grid lines
+  ctx.strokeStyle = '#e8e8e8'; ctx.lineWidth = 1;
+  [0,25,50,75,100].forEach(pct => {
+    const y = H - pad - ((pct/100) * (H - 2*pad));
+    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke();
+    ctx.fillStyle = '#999'; ctx.font = '20px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText(pct + '%', pad-8, y+6);
+  });
+
+  // Line
+  const step = (W - 2*pad) / Math.max(values.length-1, 1);
+  ctx.beginPath();
+  values.forEach((v,i) => {
+    const x = pad + i * step;
+    const y = H - pad - ((v/100) * (H - 2*pad));
+    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle = '#2d6a4f'; ctx.lineWidth = 4; ctx.stroke();
+
+  // Points
+  values.forEach((v,i) => {
+    const x = pad + i * step;
+    const y = H - pad - ((v/100) * (H - 2*pad));
+    ctx.beginPath(); ctx.arc(x,y,8,0,Math.PI*2);
+    ctx.fillStyle = v >= 50 ? '#e76f51' : '#2d6a4f'; ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
+  });
+}
+
+function renderGrid(records) {
+  const grid = document.getElementById('histGrid');
+  if (records.length === 0) {
+    grid.innerHTML = `<div class="empty">
+      <div style="font-size:3rem;margin-bottom:12px">📋</div>
+      <p>No assessments yet.</p>
+      <a href="predict.html" class="btn btn-primary" style="margin-top:16px">Take Your First AQ-10 Test →</a>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = records.map(a => {
+    const date = a.createdAt?.toDate ? a.createdAt.toDate().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : 'Recent';
+    return `
+    <div class="hcard" onclick="window.location.href='predict.html'">
+      <div class="hcard-top">
+        <span class="risk-chip rc-${a.risk_level}">${a.risk_level} Risk</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="hcard-date">${date}</span>
+          <button class="del-btn" onclick="event.stopPropagation();del('${a.id}')">🗑</button>
+        </div>
+      </div>
+      <div class="hcard-scores">
+        <div class="hs"><div class="v" style="color:${(a.probability||0)>=50?'#c44b1b':'var(--primary)'}">${a.probability||0}%</div><div class="l">Probability</div></div>
+        <div class="hs"><div class="v">${a.aq10_sum??'—'}/10</div><div class="l">AQ-10 Score</div></div>
+        <div class="hs"><div class="v" style="font-size:1rem">${a.age||'—'}</div><div class="l">Age · ${a.gender||'—'}</div></div>
+      </div>
+      <div class="mini-bar"><div class="mini-fill" style="width:${a.probability||0}%"></div></div>
+      <div style="font-size:.74rem;color:var(--muted);margin-top:10px">${a.name || 'AQ-10 Assessment'}</div>
+    </div>`;
+  }).join('');
+}
+
+window.del = async (id) => {
+  if (!confirm('Delete this assessment?')) return;
+  await deleteAssessment(id);
+  showToast('Deleted');
+};
+</script>
+</body>
+</html>

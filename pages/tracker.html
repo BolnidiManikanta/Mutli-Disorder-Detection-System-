@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Progress Tracker — NeuroScan</title>
+  <link rel="stylesheet" href="../css/main.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .tracker-header {
+      background: linear-gradient(135deg, #0d1b2a, #1b3a5c); color:#fff;
+      padding: 44px; position:relative; overflow:hidden;
+    }
+    .tracker-header::after {
+      content:''; position:absolute; right:-60px; top:-60px;
+      width:280px; height:280px; border-radius:50%;
+      background: radial-gradient(circle, rgba(244,162,97,.15), transparent 70%);
+    }
+    .tracker-header h1 { font-family:var(--font-d); font-size:2.4rem; margin:0 0 10px; }
+    .tracker-header p { color:rgba(255,255,255,.7); max-width:540px; line-height:1.65; }
+    .tracker-inner { max-width:1100px; margin:0 auto; }
+
+    .tracker-layout {
+      max-width:1100px; margin:0 auto; padding:36px 44px 80px;
+      display:grid; grid-template-columns:280px 1fr; gap:28px; align-items:start;
+    }
+    @media(max-width:860px){.tracker-layout{grid-template-columns:1fr;padding:20px}}
+
+    /* Sidebar */
+    .sidebar-panel {
+      background:var(--card); border-radius:var(--r); border:1px solid var(--border); overflow:hidden;
+      position:sticky; top:calc(var(--nav-h)+16px);
+    }
+    .sidebar-header { padding:18px 20px; border-bottom:1px solid var(--border); font-weight:800; font-size:.9rem; }
+    .sidebar-list { padding:8px; }
+    .sidebar-child-card {
+      padding:12px 14px; border-radius:var(--r-sm); cursor:pointer; transition:all .2s;
+      display:flex; align-items:center; gap:12px; margin-bottom:4px;
+    }
+    .sidebar-child-card:hover,.sidebar-child-card.active {
+      background:var(--green-bg); border:1px solid var(--primary-l);
+    }
+    .sidebar-child-card.active { background:var(--green-bg); }
+    .sidebar-avatar {
+      width:36px; height:36px; border-radius:50%; display:flex; align-items:center;
+      justify-content:center; font-size:1rem; background:var(--bg); flex-shrink:0;
+    }
+    .sidebar-child-name { font-weight:700; font-size:.85rem; }
+    .sidebar-child-sub { font-size:.72rem; color:var(--muted); }
+    .sidebar-add-btn {
+      margin:8px; width:calc(100%-16px); padding:10px; border-radius:var(--r-sm);
+      border:1.5px dashed var(--border); background:transparent; cursor:pointer;
+      font-size:.82rem; color:var(--muted); font-weight:600; transition:all .2s;
+      display:block; text-align:center;
+    }
+    .sidebar-add-btn:hover { border-color:var(--primary); color:var(--primary); }
+
+    /* Overview cards */
+    .overview-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+    @media(max-width:700px){.overview-grid{grid-template-columns:1fr 1fr}}
+    .overview-card {
+      background:var(--card); border-radius:var(--r); padding:18px 20px;
+      border:1px solid var(--border);
+    }
+    .overview-label { font-size:.72rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+    .overview-value { font-size:1.8rem; font-weight:800; line-height:1; margin-bottom:4px; }
+    .overview-sub { font-size:.75rem; color:var(--muted); }
+    .trend-up { color:#c44b1b; } .trend-down { color:#2d6a4f; } .trend-flat { color:var(--muted); }
+
+    /* Chart sections */
+    .chart-panel {
+      background:var(--card); border-radius:var(--r); padding:24px;
+      border:1px solid var(--border); margin-bottom:20px;
+    }
+    .chart-panel-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+    .chart-panel-title { font-size:1rem; font-weight:800; }
+    .chart-panel-sub { font-size:.78rem; color:var(--muted); margin-top:2px; }
+
+    /* Disorder trend cards */
+    .disorder-trend-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px; }
+    @media(max-width:600px){.disorder-trend-grid{grid-template-columns:1fr}}
+    .disorder-trend-card {
+      background:var(--card); border-radius:var(--r); padding:18px 20px;
+      border:1px solid var(--border);
+    }
+    .dtc-header { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+    .dtc-icon { font-size:1.4rem; }
+    .dtc-name { font-weight:700; font-size:.9rem; }
+    .dtc-current { display:flex; align-items:baseline; gap:6px; margin-bottom:8px; }
+    .dtc-prob { font-size:2rem; font-weight:800; }
+    .dtc-label { font-size:.75rem; color:var(--muted); }
+    .dtc-change {
+      display:inline-flex; align-items:center; gap:3px;
+      padding:2px 10px; border-radius:50px; font-size:.72rem; font-weight:800;
+    }
+    .dtc-change.improving { background:#e8f5e9; color:#2d6a4f; }
+    .dtc-change.worsening { background:#ffe5d9; color:#c44b1b; }
+    .dtc-change.stable { background:var(--bg); color:var(--muted); }
+
+    /* Mini chart canvas */
+    .mini-chart-wrap { height:60px; margin-top:8px; }
+
+    /* Timeline */
+    .timeline { padding:4px 0; }
+    .timeline-item {
+      display:flex; gap:14px; padding:14px 0;
+      border-bottom:1px solid var(--border); position:relative;
+    }
+    .timeline-item:last-child { border-bottom:none; }
+    .timeline-dot {
+      width:32px; height:32px; border-radius:50%; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:.85rem; font-weight:800; color:#fff; background:var(--primary);
+    }
+    .timeline-content { flex:1; }
+    .timeline-date { font-size:.72rem; color:var(--muted); font-weight:600; margin-bottom:2px; }
+    .timeline-title { font-size:.88rem; font-weight:700; margin-bottom:4px; }
+    .timeline-badges { display:flex; flex-wrap:wrap; gap:5px; }
+    .timeline-badge {
+      padding:2px 10px; border-radius:50px; font-size:.68rem; font-weight:700;
+      border:1.5px solid currentColor;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align:center; padding:60px 20px; color:var(--muted);
+      background:var(--card); border-radius:var(--r); border:1px solid var(--border);
+    }
+    .empty-icon { font-size:3.5rem; margin-bottom:14px; }
+    .empty-title { font-size:1.1rem; font-weight:700; color:var(--text); margin-bottom:8px; }
+    .empty-sub { font-size:.85rem; line-height:1.6; margin-bottom:20px; }
+  </style>
+</head>
+<body>
+<script type="module" src="../js/shared.js"></script>
+
+<div class="tracker-header">
+  <div class="tracker-inner">
+    <span style="background:rgba(255,255,255,.1);padding:4px 14px;border-radius:50px;font-size:.75rem;font-weight:700;border:1px solid rgba(255,255,255,.2);display:inline-block;margin-bottom:12px">📈 Risk Timeline & Progress Tracker</span>
+    <h1>Development Progress</h1>
+    <p>Track changes in neurological risk scores over time. Monitor improvement trends across all 7 disorders with visual timelines and charts.</p>
+  </div>
+</div>
+
+<div class="tracker-layout">
+  <!-- SIDEBAR: Children/Profiles -->
+  <div class="sidebar-panel">
+    <div class="sidebar-header">👤 Profiles</div>
+    <div class="sidebar-list" id="profileList">
+      <div style="padding:20px;text-align:center;font-size:.8rem;color:var(--muted)">Loading profiles…</div>
+    </div>
+    <button class="sidebar-add-btn" onclick="addNewProfile()">+ Add New Profile</button>
+  </div>
+
+  <!-- MAIN: Charts & Timeline -->
+  <div id="mainContent">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">📊</div>
+      <div class="empty-title">No Assessment History Yet</div>
+      <div class="empty-sub">Complete at least one assessment to start tracking progress. Run the Advanced AI Assessment and your results will appear here automatically.</div>
+      <a href="assess.html" style="display:inline-block;background:var(--primary);color:#fff;padding:12px 28px;border-radius:var(--r-sm);font-weight:700;text-decoration:none;font-size:.9rem">🧠 Start Assessment</a>
+    </div>
+
+    <div id="chartsArea" style="display:none">
+      <!-- Overview -->
+      <div class="overview-grid" id="overviewGrid"></div>
+
+      <!-- Radar chart -->
+      <div class="chart-panel">
+        <div class="chart-panel-header">
+          <div>
+            <div class="chart-panel-title">📡 Disorder Risk Radar</div>
+            <div class="chart-panel-sub">Current risk levels across all 7 conditions</div>
+          </div>
+          <select id="radarAssessSelect" class="form-control" style="width:160px;font-size:.8rem;padding:6px 10px" onchange="updateRadar()">
+            <option>Latest Assessment</option>
+          </select>
+        </div>
+        <div style="max-width:380px;margin:0 auto"><canvas id="radarChart" height="280"></canvas></div>
+      </div>
+
+      <!-- Trend charts per disorder -->
+      <div class="chart-panel">
+        <div class="chart-panel-header">
+          <div>
+            <div class="chart-panel-title">📈 Risk Score Trends Over Time</div>
+            <div class="chart-panel-sub">Track how each disorder's probability changes across assessments</div>
+          </div>
+        </div>
+        <canvas id="trendChart" height="180"></canvas>
+      </div>
+
+      <!-- Per-disorder mini cards -->
+      <div class="disorder-trend-grid" id="disorderTrendCards"></div>
+
+      <!-- Timeline -->
+      <div class="chart-panel">
+        <div class="chart-panel-header">
+          <div>
+            <div class="chart-panel-title">🗓️ Assessment Timeline</div>
+            <div class="chart-panel-sub">History of all completed assessments</div>
+          </div>
+        </div>
+        <div class="timeline" id="assessmentTimeline"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { getUserAssessments, onAuthChange } from '../js/mongodb.js';
+import { DISORDERS } from '../js/ai-engine.js';
+
+const DISORDER_COLORS = {
+  asd:'#2d6a4f', adhd:'#e76f51', dyslexia:'#457b9d',
+  social_anxiety:'#9b5de5', speech_delay:'#f4a261',
+  intellectual_disability:'#6d6875', spd:'#2a9d8f'
+};
+
+let allAssessments = [];
+let radarChartInst = null;
+let trendChartInst = null;
+const miniCharts = {};
+
+onAuthChange(async user => {
+  if (!user) {
+    // Load demo data for guests
+    loadDemoData();
+    return;
+  }
+  try {
+    allAssessments = await getUserAssessments(user.uid, 50);
+    renderAll(allAssessments);
+  } catch(e) {
+    loadDemoData();
+  }
+});
+
+function loadDemoData() {
+  // Synthetic demo assessments for illustration
+  const now = Date.now();
+  const day = 86400000;
+  allAssessments = [
+    { id:'d1', created_at: new Date(now - 90*day).toISOString(), name:'Demo Child', age:7, disorder_results: { asd:{probability:.72}, adhd:{probability:.58}, dyslexia:{probability:.31}, social_anxiety:{probability:.25}, speech_delay:{probability:.45}, intellectual_disability:{probability:.18}, spd:{probability:.61} } },
+    { id:'d2', created_at: new Date(now - 60*day).toISOString(), name:'Demo Child', age:7, disorder_results: { asd:{probability:.65}, adhd:{probability:.52}, dyslexia:{probability:.28}, social_anxiety:{probability:.22}, speech_delay:{probability:.38}, intellectual_disability:{probability:.16}, spd:{probability:.55} } },
+    { id:'d3', created_at: new Date(now - 30*day).toISOString(), name:'Demo Child', age:7, disorder_results: { asd:{probability:.58}, adhd:{probability:.45}, dyslexia:{probability:.24}, social_anxiety:{probability:.18}, speech_delay:{probability:.30}, intellectual_disability:{probability:.14}, spd:{probability:.48} } },
+    { id:'d4', created_at: new Date(now - 7*day).toISOString(), name:'Demo Child', age:8, disorder_results: { asd:{probability:.51}, adhd:{probability:.40}, dyslexia:{probability:.20}, social_anxiety:{probability:.15}, speech_delay:{probability:.22}, intellectual_disability:{probability:.12}, spd:{probability:.42} } },
+  ];
+  renderAll(allAssessments);
+  // Show demo indicator
+  document.querySelector('.tracker-header p').textContent += ' (Showing demo data — log in to see your real assessments)';
+}
+
+function renderAll(assessments) {
+  if (!assessments || assessments.length === 0) return;
+
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('chartsArea').style.display = 'block';
+
+  renderProfiles(assessments);
+  renderOverview(assessments);
+  renderRadarChart(assessments[assessments.length - 1]);
+  renderTrendChart(assessments);
+  renderDisorderCards(assessments);
+  renderTimeline(assessments);
+}
+
+function renderProfiles(assessments) {
+  const names = [...new Set(assessments.map(a => a.name || 'Unnamed'))];
+  document.getElementById('profileList').innerHTML = names.map((name, i) => `
+    <div class="sidebar-child-card ${i===0?'active':''}" onclick="filterByName('${name}', this)">
+      <div class="sidebar-avatar">👤</div>
+      <div>
+        <div class="sidebar-child-name">${name}</div>
+        <div class="sidebar-child-sub">${assessments.filter(a=>(a.name||'Unnamed')===name).length} assessments</div>
+      </div>
+    </div>
+  `).join('') + `<div class="sidebar-child-card" onclick="filterByName(null, this)">
+    <div class="sidebar-avatar">👥</div>
+    <div><div class="sidebar-child-name">All Profiles</div><div class="sidebar-child-sub">${assessments.length} total</div></div>
+  </div>`;
+}
+
+window.filterByName = function(name, el) {
+  document.querySelectorAll('.sidebar-child-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const filtered = name ? allAssessments.filter(a => (a.name||'Unnamed') === name) : allAssessments;
+  if (filtered.length > 0) {
+    renderOverview(filtered);
+    renderRadarChart(filtered[filtered.length-1]);
+    renderTrendChart(filtered);
+    renderDisorderCards(filtered);
+    renderTimeline(filtered);
+  }
+};
+
+function renderOverview(assessments) {
+  const latest = assessments[assessments.length-1];
+  const earliest = assessments[0];
+  const results = latest.disorder_results || {};
+  const primaryDisorder = Object.entries(results).sort((a,b)=>b[1].probability-a[1].probability)[0];
+  const totalAssessments = assessments.length;
+  
+  let improvingCount = 0;
+  if (assessments.length >= 2) {
+    const prev = assessments[assessments.length-2].disorder_results || {};
+    for (const [id, data] of Object.entries(results)) {
+      if (prev[id] && data.probability < prev[id].probability - 0.02) improvingCount++;
+    }
+  }
+
+  const daysSinceFirst = Math.round((new Date(latest.created_at) - new Date(earliest.created_at)) / 86400000);
+
+  document.getElementById('overviewGrid').innerHTML = `
+    <div class="overview-card">
+      <div class="overview-label">Primary Concern</div>
+      <div class="overview-value" style="font-size:1.3rem;color:${DISORDER_COLORS[primaryDisorder?.[0]]}">${DISORDERS[primaryDisorder?.[0]]?.icon} ${DISORDERS[primaryDisorder?.[0]]?.short||'N/A'}</div>
+      <div class="overview-sub">${Math.round((primaryDisorder?.[1]?.probability||0)*100)}% probability</div>
+    </div>
+    <div class="overview-card">
+      <div class="overview-label">Assessments</div>
+      <div class="overview-value">${totalAssessments}</div>
+      <div class="overview-sub">Over ${daysSinceFirst} days</div>
+    </div>
+    <div class="overview-card">
+      <div class="overview-label">Improving</div>
+      <div class="overview-value trend-down">${improvingCount}</div>
+      <div class="overview-sub">disorders trending ↓</div>
+    </div>
+    <div class="overview-card">
+      <div class="overview-label">Last Assessment</div>
+      <div class="overview-value" style="font-size:1rem">${new Date(latest.created_at).toLocaleDateString()}</div>
+      <div class="overview-sub">Age ${latest.age || 'N/A'} years</div>
+    </div>
+  `;
+}
+
+function renderRadarChart(assessment) {
+  const results = assessment.disorder_results || {};
+  const labels = Object.values(DISORDERS).map(d => `${d.icon} ${d.short}`);
+  const data = Object.keys(DISORDERS).map(id => Math.round((results[id]?.probability || 0) * 100));
+  const colors = Object.keys(DISORDERS).map(id => DISORDER_COLORS[id]);
+
+  if (radarChartInst) radarChartInst.destroy();
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  radarChartInst = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Risk %',
+        data,
+        backgroundColor: 'rgba(45,106,79,.15)',
+        borderColor: '#2d6a4f',
+        pointBackgroundColor: colors,
+        pointBorderColor: '#fff',
+        pointHoverRadius: 6,
+        borderWidth: 2,
+        pointRadius: 5,
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { r: { min:0, max:100, ticks: { stepSize:25, font:{size:9} }, pointLabels:{font:{size:10,weight:'bold'}} } },
+      plugins: { legend:{display:false} },
+    }
+  });
+}
+
+function renderTrendChart(assessments) {
+  const labels = assessments.map(a => new Date(a.created_at).toLocaleDateString('en-IN',{month:'short',day:'numeric'}));
+  const datasets = Object.keys(DISORDERS).map(id => ({
+    label: `${DISORDERS[id].icon} ${DISORDERS[id].short}`,
+    data: assessments.map(a => Math.round((a.disorder_results?.[id]?.probability || 0) * 100)),
+    borderColor: DISORDER_COLORS[id],
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    tension: 0.4,
+    pointRadius: 4,
+    pointBackgroundColor: DISORDER_COLORS[id],
+  }));
+
+  if (trendChartInst) trendChartInst.destroy();
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  trendChartInst = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      scales: {
+        y: { min:0, max:100, ticks:{ callback: v => v+'%' } },
+        x: { grid:{ display:false } }
+      },
+      plugins: {
+        legend: { position:'bottom', labels:{ usePointStyle:true, pointStyleWidth:8, font:{size:10} } },
+        tooltip: { callbacks:{ label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y}%` } }
+      },
+      interaction: { mode:'index', intersect:false },
+    }
+  });
+}
+
+function renderDisorderCards(assessments) {
+  const latest = assessments[assessments.length-1].disorder_results || {};
+  const prev = assessments.length >= 2 ? assessments[assessments.length-2].disorder_results || {} : {};
+
+  const html = Object.entries(DISORDERS).sort((a,b) => (latest[b[0]]?.probability||0) - (latest[a[0]]?.probability||0)).map(([id, d]) => {
+    const prob = latest[id]?.probability || 0;
+    const prevProb = prev[id]?.probability || prob;
+    const change = prob - prevProb;
+    const trend = change < -0.02 ? 'improving' : change > 0.02 ? 'worsening' : 'stable';
+    const trendIcon = trend==='improving' ? '↓' : trend==='worsening' ? '↑' : '→';
+    const changeText = `${trendIcon} ${Math.abs(Math.round(change*100))}%`;
+    const sparkData = assessments.map(a => Math.round((a.disorder_results?.[id]?.probability||0)*100));
+
+    return `<div class="disorder-trend-card">
+      <div class="dtc-header">
+        <span class="dtc-icon">${d.icon}</span>
+        <div>
+          <div class="dtc-name">${d.name}</div>
+          <div style="font-size:.7rem;color:var(--muted)">${d.icd}</div>
+        </div>
+      </div>
+      <div class="dtc-current">
+        <span class="dtc-prob" style="color:${DISORDER_COLORS[id]}">${Math.round(prob*100)}%</span>
+        <span class="dtc-label">risk score</span>
+      </div>
+      <span class="dtc-change ${trend}">${changeText} ${assessments.length<2?'(baseline)':'vs last'}</span>
+      <div class="mini-chart-wrap">
+        <canvas id="mini-${id}"></canvas>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('disorderTrendCards').innerHTML = html;
+
+  // Draw mini sparklines
+  Object.keys(DISORDERS).forEach(id => {
+    const canvas = document.getElementById(`mini-${id}`);
+    if (!canvas) return;
+    const sparkData = assessments.map(a => Math.round((a.disorder_results?.[id]?.probability||0)*100));
+    if (miniCharts[id]) miniCharts[id].destroy();
+    miniCharts[id] = new Chart(canvas.getContext('2d'), {
+      type:'line',
+      data:{
+        labels: sparkData.map((_,i)=>''),
+        datasets:[{data:sparkData, borderColor:DISORDER_COLORS[id], borderWidth:2, tension:.4, pointRadius:2, backgroundColor:'transparent'}]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        scales:{x:{display:false},y:{display:false,min:0,max:100}},
+        plugins:{legend:{display:false},tooltip:{enabled:false}},
+        animation:{duration:600}
+      }
+    });
+  });
+}
+
+function renderTimeline(assessments) {
+  const sorted = [...assessments].sort((a,b) => new Date(b.created_at)-new Date(a.created_at));
+  const html = sorted.map((a, i) => {
+    const results = a.disorder_results || {};
+    const topDisorders = Object.entries(results)
+      .filter(([,d]) => d.probability > 0.45)
+      .sort((a,b) => b[1].probability - a[1].probability)
+      .slice(0,4);
+
+    return `<div class="timeline-item">
+      <div class="timeline-dot" style="background:${i===0?'var(--primary)':'var(--muted)'}">${sorted.length - i}</div>
+      <div class="timeline-content">
+        <div class="timeline-date">${new Date(a.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})} · Age ${a.age||'N/A'}</div>
+        <div class="timeline-title">${a.name||'Assessment'} — ${i===0?'Latest':'Previous'} screening</div>
+        <div class="timeline-badges">
+          ${topDisorders.map(([id,d])=>
+            `<span class="timeline-badge" style="color:${DISORDER_COLORS[id]};border-color:${DISORDER_COLORS[id]}">${DISORDERS[id].icon} ${DISORDERS[id].short} ${Math.round(d.probability*100)}%</span>`
+          ).join('')}
+          ${topDisorders.length===0?'<span style="font-size:.78rem;color:var(--muted)">No significant risks detected</span>':''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('assessmentTimeline').innerHTML = html || '<p style="color:var(--muted);padding:20px;text-align:center">No assessments yet.</p>';
+}
+
+window.addNewProfile = function() {
+  window.location.href = 'assess.html';
+};
+</script>
+</body>
+</html>

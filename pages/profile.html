@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>My Profile — AutismRecog</title>
+  <link rel="stylesheet" href="../css/main.css"/>
+  <style>
+    .profile-layout{max-width:var(--max);margin:0 auto;padding:44px 44px 80px;display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start}
+    .profile-card{background:var(--card);border-radius:var(--r);padding:28px;border:1px solid var(--border);text-align:center;position:sticky;top:calc(var(--nav-h)+16px)}
+    .avatar{width:88px;height:88px;border-radius:50%;margin:0 auto 14px;object-fit:cover;border:3px solid var(--primary-l)}
+    .profile-name{font-family:var(--font-d);font-size:1.5rem;margin-bottom:4px}
+    .profile-email{color:var(--muted);font-size:.85rem}
+    .profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+    .pstat{background:var(--bg);border-radius:10px;padding:12px;text-align:center}
+    .pstat-num{font-family:var(--font-d);font-size:1.6rem;color:var(--primary)}
+    .pstat-lbl{font-size:.72rem;color:var(--muted);font-weight:500}
+    .history-panel{background:var(--card);border-radius:var(--r);padding:28px;border:1px solid var(--border)}
+    .history-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+    .history-hdr h2{font-family:var(--font-d);font-size:1.5rem}
+    .assessment-card{background:var(--bg);border-radius:var(--r-sm);padding:18px;margin-bottom:12px;border:1.5px solid var(--border);transition:all .2s;cursor:pointer}
+    .assessment-card:hover{border-color:var(--primary-l);box-shadow:var(--shadow)}
+    .ac-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .ac-date{font-size:.76rem;color:var(--muted)}
+    .ac-body{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .ac-stat{text-align:center}
+    .ac-stat .val{font-size:1.3rem;font-weight:700}
+    .ac-stat .lbl{font-size:.72rem;color:var(--muted)}
+    .risk-pill{padding:4px 12px;border-radius:50px;font-size:.76rem;font-weight:700}
+    .risk-High{background:var(--orange-bg);color:#c44b1b}
+    .risk-Moderate{background:var(--yellow-bg);color:#7a5c00}
+    .risk-Low,.risk-Minimal{background:var(--green-bg);color:var(--primary)}
+    .empty-state{text-align:center;padding:48px 20px;color:var(--muted)}
+    .empty-state .big{font-size:3rem;margin-bottom:12px}
+    .delete-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:6px;font-size:.8rem;transition:all .2s}
+    .delete-btn:hover{background:var(--orange-bg);color:#c44b1b}
+    .sign-out-btn{width:100%;margin-top:16px;background:none;border:1.5px solid var(--border);padding:10px;border-radius:10px;color:var(--muted);font-size:.85rem;cursor:pointer;transition:all .2s}
+    .sign-out-btn:hover{border-color:#e76f51;color:#e76f51}
+    .live-dot{width:8px;height:8px;background:var(--primary-l);border-radius:50%;display:inline-block;margin-right:6px;animation:pulse 1.8s infinite}
+    @media(max-width:900px){.profile-layout{grid-template-columns:1fr}.profile-card{position:static}.ac-body{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+<div id="nav-ph"></div>
+
+<div class="profile-layout">
+
+  <!-- LEFT: Profile Card -->
+  <div>
+    <div class="profile-card">
+      <img id="profileAvatar" class="avatar" src="" alt="Avatar"/>
+      <div class="profile-name" id="profileName">Loading…</div>
+      <div class="profile-email" id="profileEmail"></div>
+      <div class="profile-stats">
+        <div class="pstat">
+          <div class="pstat-num" id="totalAssessments">0</div>
+          <div class="pstat-lbl">Assessments</div>
+        </div>
+        <div class="pstat">
+          <div class="pstat-num" id="highRiskCount">0</div>
+          <div class="pstat-lbl">High Risk</div>
+        </div>
+      </div>
+      <a href="predict.html" class="btn btn-primary btn-full" style="margin-bottom:8px">+ New AQ-10 Test</a>
+      <a href="chat.html"    class="btn btn-outline btn-full" style="margin-bottom:8px">💬 AI Chat</a>
+      <a href="history.html" class="btn btn-ghost btn-full"   style="margin-bottom:8px">📊 Full History</a>
+      <button class="sign-out-btn" id="signOutBtn">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: Assessment History -->
+  <div>
+    <div class="history-panel">
+      <div class="history-hdr">
+        <h2>My Assessments <span class="live-dot"></span></h2>
+        <span id="histCount" style="font-size:.82rem;color:var(--muted)">Loading…</span>
+      </div>
+      <div id="historyList">
+        <div class="empty-state"><div class="big">📋</div><p>Loading your assessments…</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footer-ph"></div>
+
+<!-- Assessment Detail Modal -->
+<div id="detailModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:600px">
+    <button class="modal-close" onclick="closeModal('detailModal')">×</button>
+    <h3 id="detailTitle">Assessment Detail</h3>
+    <p class="modal-sub" id="detailDate"></p>
+    <div id="detailContent"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('detailModal')">Close</button>
+      <button class="btn btn-primary" onclick="window.print()">🖨 Print Report</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { onAuthChange, firebaseSignOut, getUserDoc, getUserAssessments, deleteAssessment, watchAssessments } from '../js/mongodb.js';
+import '../js/shared.js';
+
+let currentUser = null;
+
+const user = await requireAuth();
+currentUser = user;
+
+// Populate profile
+const userDoc = await getUserDoc(user.uid).catch(() => null);
+document.getElementById('profileName').textContent  = user.displayName || 'User';
+document.getElementById('profileEmail').textContent = user.email;
+document.getElementById('profileAvatar').src = user.photoURL ||
+  `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName||'U')}&background=2d6a4f&color=fff&size=88`;
+
+// Sign out
+document.getElementById('signOutBtn').onclick = async () => {
+  await firebaseSignOut();
+  window.location.href = '../index.html';
+};
+
+// Real-time assessments listener
+watchAssessments(user.uid, (assessments) => {
+  document.getElementById('totalAssessments').textContent = assessments.length;
+  document.getElementById('highRiskCount').textContent    = assessments.filter(a => a.risk_level === 'High').length;
+  document.getElementById('histCount').textContent        = `${assessments.length} records`;
+  renderHistory(assessments);
+});
+
+function renderHistory(assessments) {
+  const container = document.getElementById('historyList');
+  if (assessments.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="big">📝</div>
+        <p>No assessments yet.</p>
+        <a href="predict.html" class="btn btn-primary" style="margin-top:16px">Take Your First AQ-10 Test →</a>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = assessments.map(a => {
+    const date = a.createdAt?.toDate ? a.createdAt.toDate().toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Recent';
+    return `
+    <div class="assessment-card" onclick="showDetail('${a.id}')">
+      <div class="ac-header">
+        <div>
+          <span class="risk-pill risk-${a.risk_level}">${a.risk_level} Risk</span>
+          <span style="margin-left:8px;font-size:.82rem;font-weight:600;color:var(--text)">${a.name || 'AQ-10 Assessment'}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="ac-date">${date}</span>
+          <button class="delete-btn" onclick="event.stopPropagation();deleteRecord('${a.id}')">🗑</button>
+        </div>
+      </div>
+      <div class="ac-body">
+        <div class="ac-stat">
+          <div class="val" style="color:var(--primary)">${a.probability || 0}%</div>
+          <div class="lbl">ASD Probability</div>
+        </div>
+        <div class="ac-stat">
+          <div class="val">${a.aq10_sum ?? '—'}/10</div>
+          <div class="lbl">AQ-10 Score</div>
+        </div>
+        <div class="ac-stat">
+          <div class="val" style="color:var(--muted);font-size:1rem">${a.age || '—'}</div>
+          <div class="lbl">Age · ${a.gender || '—'}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.deleteRecord = async (id) => {
+  if (!confirm('Delete this assessment?')) return;
+  await deleteAssessment(id);
+  showToast('Assessment deleted');
+};
+
+window.showDetail = async (id) => {
+  const { getAssessmentById } = await import('../js/mongodb.js');
+  const a = await getAssessmentById(id);
+  if (!a) return;
+  const date = a.createdAt?.toDate?.()?.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}) || '';
+  document.getElementById('detailTitle').textContent = `AQ-10 Report — ${a.risk_level} Risk`;
+  document.getElementById('detailDate').textContent  = date;
+
+  const QUESTIONS = {A1:'Notices small sounds',A2:'Focuses on whole picture',A3:'Multitasking easily',A4:'Resumes tasks quickly',A5:'Reads between lines',A6:'Tells when someone bored',A7:'Hard to work out character intentions',A8:'Collects information categories',A9:'Reads faces to understand feelings',A10:'Difficult to work out intentions'};
+
+  document.getElementById('detailContent').innerHTML = `
+    <div style="background:linear-gradient(135deg,var(--primary),var(--primary-l));border-radius:var(--r-sm);padding:20px;color:#fff;display:flex;gap:20px;align-items:center;margin-bottom:18px">
+      <div style="text-align:center;min-width:80px">
+        <div style="font-family:var(--font-d);font-size:2.8rem;line-height:1">${a.probability}%</div>
+        <div style="opacity:.75;font-size:.76rem">Probability</div>
+      </div>
+      <div>
+        <div style="font-size:1rem;font-weight:700;margin-bottom:3px">${a.risk_level} Risk · AQ-10: ${a.aq10_sum}/10</div>
+        <div style="opacity:.8;font-size:.82rem">Age: ${a.age || '—'} · Gender: ${a.gender || '—'} · Jaundice: ${a.jaundice||'—'} · Family ASD: ${a.family||'—'}</div>
+      </div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:14px">
+      <thead><tr style="background:var(--bg)">
+        <th style="padding:8px;text-align:left;border:1px solid var(--border)">Q</th>
+        <th style="padding:8px;text-align:left;border:1px solid var(--border)">Question</th>
+        <th style="padding:8px;text-align:center;border:1px solid var(--border)">Score</th>
+      </tr></thead>
+      <tbody>
+        ${Object.entries(QUESTIONS).map(([k,q]) => `
+        <tr style="background:${(a.answers||{})[k]===1?'var(--orange-bg)':'#fff'}">
+          <td style="padding:7px 8px;border:1px solid var(--border);font-weight:700">${k}</td>
+          <td style="padding:7px 8px;border:1px solid var(--border)">${q}</td>
+          <td style="padding:7px 8px;border:1px solid var(--border);text-align:center;font-weight:700;color:${(a.answers||{})[k]===1?'#c44b1b':'var(--primary)'}">${(a.answers||{})[k]??'—'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+    <div style="background:var(--yellow-bg);border-radius:var(--r-sm);padding:12px 14px;font-size:.76rem;color:#7a5c00;line-height:1.6;border-left:3px solid #e9c46a">
+      ⚠️ Screening result only. Not a clinical diagnosis.
+    </div>`;
+
+  openModal('detailModal');
+};
+</script>
+</body>
+</html>

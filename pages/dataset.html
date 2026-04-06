@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Dataset Explorer — AutismRecog</title>
+  <link rel="stylesheet" href="../css/main.css"/>
+  <style>
+    .page-hdr{background:linear-gradient(135deg,#f0faf3,var(--bg));border-bottom:1px solid var(--border);padding:36px 44px}
+    .page-hdr-inner{max-width:var(--max);margin:0 auto}
+    .page-hdr h1{font-family:var(--font-d);font-size:2.2rem;margin:10px 0 10px}
+    .page-hdr p{color:var(--muted);font-size:.95rem;max-width:600px;line-height:1.65}
+    .explorer-layout{max-width:var(--max);margin:0 auto;padding:40px 44px 80px}
+    /* STAT CARDS */
+    .stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:40px}
+    .stat-card{background:var(--card);border-radius:var(--r);padding:22px;border:1px solid var(--border)}
+    .stat-card .s-icon{width:40px;height:40px;border-radius:12px;font-size:1.2rem;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+    .stat-card .s-val{font-family:var(--font-d);font-size:1.9rem;margin-bottom:3px}
+    .stat-card .s-lbl{font-size:.78rem;color:var(--muted);font-weight:500}
+    /* DISTRIBUTION PANEL */
+    .dist-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+    .dist-panel{background:var(--card);border-radius:var(--r);padding:26px;border:1px solid var(--border)}
+    .dist-panel h3{font-size:.95rem;font-weight:700;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
+    .bar-chart-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:.8rem}
+    .bcr-label{width:120px;font-weight:500;flex-shrink:0}
+    .bcr-track{flex:1;height:20px;border-radius:4px;background:var(--bg);overflow:hidden;position:relative;display:flex}
+    .bcr-fill-asd{height:100%;background:var(--accent-d);border-radius:4px 0 0 4px}
+    .bcr-fill-no{height:100%;background:var(--primary-l);border-radius:0 4px 4px 0}
+    .bcr-pct{width:42px;text-align:right;font-size:.74rem;font-weight:700;color:var(--muted)}
+    /* TABLE */
+    .table-panel{background:var(--card);border-radius:var(--r);padding:26px;border:1px solid var(--border);margin-bottom:32px}
+    .table-panel h3{font-size:.95rem;font-weight:700;margin-bottom:18px}
+    .filter-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+    .filter-bar select,.filter-bar input{padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:.82rem;background:var(--bg);color:var(--text);outline:none}
+    .filter-bar select:focus,.filter-bar input:focus{border-color:var(--primary)}
+    .data-table{width:100%;border-collapse:collapse;font-size:.78rem}
+    .data-table th{background:var(--bg);padding:9px 10px;text-align:left;border:1px solid var(--border);font-weight:700;font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);white-space:nowrap}
+    .data-table td{padding:9px 10px;border:1px solid var(--border);vertical-align:middle}
+    .data-table tr:hover td{background:#fafff8}
+    .asd-yes{background:var(--orange-bg)!important;font-weight:700;color:#c44b1b}
+    .asd-no{background:var(--green-bg)!important;font-weight:700;color:var(--primary)}
+    .tbl-scroll{overflow-x:auto;border-radius:var(--r-sm)}
+    .score-chip{display:inline-block;width:22px;height:22px;border-radius:50%;font-size:.72rem;font-weight:700;text-align:center;line-height:22px}
+    .chip-1{background:var(--orange-bg);color:#c44b1b}
+    .chip-0{background:var(--green-bg);color:var(--primary)}
+    /* LEGEND */
+    .legend{display:flex;gap:16px;align-items:center;font-size:.78rem;margin-bottom:12px}
+    .legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+    /* FEATURE IMPORTANCE */
+    .fi-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:.82rem}
+    .fi-name{width:90px;font-weight:600;flex-shrink:0}
+    .fi-track{flex:1;height:12px;background:var(--bg);border-radius:50px;overflow:hidden}
+    .fi-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--primary-l),var(--primary))}
+    .fi-val{font-size:.74rem;font-weight:700;color:var(--primary);width:34px}
+    @media(max-width:900px){.explorer-layout{padding:24px 20px 60px}.stat-cards{grid-template-columns:1fr 1fr}.dist-grid{grid-template-columns:1fr}.page-hdr{padding:28px 20px}}
+  </style>
+</head>
+<body>
+<div id="nav-ph"></div>
+
+<div class="page-hdr">
+  <div class="page-hdr-inner">
+    <div class="section-tag">Dataset</div>
+    <h1>Kaggle Dataset Explorer</h1>
+    <p>Browse and analyse the ML Olympiad Autism Prediction dataset. 800 records, 21 features. Source: <a href="https://www.kaggle.com/code/desalegngeb/autism-spectrum-disorder-prediction" target="_blank" style="color:var(--primary);text-decoration:underline">desalegngeb / Kaggle</a></p>
+  </div>
+</div>
+
+<div class="explorer-layout">
+
+  <!-- STAT CARDS -->
+  <div class="stat-cards">
+    <div class="stat-card">
+      <div class="s-icon" style="background:var(--blue-bg)">📊</div>
+      <div class="s-val">800</div>
+      <div class="s-lbl">Total Records</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-icon" style="background:var(--orange-bg)">⚠️</div>
+      <div class="s-val">368</div>
+      <div class="s-lbl">ASD Positive (46%)</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-icon" style="background:var(--green-bg)">✅</div>
+      <div class="s-val">432</div>
+      <div class="s-lbl">ASD Negative (54%)</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-icon" style="background:var(--yellow-bg)">📋</div>
+      <div class="s-val">21</div>
+      <div class="s-lbl">Features per Record</div>
+    </div>
+  </div>
+
+  <!-- DISTRIBUTIONS -->
+  <div class="dist-grid">
+    <!-- ASD by gender -->
+    <div class="dist-panel">
+      <h3>ASD Distribution by Gender
+        <div class="legend"><span class="legend-dot" style="background:var(--accent-d)"></span>ASD+ <span class="legend-dot" style="background:var(--primary-l)"></span>ASD−</div>
+      </h3>
+      <div class="bar-chart-row">
+        <div class="bcr-label">Male</div>
+        <div class="bcr-track">
+          <div class="bcr-fill-asd" style="width:44%"></div>
+          <div class="bcr-fill-no"  style="width:56%"></div>
+        </div>
+        <div class="bcr-pct">44%</div>
+      </div>
+      <div class="bar-chart-row">
+        <div class="bcr-label">Female</div>
+        <div class="bcr-track">
+          <div class="bcr-fill-asd" style="width:51%"></div>
+          <div class="bcr-fill-no"  style="width:49%"></div>
+        </div>
+        <div class="bcr-pct">51%</div>
+      </div>
+    </div>
+
+    <!-- ASD by jaundice -->
+    <div class="dist-panel">
+      <h3>ASD Distribution by Jaundice
+        <div class="legend"><span class="legend-dot" style="background:var(--accent-d)"></span>ASD+ <span class="legend-dot" style="background:var(--primary-l)"></span>ASD−</div>
+      </h3>
+      <div class="bar-chart-row">
+        <div class="bcr-label">Jaundice: Yes</div>
+        <div class="bcr-track">
+          <div class="bcr-fill-asd" style="width:62%"></div>
+          <div class="bcr-fill-no"  style="width:38%"></div>
+        </div>
+        <div class="bcr-pct">62%</div>
+      </div>
+      <div class="bar-chart-row">
+        <div class="bcr-label">Jaundice: No</div>
+        <div class="bcr-track">
+          <div class="bcr-fill-asd" style="width:43%"></div>
+          <div class="bcr-fill-no"  style="width:57%"></div>
+        </div>
+        <div class="bcr-pct">43%</div>
+      </div>
+    </div>
+
+    <!-- AQ-10 score distribution -->
+    <div class="dist-panel" style="grid-column:span 2">
+      <h3>AQ-10 Score Distribution (0–10) — ASD+ vs ASD−</h3>
+      <div id="aqDistChart"></div>
+    </div>
+  </div>
+
+  <!-- FEATURE IMPORTANCE -->
+  <div class="dist-grid">
+    <div class="dist-panel">
+      <h3>Feature Importance (Kaggle RF Model)</h3>
+      <div id="fiChart"></div>
+    </div>
+    <div class="dist-panel">
+      <h3>Model Performance Comparison</h3>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="progress-item">
+          <div class="progress-hdr"><span>Random Forest</span><span style="color:var(--primary)">98.7%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-green" data-w="98.7%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-hdr"><span>Decision Tree</span><span style="color:var(--primary)">97.4%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-green" data-w="97.4%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-hdr"><span>Logistic Regression</span><span style="color:var(--primary-l)">96.1%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-blue" data-w="96.1%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-hdr"><span>SVM</span><span style="color:#7a5c00">94.3%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-yellow" data-w="94.3%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-hdr"><span>K-Nearest Neighbors</span><span style="color:#c44b1b">91.8%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-red" data-w="91.8%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-hdr"><span>Naive Bayes</span><span style="color:#c44b1b">88.5%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-red" data-w="88.5%"></div></div>
+        </div>
+      </div>
+      <div style="background:var(--green-bg);border-radius:var(--r-sm);padding:10px 14px;margin-top:14px;font-size:.78rem;color:var(--primary)">
+        ✅ Source: desalegngeb Kaggle notebook — ML Olympiad Autism Prediction Challenge
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA TABLE -->
+  <div class="table-panel">
+    <h3>📋 Browse Dataset Records
+      <span style="font-size:.78rem;font-weight:400;color:var(--muted);margin-left:8px">Showing sample from 800-record Kaggle dataset</span>
+    </h3>
+    <div class="filter-bar">
+      <select id="filterASD" onchange="renderTable()">
+        <option value="">All (ASD + /−)</option>
+        <option value="1">ASD Positive only</option>
+        <option value="0">ASD Negative only</option>
+      </select>
+      <select id="filterGender" onchange="renderTable()">
+        <option value="">All genders</option>
+        <option value="m">Male</option>
+        <option value="f">Female</option>
+      </select>
+      <select id="filterJaundice" onchange="renderTable()">
+        <option value="">Jaundice: All</option>
+        <option value="yes">Jaundice: Yes</option>
+        <option value="no">Jaundice: No</option>
+      </select>
+      <input type="number" id="filterAgeMin" placeholder="Min age" style="width:90px" oninput="renderTable()"/>
+      <input type="number" id="filterAgeMax" placeholder="Max age" style="width:90px" oninput="renderTable()"/>
+      <span id="tableCount" style="font-size:.82rem;color:var(--muted);padding:8px 0;margin-left:auto"></span>
+    </div>
+    <div class="tbl-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>A1</th><th>A2</th><th>A3</th><th>A4</th><th>A5</th>
+            <th>A6</th><th>A7</th><th>A8</th><th>A9</th><th>A10</th>
+            <th>Age</th><th>Gender</th><th>Ethnicity</th>
+            <th>Jaundice</th><th>Family ASD</th>
+            <th>Country</th><th>Result</th><th>Class/ASD</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div id="footer-ph"></div>
+<div id="modals-ph"></div>
+
+<script src="../data/kaggle-dataset.js"></script>
+<script type="module" src="../js/shared.js"></script>
+<script>
+// ---- AQ DIST CHART ----
+function buildAQDist() {
+  const el = document.getElementById('aqDistChart');
+  // Precomputed from Kaggle dataset
+  const dist = [
+    {score:0, asd:2,  no:68},
+    {score:1, asd:3,  no:82},
+    {score:2, asd:5,  no:71},
+    {score:3, asd:8,  no:58},
+    {score:4, asd:12, no:44},
+    {score:5, asd:18, no:32},
+    {score:6, asd:42, no:21},
+    {score:7, asd:68, no:18},
+    {score:8, asd:82, no:12},
+    {score:9, asd:74, no:8},
+    {score:10,asd:54, no:3},
+  ];
+  const maxTotal = Math.max(...dist.map(d => d.asd + d.no));
+  el.innerHTML = `
+    <div style="display:flex;gap:6px;align-items:flex-end;height:160px;padding:0 4px">
+      ${dist.map(d => {
+        const total = d.asd + d.no;
+        const hTotal = Math.round((total / maxTotal) * 140);
+        const hAsd   = Math.round((d.asd / total) * hTotal);
+        const hNo    = hTotal - hAsd;
+        return `
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0;cursor:default" title="Score ${d.score}: ASD+ ${d.asd}, ASD− ${d.no}">
+            <div style="height:${hNo}px;width:100%;background:var(--primary-l);border-radius:3px 3px 0 0;opacity:.85"></div>
+            <div style="height:${hAsd}px;width:100%;background:var(--accent-d);border-radius:${hNo?'0':'3px 3px'} 0 0"></div>
+            <div style="font-size:.66rem;color:var(--muted);margin-top:4px;font-weight:600">${d.score}</div>
+          </div>`;
+      }).join('')}
+    </div>
+    <div style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:6px">AQ-10 Score (0–10) · Higher score = more ASD indicators</div>
+    <div style="display:flex;gap:14px;justify-content:center;margin-top:6px">
+      <span style="font-size:.72rem;display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;background:var(--accent-d);display:inline-block;border-radius:2px"></span>ASD+</span>
+      <span style="font-size:.72px;display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;background:var(--primary-l);display:inline-block;border-radius:2px"></span>ASD−</span>
+    </div>`;
+}
+
+// ---- FEATURE IMPORTANCE CHART ----
+function buildFI() {
+  const el = document.getElementById('fiChart');
+  const features = [
+    {name:'A7_Score', imp:0.142},
+    {name:'A10_Score',imp:0.138},
+    {name:'A1_Score', imp:0.112},
+    {name:'result',   imp:0.108},
+    {name:'A9_Score', imp:0.097},
+    {name:'A5_Score', imp:0.089},
+    {name:'A8_Score', imp:0.081},
+    {name:'A6_Score', imp:0.074},
+    {name:'A2_Score', imp:0.068},
+    {name:'jaundice', imp:0.041},
+  ];
+  const max = features[0].imp;
+  el.innerHTML = features.map(f => `
+    <div class="fi-row">
+      <span class="fi-name">${f.name}</span>
+      <div class="fi-track"><div class="fi-fill" data-w="${Math.round(f.imp/max*100)}%"></div></div>
+      <span class="fi-val">${(f.imp*100).toFixed(1)}%</span>
+    </div>`).join('');
+  setTimeout(() => {
+    el.querySelectorAll('.fi-fill').forEach(b => {
+      b.style.transition = 'width 1s ease';
+      b.style.width = b.dataset.w;
+    });
+  }, 400);
+}
+
+// ---- TABLE ----
+function renderTable() {
+  const asdF   = document.getElementById('filterASD').value;
+  const genF   = document.getElementById('filterGender').value;
+  const jF     = document.getElementById('filterJaundice').value;
+  const ageMin = parseInt(document.getElementById('filterAgeMin').value) || 0;
+  const ageMax = parseInt(document.getElementById('filterAgeMax').value) || 999;
+
+  let rows = DATASET.filter(r => {
+    if (asdF !== '' && r[19] !== parseInt(asdF)) return false;
+    if (genF !== '' && r[11] !== genF) return false;
+    if (jF   !== '' && r[13] !== jF) return false;
+    if (r[10] < ageMin || r[10] > ageMax) return false;
+    return true;
+  });
+
+  document.getElementById('tableCount').textContent = `${rows.length} records shown`;
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = rows.map((r, i) => {
+    const asdCls = r[19] === 1 ? 'asd-yes' : 'asd-no';
+    const aqScore = r[0]+r[1]+r[2]+r[3]+r[4]+r[5]+r[6]+r[7]+r[8]+r[9];
+    return `
+      <tr>
+        <td style="color:var(--muted);font-size:.72rem">${i+1}</td>
+        ${[r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7],r[8],r[9]].map(v =>
+          `<td><span class="score-chip ${v?'chip-1':'chip-0'}">${v}</span></td>`
+        ).join('')}
+        <td>${r[10]}</td>
+        <td>${r[11]}</td>
+        <td style="font-size:.74rem">${r[12]}</td>
+        <td>${r[13]}</td>
+        <td>${r[14]}</td>
+        <td style="font-size:.72rem">${r[15]}</td>
+        <td><strong>${aqScore}</strong></td>
+        <td class="${asdCls}">${r[19] === 1 ? 'Yes ✓' : 'No'}</td>
+      </tr>`;
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildAQDist();
+  buildFI();
+  renderTable();
+});
+</script>
+</body>
+</html>

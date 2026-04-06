@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Advanced AI Assessment — NeuroScan</title>
+  <link rel="stylesheet" href="../css/main.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --asd:#2d6a4f; --adhd:#e76f51; --dys:#457b9d; --sad:#9b5de5;
+      --sld:#f4a261; --id:#6d6875; --spd:#2a9d8f;
+    }
+
+    /* ── PAGE HEADER ── */
+    .assess-header {
+      background: linear-gradient(135deg, #0a1628 0%, #1a2d4a 40%, #0d2137 100%);
+      color: #fff; padding: 52px 44px 44px; position: relative; overflow: hidden;
+    }
+    .assess-header::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(45,106,79,.3) 0%, transparent 60%);
+    }
+    .assess-header-inner { max-width: 1100px; margin: 0 auto; position: relative; }
+    .assess-header h1 { font-family: var(--font-d); font-size: 2.6rem; margin: 0 0 12px; }
+    .assess-header p { color: rgba(255,255,255,.7); max-width: 580px; line-height: 1.65; font-size: .95rem; }
+    .disorder-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .disorder-badge {
+      padding: 5px 14px; border-radius: 50px; font-size: .75rem; font-weight: 700;
+      border: 1px solid rgba(255,255,255,.2); color: #fff; background: rgba(255,255,255,.08);
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .assess-layout {
+      max-width: 1200px; margin: 0 auto; padding: 40px 44px 80px;
+      display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: start;
+    }
+    @media(max-width:900px) { .assess-layout { grid-template-columns:1fr; padding:20px; } }
+
+    /* ── PROGRESS BAR ── */
+    .progress-track {
+      background: var(--card); border-radius: var(--r); padding: 20px 24px;
+      border: 1px solid var(--border); margin-bottom: 20px;
+    }
+    .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .progress-title { font-weight: 700; font-size: .9rem; }
+    .progress-count { font-size: .82rem; color: var(--muted); font-weight: 600; }
+    .progress-bar-track { height: 8px; background: var(--bg); border-radius: 50px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-l)); border-radius: 50px; transition: width .4s ease; }
+
+    /* ── STEP INDICATOR ── */
+    .step-indicator { display: flex; gap: 4px; margin-bottom: 8px; }
+    .step-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--border);
+      transition: all .3s; flex-shrink: 0;
+    }
+    .step-dot.active { background: var(--primary); transform: scale(1.3); }
+    .step-dot.done { background: var(--primary-l); }
+
+    /* ── DEMOGRAPHICS ── */
+    .demo-panel {
+      background: var(--card); border-radius: var(--r); padding: 28px;
+      border: 1px solid var(--border); margin-bottom: 20px;
+    }
+    .demo-panel h3 { font-size: 1rem; font-weight: 700; margin: 0 0 16px; display: flex; align-items: center; gap: 8px; }
+    .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: .78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+    .form-control {
+      padding: 10px 14px; border-radius: var(--r-sm); border: 1.5px solid var(--border);
+      background: var(--bg); font-size: .88rem; color: var(--text); transition: border-color .2s;
+    }
+    .form-control:focus { outline: none; border-color: var(--primary); }
+    .form-check-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+    .form-check-row label { font-size: .85rem; cursor: pointer; }
+
+    /* ── QUESTION CARD ── */
+    .question-card {
+      background: var(--card); border-radius: var(--r); padding: 28px;
+      border: 1px solid var(--border); margin-bottom: 14px;
+      animation: fadeSlideIn .3s ease;
+    }
+    @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .q-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 18px; }
+    .q-num {
+      min-width: 32px; height: 32px; border-radius: 50%; background: var(--primary);
+      color: #fff; font-size: .78rem; font-weight: 800; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0;
+    }
+    .q-text { font-size: .95rem; font-weight: 600; line-height: 1.55; flex: 1; }
+    .q-disorders { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .q-disorder-tag {
+      padding: 2px 10px; border-radius: 50px; font-size: .68rem; font-weight: 700;
+      border: 1.5px solid currentColor; opacity: .8;
+    }
+    .q-options { display: flex; flex-direction: column; gap: 8px; }
+    .q-option {
+      padding: 10px 16px; border-radius: var(--r-sm); border: 1.5px solid var(--border);
+      background: var(--bg); cursor: pointer; font-size: .85rem; font-weight: 500;
+      transition: all .2s; display: flex; align-items: center; gap: 10px; text-align: left;
+    }
+    .q-option:hover { border-color: var(--primary); background: var(--green-bg); }
+    .q-option.selected { border-color: var(--primary); background: var(--green-bg); color: var(--primary); font-weight: 700; }
+    .q-option-radio {
+      width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border);
+      flex-shrink: 0; transition: all .2s; position: relative;
+    }
+    .q-option.selected .q-option-radio { border-color: var(--primary); background: var(--primary); }
+    .q-option.selected .q-option-radio::after {
+      content: ''; position: absolute; inset: 3px; border-radius: 50%; background: #fff;
+    }
+
+    /* ── SECTION HEADER ── */
+    .section-header {
+      display: flex; align-items: center; gap: 12px; padding: 12px 0; margin-bottom: 6px;
+    }
+    .section-header h3 { font-size: 1rem; font-weight: 700; margin: 0; }
+    .section-divider { flex: 1; height: 1px; background: var(--border); }
+
+    /* ── SUBMIT AREA ── */
+    .submit-area {
+      background: var(--card); border-radius: var(--r); padding: 24px;
+      border: 1px solid var(--border); margin-top: 20px; text-align: center;
+    }
+    .btn-primary-lg {
+      background: var(--primary); color: #fff; border: none; padding: 16px 40px;
+      border-radius: var(--r-sm); font-size: 1rem; font-weight: 700; cursor: pointer;
+      transition: all .2s; width: 100%;
+    }
+    .btn-primary-lg:hover { background: var(--primary-l); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,106,79,.3); }
+    .btn-primary-lg:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    /* ── RESULTS PANEL ── */
+    .results-panel {
+      position: sticky; top: calc(var(--nav-h) + 16px);
+      background: var(--card); border-radius: var(--r); padding: 24px;
+      border: 1px solid var(--border); max-height: calc(100vh - 120px); overflow-y: auto;
+    }
+    .results-title { font-size: 1rem; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+    /* Disorder score card */
+    .disorder-score-card {
+      border-radius: var(--r-sm); padding: 14px 16px; margin-bottom: 10px;
+      border: 1.5px solid var(--border); transition: all .3s; cursor: pointer;
+    }
+    .disorder-score-card:hover { transform: translateY(-2px); }
+    .disorder-score-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .disorder-icon { font-size: 1.2rem; }
+    .disorder-name-group { flex: 1; }
+    .disorder-name-main { font-size: .85rem; font-weight: 700; }
+    .disorder-name-sub { font-size: .7rem; color: var(--muted); }
+    .disorder-prob { font-size: 1.3rem; font-weight: 800; }
+    .disorder-bar-track { height: 6px; background: var(--bg); border-radius: 50px; overflow: hidden; margin-top: 4px; }
+    .disorder-bar-fill { height: 100%; border-radius: 50px; transition: width .8s ease; }
+    .risk-pill {
+      display: inline-block; padding: 2px 10px; border-radius: 50px;
+      font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em;
+    }
+    .risk-High { background: #ffe5d9; color: #c44b1b; }
+    .risk-Moderate { background: #fff8e1; color: #b76a00; }
+    .risk-Low { background: #e8f5e9; color: #2d6a4f; }
+    .risk-Minimal { background: var(--bg); color: var(--muted); }
+
+    /* Ensemble model display */
+    .model-ensemble { background: var(--bg); border-radius: var(--r-sm); padding: 14px; margin-bottom: 16px; }
+    .model-ensemble-title { font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+    .model-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: .75rem; }
+    .model-label { width: 40px; font-weight: 700; color: var(--muted); font-size: .68rem; }
+    .model-track { flex: 1; height: 5px; background: rgba(0,0,0,.08); border-radius: 50px; overflow: hidden; }
+    .model-fill { height: 100%; border-radius: 50px; }
+    .model-val { width: 34px; text-align: right; font-weight: 700; font-size: .72rem; }
+
+    /* SHAP explanation */
+    .shap-section { margin-bottom: 16px; }
+    .shap-title { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+    .shap-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .shap-feature { font-size: .72rem; flex: 1; color: var(--text); text-transform: capitalize; }
+    .shap-bar-track { width: 80px; height: 8px; background: var(--bg); border-radius: 50px; overflow: hidden; position: relative; }
+    .shap-bar-pos { height: 100%; background: #e76f51; border-radius: 50px; }
+    .shap-bar-neg { height: 100%; background: #2d6a4f; border-radius: 50px; }
+    .shap-val { font-size: .68rem; font-weight: 700; width: 32px; text-align: right; }
+
+    /* Doctor explanation */
+    .doc-explanation {
+      background: linear-gradient(135deg, #f0faf3, var(--bg));
+      border-radius: var(--r-sm); padding: 16px; border-left: 4px solid var(--primary);
+      font-size: .82rem; line-height: 1.7; margin-bottom: 16px; max-height: 280px; overflow-y: auto;
+    }
+    .doc-explanation strong { color: var(--primary); }
+    .doc-explanation ul { padding-left: 16px; margin: 6px 0; }
+
+    /* Placeholder state */
+    .result-placeholder { text-align: center; padding: 40px 20px; color: var(--muted); }
+    .result-placeholder-icon { font-size: 3rem; margin-bottom: 12px; }
+    .result-placeholder h3 { font-size: 1rem; margin-bottom: 6px; color: var(--text); }
+    .result-placeholder p { font-size: .82rem; line-height: 1.5; }
+
+    /* Analyzing overlay */
+    .analyzing-overlay {
+      display: none; text-align: center; padding: 30px 16px;
+    }
+    .analyzing-overlay.show { display: block; }
+    .analyze-spinner {
+      width: 48px; height: 48px; border: 4px solid var(--border);
+      border-top-color: var(--primary); border-radius: 50%;
+      animation: spin .8s linear infinite; margin: 0 auto 14px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .analyzing-steps { text-align: left; margin-top: 16px; }
+    .analyzing-step { padding: 6px 12px; border-radius: var(--r-sm); font-size: .78rem; margin-bottom: 4px; background: var(--bg); display: flex; align-items: center; gap: 8px; color: var(--muted); }
+    .analyzing-step.done { background: var(--green-bg); color: var(--primary); }
+    .analyzing-step.active { background: #fff8e1; color: #7a5c00; }
+
+    /* Tabs for results sections */
+    .result-tabs { display: flex; gap: 2px; margin-bottom: 14px; background: var(--bg); border-radius: var(--r-sm); padding: 3px; }
+    .result-tab { flex: 1; padding: 7px 4px; border: none; background: transparent; font-size: .7rem; font-weight: 700; cursor: pointer; border-radius: calc(var(--r-sm) - 2px); transition: all .2s; color: var(--muted); }
+    .result-tab.active { background: #fff; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+
+    .result-section { display: none; }
+    .result-section.active { display: block; }
+
+    /* Download report btn */
+    .btn-report {
+      width: 100%; padding: 12px; border-radius: var(--r-sm);
+      background: linear-gradient(135deg, #1a2d4a, #0a1628);
+      color: #fff; border: none; font-size: .85rem; font-weight: 700;
+      cursor: pointer; transition: all .2s; margin-top: 10px; display: flex;
+      align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-report:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(10,22,40,.3); }
+    .btn-report:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+    /* Co-occurring section */
+    .cooccur-section { margin-top: 14px; }
+    .cooccur-title { font-size: .78rem; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .06em; }
+    .cooccur-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .cooccur-card { border-radius: var(--r-sm); padding: 10px 12px; border: 1px solid var(--border); font-size: .78rem; }
+    .cooccur-name { font-weight: 700; margin-bottom: 2px; }
+    .cooccur-prob { font-size: .7rem; color: var(--muted); }
+
+    /* Adaptive question tags */
+    .adaptive-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 50px; font-size: .65rem; font-weight: 700;
+      background: #e8f5e9; color: var(--primary); border: 1px solid var(--primary-l);
+    }
+  </style>
+</head>
+<body>
+<script type="module" src="../js/shared.js"></script>
+
+<!-- PAGE HEADER -->
+<div class="assess-header">
+  <div class="assess-header-inner">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <span style="background:rgba(255,255,255,.12);padding:6px 14px;border-radius:50px;font-size:.75rem;font-weight:700;border:1px solid rgba(255,255,255,.2)">🧠 Multi-Disorder AI Assessment</span>
+    </div>
+    <h1>NeuroScan Advanced Assessment</h1>
+    <p>AI-powered adaptive questionnaire screening 7 neurodevelopmental and psychiatric conditions. Powered by an ensemble of Logistic Regression, Random Forest & XGBoost models with SHAP explanations.</p>
+    <div class="disorder-badges">
+      <span class="disorder-badge">🧩 ASD</span>
+      <span class="disorder-badge">⚡ ADHD</span>
+      <span class="disorder-badge">📖 Dyslexia</span>
+      <span class="disorder-badge">😰 Social Anxiety</span>
+      <span class="disorder-badge">🗣️ Speech Delay</span>
+      <span class="disorder-badge">🧠 Intellectual Disability</span>
+      <span class="disorder-badge">✋ Sensory Processing</span>
+    </div>
+  </div>
+</div>
+
+<div class="assess-layout">
+  <!-- LEFT: FORM -->
+  <div>
+    <!-- Progress -->
+    <div class="progress-track">
+      <div class="progress-header">
+        <span class="progress-title">Assessment Progress</span>
+        <span class="progress-count" id="progressCount">0 / 0 answered</span>
+      </div>
+      <div class="step-indicator" id="stepIndicator"></div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Demographics -->
+    <div class="demo-panel">
+      <h3>👤 Individual Profile</h3>
+      <div class="demo-grid">
+        <div class="form-group">
+          <label class="form-label">Full Name / Label</label>
+          <input class="form-control" id="demoName" placeholder="e.g. Child's name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Age (years)</label>
+          <input class="form-control" id="demoAge" type="number" min="0" max="100" placeholder="e.g. 5" oninput="onAgeChange()"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gender</label>
+          <select class="form-control" id="demoGender">
+            <option value="">Select gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other / Prefer not to say</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Evaluator Role</label>
+          <select class="form-control" id="demoRole">
+            <option value="parent">Parent / Guardian</option>
+            <option value="clinician">Clinician / Therapist</option>
+            <option value="teacher">Teacher / Educator</option>
+            <option value="self">Self</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ethnicity</label>
+          <select class="form-control" id="demoEthnicity">
+            <option>White-European</option><option>Asian</option>
+            <option>South Asian</option><option>Middle Eastern</option>
+            <option>Black</option><option>Hispanic</option>
+            <option>Pasifika</option><option>Others</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Country</label>
+          <input class="form-control" id="demoCountry" placeholder="e.g. India" value="India"/>
+        </div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:24px;flex-wrap:wrap">
+        <div class="form-check-row">
+          <input type="checkbox" id="demoJaundice" style="width:16px;height:16px;cursor:pointer"/>
+          <label for="demoJaundice" style="font-size:.85rem">History of neonatal jaundice?</label>
+        </div>
+        <div class="form-check-row">
+          <input type="checkbox" id="demoFamily" style="width:16px;height:16px;cursor:pointer"/>
+          <label for="demoFamily" style="font-size:.85rem">Family history of any neurodevelopmental disorder?</label>
+        </div>
+        <div class="form-check-row">
+          <input type="checkbox" id="demoPremature" style="width:16px;height:16px;cursor:pointer"/>
+          <label for="demoPremature" style="font-size:.85rem">Born premature (&lt;37 weeks)?</label>
+        </div>
+      </div>
+      <!-- Language selector -->
+      <div style="margin-top:14px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:.78rem;font-weight:600;color:var(--muted)">Language:</span>
+        <button class="q-option" style="padding:5px 14px;font-size:.75rem;width:auto" onclick="setLang('en')" id="langEn">English</button>
+        <button class="q-option" style="padding:5px 14px;font-size:.75rem;width:auto" onclick="setLang('ta')" id="langTa">தமிழ்</button>
+        <button class="q-option" style="padding:5px 14px;font-size:.75rem;width:auto" onclick="setLang('hi')" id="langHi">हिंदी</button>
+      </div>
+    </div>
+
+    <!-- Questions render area -->
+    <div id="questionsContainer"></div>
+
+    <!-- Submit -->
+    <div class="submit-area">
+      <button class="btn-primary-lg" id="submitBtn" onclick="runAnalysis()" disabled>
+        🧠 Run Full AI Analysis
+      </button>
+      <p style="margin-top:10px;font-size:.75rem;color:var(--muted)">
+        Ensemble of 3 ML models across 7 disorders with SHAP explanations
+      </p>
+    </div>
+  </div>
+
+  <!-- RIGHT: RESULTS PANEL -->
+  <div class="results-panel">
+    <div class="results-title">📊 Live AI Results</div>
+
+    <!-- Placeholder -->
+    <div id="resultPlaceholder" class="result-placeholder">
+      <div class="result-placeholder-icon">🔬</div>
+      <h3>Awaiting Assessment</h3>
+      <p>Answer the questionnaire and click "Run Full AI Analysis" to see multi-disorder predictions with doctor-style explanations.</p>
+      <div style="margin-top:20px;text-align:left">
+        <div style="font-size:.78rem;font-weight:700;color:var(--muted);margin-bottom:8px">WHAT YOU'LL GET:</div>
+        <div style="font-size:.8rem;line-height:2;color:var(--text)">
+          ✅ 7-disorder probability scores<br>
+          ✅ Ensemble ML model breakdown<br>
+          ✅ SHAP feature explanations<br>
+          ✅ Doctor-style diagnosis narrative<br>
+          ✅ Co-occurring conditions<br>
+          ✅ Personalized therapy recommendations<br>
+          ✅ Downloadable PDF report
+        </div>
+      </div>
+    </div>
+
+    <!-- Analyzing overlay -->
+    <div id="analyzingOverlay" class="analyzing-overlay">
+      <div class="analyze-spinner"></div>
+      <div style="font-weight:700;font-size:.9rem;margin-bottom:4px">Running AI Analysis…</div>
+      <div style="font-size:.78rem;color:var(--muted);margin-bottom:16px">Processing ensemble models</div>
+      <div class="analyzing-steps" id="analyzeSteps">
+        <div class="analyzing-step" id="step1">⚙️ Running Logistic Regression model</div>
+        <div class="analyzing-step" id="step2">🌲 Running Random Forest (10 trees)</div>
+        <div class="analyzing-step" id="step3">🚀 Running XGBoost model</div>
+        <div class="analyzing-step" id="step4">📊 Computing ensemble weights</div>
+        <div class="analyzing-step" id="step5">🔬 SHAP feature importance analysis</div>
+        <div class="analyzing-step" id="step6">👨‍⚕️ Generating doctor explanation</div>
+        <div class="analyzing-step" id="step7">💊 Building recommendation plan</div>
+      </div>
+    </div>
+
+    <!-- Results content -->
+    <div id="resultContent" style="display:none">
+      <div class="result-tabs">
+        <button class="result-tab active" onclick="showTab('scores')">Scores</button>
+        <button class="result-tab" onclick="showTab('explanation')">Explanation</button>
+        <button class="result-tab" onclick="showTab('shap')">SHAP</button>
+        <button class="result-tab" onclick="showTab('recs')">Recs</button>
+      </div>
+
+      <!-- SCORES TAB -->
+      <div class="result-section active" id="tab-scores">
+        <div id="disorderScores"></div>
+        <div class="cooccur-section" id="cooccurSection"></div>
+        <div class="model-ensemble" id="modelEnsemble"></div>
+      </div>
+
+      <!-- EXPLANATION TAB -->
+      <div class="result-section" id="tab-explanation">
+        <div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">👨‍⚕️ Doctor-Style Explanation</div>
+        <div class="doc-explanation" id="docExplanation"></div>
+      </div>
+
+      <!-- SHAP TAB -->
+      <div class="result-section" id="tab-shap">
+        <div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🔬 Feature Importance (SHAP)</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:10px">Showing top factors for primary detected condition</div>
+        <div id="shapChart"></div>
+      </div>
+
+      <!-- RECOMMENDATIONS TAB -->
+      <div class="result-section" id="tab-recs">
+        <div id="recsContent"></div>
+      </div>
+
+      <button class="btn-report" id="reportBtn" onclick="generateReport()">
+        📄 Download Full PDF Report
+      </button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { DISORDERS, ADAPTIVE_QUESTIONS, ensemblePredict, computeSHAP, generateDoctorExplanation, generateRecommendations, TRANSLATIONS, CO_OCCURRENCE } from '../js/ai-engine.js';
+import { saveAssessment, onAuthChange, auth } from '../js/mongodb.js';
+
+// ── STATE ──────────────────────────────────────────────────────
+let answers = {};
+let currentLang = 'en';
+let currentResults = null;
+let currentRecs = null;
+let ageGroup = 'child'; // toddler / child / adolescent / adult
+
+const DISORDER_COLORS = {
+  asd:'#2d6a4f', adhd:'#e76f51', dyslexia:'#457b9d',
+  social_anxiety:'#9b5de5', speech_delay:'#f4a261',
+  intellectual_disability:'#6d6875', spd:'#2a9d8f'
+};
+
+// Expose to window for inline onclick
+window.setLang = setLang;
+window.onAgeChange = onAgeChange;
+window.runAnalysis = runAnalysis;
+window.showTab = showTab;
+window.generateReport = generateReport;
+
+// ── RENDER QUESTIONS ──────────────────────────────────────────
+function getAgeGroup(age) {
+  if (!age || age < 0) return 'child';
+  if (age <= 3) return 'toddler';
+  if (age <= 12) return 'child';
+  if (age <= 17) return 'adolescent';
+  return 'adult';
+}
+
+function onAgeChange() {
+  const age = parseInt(document.getElementById('demoAge').value);
+  ageGroup = getAgeGroup(age);
+  renderQuestions();
+}
+
+function getActiveQuestions() {
+  const universal = ADAPTIVE_QUESTIONS.universal.filter(q =>
+    !q.ageGroups || q.ageGroups.includes(ageGroup)
+  );
+  const specific = (ADAPTIVE_QUESTIONS[ageGroup] || []);
+  return [...universal, ...specific];
+}
+
+function renderQuestions() {
+  const questions = getActiveQuestions();
+  const container = document.getElementById('questionsContainer');
+
+  // Step dots
+  const stepInd = document.getElementById('stepIndicator');
+  stepInd.innerHTML = questions.map((_, i) =>
+    `<div class="step-dot ${answers[questions[i].id] !== undefined ? 'done' : ''}" id="dot-${i}"></div>`
+  ).join('');
+
+  // Questions
+  const universalQ = questions.filter(q => !ADAPTIVE_QUESTIONS.toddler?.includes(q) && !ADAPTIVE_QUESTIONS.child?.includes(q) && !ADAPTIVE_QUESTIONS.adolescent?.includes(q));
+  const ageSpecificQ = questions.filter(q => ADAPTIVE_QUESTIONS[ageGroup]?.includes(q));
+
+  let html = '';
+  if (universalQ.length) {
+    html += `<div class="section-header"><h3>📋 Core Behavioral Questions</h3><div class="section-divider"></div></div>`;
+    universalQ.forEach((q, i) => html += renderQuestionCard(q, i + 1));
+  }
+  if (ageSpecificQ.length) {
+    const label = { toddler:'👶 Toddler-Specific', child:'🧒 Child-Specific', adolescent:'🧑 Adolescent-Specific', adult:'🧑‍💼 Adult-Specific' }[ageGroup];
+    html += `<div class="section-header" style="margin-top:20px"><h3>${label} Questions <span class="adaptive-tag">✨ Adaptive</span></h3><div class="section-divider"></div></div>`;
+    ageSpecificQ.forEach((q, idx) => html += renderQuestionCard(q, universalQ.length + idx + 1));
+  }
+
+  container.innerHTML = html;
+  updateProgress(questions);
+}
+
+function renderQuestionCard(q, num) {
+  const disorderTags = q.disorder.map(d => {
+    const dis = DISORDERS[d];
+    return `<span class="q-disorder-tag" style="color:${DISORDER_COLORS[d]};border-color:${DISORDER_COLORS[d]}">${dis?.icon} ${dis?.short}</span>`;
+  }).join('');
+
+  const opts = q.options.map((opt, idx) => {
+    const selected = answers[q.id] === idx;
+    return `<button class="q-option ${selected?'selected':''}" onclick="selectAnswer('${q.id}', ${idx}, this.closest('.q-options'))">
+      <div class="q-option-radio"></div>${opt}
+    </button>`;
+  }).join('');
+
+  return `<div class="question-card" id="qcard-${q.id}">
+    <div class="q-header">
+      <div class="q-num">${num}</div>
+      <div class="q-text">${q.question}</div>
+    </div>
+    <div class="q-disorders">${disorderTags}</div>
+    <div class="q-options">${opts}</div>
+  </div>`;
+}
+
+function updateProgress(questions) {
+  const total = questions.length;
+  const done = questions.filter(q => answers[q.id] !== undefined).length;
+  document.getElementById('progressCount').textContent = `${done} / ${total} answered`;
+  document.getElementById('progressFill').style.width = `${total > 0 ? (done/total)*100 : 0}%`;
+  document.getElementById('submitBtn').disabled = done < Math.ceil(total * 0.7);
+
+  // Update step dots
+  questions.forEach((q, i) => {
+    const dot = document.getElementById(`dot-${i}`);
+    if (dot) {
+      dot.className = `step-dot ${answers[q.id] !== undefined ? 'done' : ''}`;
+    }
+  });
+}
+
+window.selectAnswer = function(qId, idx, container) {
+  answers[qId] = idx;
+  // Update UI
+  container.querySelectorAll('.q-option').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === idx);
+  });
+  updateProgress(getActiveQuestions());
+};
+
+// ── ANALYSIS ──────────────────────────────────────────────────
+async function runAnalysis() {
+  // Show analyzing overlay
+  document.getElementById('resultPlaceholder').style.display = 'none';
+  document.getElementById('resultContent').style.display = 'none';
+  document.getElementById('analyzingOverlay').classList.add('show');
+
+  const steps = ['step1','step2','step3','step4','step5','step6','step7'];
+  for (let i = 0; i < steps.length; i++) {
+    await new Promise(r => setTimeout(r, 350 + Math.random() * 300));
+    document.getElementById(steps[i]).className = 'analyzing-step done';
+    if (i + 1 < steps.length) {
+      document.getElementById(steps[i+1]).className = 'analyzing-step active';
+    }
+  }
+
+  await new Promise(r => setTimeout(r, 400));
+
+  const demographics = {
+    age: parseInt(document.getElementById('demoAge').value) || 8,
+    gender: document.getElementById('demoGender').value || 'male',
+    family_history: document.getElementById('demoFamily').checked,
+    jaundice: document.getElementById('demoJaundice').checked,
+    premature: document.getElementById('demoPremature').checked,
+  };
+
+  currentResults = ensemblePredict(answers, demographics);
+  currentRecs = generateRecommendations(currentResults);
+
+  const primaryId = Object.entries(currentResults).sort((a,b) => b[1].probability - a[1].probability)[0][0];
+  const shapValues = computeSHAP(answers, primaryId);
+  const docExplanation = generateDoctorExplanation(currentResults, shapValues, demographics);
+
+  // Hide overlay, show results
+  document.getElementById('analyzingOverlay').classList.remove('show');
+  document.getElementById('resultContent').style.display = 'block';
+
+  renderScores(currentResults);
+  renderModelEnsemble(currentResults, primaryId);
+  renderCoOccurring(currentResults, primaryId);
+  renderSHAP(shapValues);
+  renderExplanation(docExplanation);
+  renderRecommendations(currentRecs);
+  document.getElementById('reportBtn').disabled = false;
+
+  // Auto-save to Firebase if logged in
+  try {
+    const user = auth.currentUser;
+    if (user) {
+      await saveAssessment(user.uid, {
+        name: document.getElementById('demoName').value,
+        disorder_results: currentResults,
+        answers: answers,
+        age: demographics.age,
+        gender: demographics.gender,
+        family_history: demographics.family_history,
+        jaundice: demographics.jaundice,
+        assessment_type: 'multi-disorder',
+      });
+    }
+  } catch(e) { console.warn('Save failed:', e); }
+
+  showTab('scores');
+}
+
+function renderScores(results) {
+  const sorted = Object.entries(results).sort((a,b) => b[1].probability - a[1].probability);
+  const html = sorted.map(([id, data]) => {
+    const d = DISORDERS[id];
+    const pct = Math.round(data.probability * 100);
+    const color = DISORDER_COLORS[id];
+    return `<div class="disorder-score-card" style="border-color:${data.probability>0.5?color:''}" onclick="highlightSHAP('${id}')">
+      <div class="disorder-score-header">
+        <span class="disorder-icon">${d.icon}</span>
+        <div class="disorder-name-group">
+          <div class="disorder-name-main">${d.name}</div>
+          <div class="disorder-name-sub">${d.icd} · ${d.short}</div>
+        </div>
+        <div>
+          <div class="disorder-prob" style="color:${color}">${pct}%</div>
+          <span class="risk-pill risk-${data.riskLevel}">${data.riskLevel}</span>
+        </div>
+      </div>
+      <div class="disorder-bar-track">
+        <div class="disorder-bar-fill" style="width:${pct}%;background:${color}"></div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('disorderScores').innerHTML = html;
+}
+
+function renderModelEnsemble(results, primaryId) {
+  const data = results[primaryId];
+  const pct = v => Math.round(v * 100);
+  document.getElementById('modelEnsemble').innerHTML = `
+    <div class="model-ensemble-title">🤖 Ensemble Model Breakdown — ${DISORDERS[primaryId]?.short}</div>
+    <div class="model-row">
+      <span class="model-label">LR</span>
+      <div class="model-track"><div class="model-fill" style="width:${pct(data.lr_score)}%;background:#457b9d"></div></div>
+      <span class="model-val" style="color:#457b9d">${pct(data.lr_score)}%</span>
+    </div>
+    <div class="model-row">
+      <span class="model-label">RF</span>
+      <div class="model-track"><div class="model-fill" style="width:${pct(data.rf_score)}%;background:#2d6a4f"></div></div>
+      <span class="model-val" style="color:#2d6a4f">${pct(data.rf_score)}%</span>
+    </div>
+    <div class="model-row">
+      <span class="model-label">XGB</span>
+      <div class="model-track"><div class="model-fill" style="width:${pct(data.xgb_score)}%;background:#e76f51"></div></div>
+      <span class="model-val" style="color:#e76f51">${pct(data.xgb_score)}%</span>
+    </div>
+    <div style="margin-top:8px;font-size:.68rem;color:var(--muted)">Confidence: <strong>${data.confidence}</strong> · Weights: RF 40% + XGB 40% + LR 20%</div>
+  `;
+}
+
+function renderCoOccurring(results, primaryId) {
+  const coIds = Object.keys(CO_OCCURRENCE[primaryId] || {});
+  const co = coIds.filter(id => results[id] && results[id].probability > 0.40)
+    .map(id => ({ id, d: DISORDERS[id], prob: results[id].probability }));
+
+  if (co.length === 0) {
+    document.getElementById('cooccurSection').innerHTML = '';
+    return;
+  }
+
+  document.getElementById('cooccurSection').innerHTML = `
+    <div class="cooccur-title">🔗 Co-occurring Conditions</div>
+    <div class="cooccur-grid">
+      ${co.map(({id,d,prob}) => `<div class="cooccur-card" style="border-color:${DISORDER_COLORS[id]}30">
+        <div class="cooccur-name" style="color:${DISORDER_COLORS[id]}">${d.icon} ${d.short}</div>
+        <div class="cooccur-prob">${Math.round(prob*100)}% likelihood</div>
+      </div>`).join('')}
+    </div>
+  `;
+}
+
+function renderSHAP(shapValues) {
+  const maxMag = Math.max(...shapValues.map(s => s.magnitude), 0.01);
+  const html = shapValues.map(s => {
+    const barW = Math.round((s.magnitude / maxMag) * 100);
+    const isPos = s.shap_value > 0;
+    return `<div class="shap-row">
+      <span class="shap-feature" title="${s.question}">${s.feature.slice(0,18)}</span>
+      <div class="shap-bar-track">
+        ${isPos
+          ? `<div class="shap-bar-pos" style="width:${barW}%"></div>`
+          : `<div class="shap-bar-neg" style="width:${barW}%"></div>`
+        }
+      </div>
+      <span class="shap-val" style="color:${isPos?'#c44b1b':'#2d6a4f'}">${isPos?'+':''}${s.shap_value.toFixed(2)}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('shapChart').innerHTML = `
+    <div style="display:flex;gap:12px;margin-bottom:10px;font-size:.68rem">
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:#e76f51;border-radius:50%;display:inline-block"></span> Increases risk</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:#2d6a4f;border-radius:50%;display:inline-block"></span> Decreases risk</span>
+    </div>
+    ${html}
+  `;
+}
+
+function renderExplanation(text) {
+  // Convert markdown-like formatting to HTML
+  let html = text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^/, '<p>')
+    .replace(/$/, '</p>')
+    .replace(/• /g, '<li>')
+    .replace(/\n/g, '<br>');
+  document.getElementById('docExplanation').innerHTML = html;
+}
+
+function renderRecommendations(recs) {
+  const therapyCards = recs.therapies.map(t => `
+    <div style="background:var(--bg);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--primary)">
+      <div style="font-weight:700;font-size:.85rem;margin-bottom:4px">${t.name}</div>
+      <div style="font-size:.78rem;color:var(--muted);line-height:1.5;margin-bottom:4px">${t.description}</div>
+      <div style="font-size:.72rem;font-weight:700;color:var(--primary)">⏱ ${t.frequency} · ${t.disorder}</div>
+    </div>
+  `).join('');
+
+  const dailyPlan = recs.daily_plan.map(p =>
+    `<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.78rem">
+      <span style="font-size:1.1rem">${p.icon}</span>
+      <div><div style="font-weight:700;font-size:.72rem;color:var(--muted)">${p.time}</div><div>${p.activity}</div></div>
+    </div>`
+  ).join('');
+
+  const specialists = recs.specialists.map(s =>
+    `<span style="display:inline-block;background:var(--green-bg);color:var(--primary);padding:3px 10px;border-radius:50px;font-size:.72rem;font-weight:700;margin:3px;border:1px solid var(--primary-l)">${s}</span>`
+  ).join('');
+
+  document.getElementById('recsContent').innerHTML = `
+    <div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">💊 Recommended Therapies</div>
+    ${therapyCards}
+    <div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 8px">👨‍⚕️ Recommended Specialists</div>
+    <div>${specialists}</div>
+    <div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 8px">🗓️ Daily Improvement Plan</div>
+    <div>${dailyPlan}</div>
+    <div style="margin-top:14px;padding:12px;border-radius:var(--r-sm);background:#fff8e1;border-left:3px solid #e9c46a;font-size:.78rem;color:#7a5c00">
+      ⚠️ <strong>Disclaimer:</strong> This AI assessment is for screening purposes only. It is not a medical diagnosis. Please consult qualified healthcare professionals for evaluation and treatment planning.
+    </div>
+  `;
+}
+
+window.highlightSHAP = function(disorderId) {
+  const shapValues = computeSHAP(answers, disorderId);
+  renderSHAP(shapValues);
+  showTab('shap');
+};
+
+// ── TAB SWITCHING ─────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.result-tab').forEach((t,i) => {
+    const tabs = ['scores','explanation','shap','recs'];
+    t.classList.toggle('active', tabs[i] === name);
+  });
+  document.querySelectorAll('.result-section').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(`tab-${name}`);
+  if (el) el.classList.add('active');
+}
+
+// ── LANGUAGE ──────────────────────────────────────────────────
+function setLang(lang) {
+  currentLang = lang;
+  ['en','ta','hi'].forEach(l => {
+    document.getElementById(`lang${l.charAt(0).toUpperCase()+l.slice(1)}`).classList.toggle('selected', l === lang);
+  });
+}
+
+// ── PDF REPORT ────────────────────────────────────────────────
+async function generateReport() {
+  if (!currentResults) return;
+  const btn = document.getElementById('reportBtn');
+  btn.textContent = '⏳ Generating Report…';
+  btn.disabled = true;
+
+  // Load jsPDF via script tag (UMD build — dynamic import does not work for this library)
+  if (!window.jspdf) {
+    await new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  const { jsPDF: PDF } = window.jspdf;
+  const doc = new PDF();
+  const name = document.getElementById('demoName').value || 'Individual';
+  const age = document.getElementById('demoAge').value || 'N/A';
+  const date = new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+
+  // Header
+  doc.setFillColor(10, 22, 40); doc.rect(0, 0, 210, 38, 'F');
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(20);
+  doc.text('NeuroScan Advanced Report', 14, 18);
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.text(`AI-Powered Multi-Disorder Neurological Assessment`, 14, 27);
+  doc.text(`Generated: ${date}`, 14, 34);
+
+  // Subject info
+  doc.setTextColor(30,30,30); doc.setFontSize(11); doc.setFont('helvetica','bold');
+  doc.text('Subject Information', 14, 50);
+  doc.setFont('helvetica','normal'); doc.setFontSize(10);
+  doc.text(`Name: ${name}`, 14, 58);
+  doc.text(`Age: ${age} years`, 80, 58);
+  doc.text(`Gender: ${document.getElementById('demoGender').value || 'N/A'}`, 140, 58);
+
+  // Results table
+  doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text('Disorder Probability Scores', 14, 72);
+  doc.setFillColor(240,250,244); doc.rect(14, 76, 182, 8, 'F');
+  doc.setFontSize(9); doc.setFont('helvetica','bold');
+  doc.text('Disorder', 16, 82); doc.text('ICD', 90, 82);
+  doc.text('Probability', 120, 82); doc.text('Risk Level', 160, 82);
+
+  const sorted = Object.entries(currentResults).sort((a,b) => b[1].probability - a[1].probability);
+  let y = 94;
+  sorted.forEach(([id, data]) => {
+    const d = DISORDERS[id];
+    const pct = `${Math.round(data.probability * 100)}%`;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    doc.text(d.name, 16, y); doc.text(d.icd, 90, y);
+    doc.text(pct, 126, y); doc.text(data.riskLevel, 160, y);
+    y += 8;
+  });
+
+  // Recommendations
+  y += 4;
+  doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text('Recommended Therapies', 14, y); y += 8;
+  currentRecs.therapies.forEach(t => {
+    doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.text(`• ${t.name} (${t.disorder})`, 14, y); y += 5;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
+    const lines = doc.splitTextToSize(t.description, 180);
+    lines.forEach(l => { doc.text(l, 18, y); y += 4; });
+    y += 2;
+    if (y > 260) { doc.addPage(); y = 20; }
+  });
+
+  // Disclaimer
+  if (y > 240) { doc.addPage(); y = 20; }
+  doc.setFillColor(255, 248, 225); doc.rect(14, y, 182, 20, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(180, 100, 0);
+  doc.text('⚠ DISCLAIMER', 16, y+7);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8);
+  doc.text('This AI assessment is for screening purposes only and does not constitute a medical diagnosis.', 16, y+14);
+  doc.text('Always consult qualified healthcare professionals for evaluation and treatment.', 16, y+19);
+
+  doc.save(`NeuroScan_Report_${name}_${date}.pdf`);
+  btn.textContent = '📄 Download Full PDF Report';
+  btn.disabled = false;
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+renderQuestions();
+</script>
+</body>
+</html>

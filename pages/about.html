@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>About & Methodology — AutismRecog</title>
+  <link rel="stylesheet" href="../css/main.css"/>
+  <style>
+    .about-hero{background:linear-gradient(135deg,#f0faf3,var(--bg));border-bottom:1px solid var(--border);padding:60px 44px;text-align:center}
+    .about-hero h1{font-family:var(--font-d);font-size:2.8rem;margin:14px 0 16px;line-height:1.2}
+    .about-hero p{color:var(--muted);max-width:580px;margin:0 auto;font-size:1rem;line-height:1.75}
+    .about-content{max-width:var(--max);margin:0 auto;padding:64px 44px 80px}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;margin-bottom:64px}
+    .two-col h2{font-family:var(--font-d);font-size:2rem;margin-bottom:16px;line-height:1.25}
+    .two-col p{color:var(--muted);line-height:1.8;margin-bottom:14px;font-size:.93rem}
+    .check-list{display:flex;flex-direction:column;gap:9px;margin-top:16px}
+    .check-list li{display:flex;align-items:flex-start;gap:10px;font-size:.9rem;font-weight:500}
+    .check-list li::before{content:'✓';color:var(--primary-l);font-weight:800;flex-shrink:0;margin-top:1px}
+    .visual-box{background:var(--green-bg);border-radius:var(--r);padding:30px}
+    .visual-box h4{font-size:.95rem;font-weight:700;color:var(--primary);margin-bottom:18px}
+    .method-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:64px}
+    .method-card{background:var(--card);border-radius:var(--r);padding:26px;border:1px solid var(--border);display:flex;gap:16px;transition:all .22s}
+    .method-card:hover{box-shadow:var(--shadow);transform:translateY(-3px)}
+    .method-icon{font-size:1.7rem;flex-shrink:0;margin-top:2px}
+    .method-card h4{font-weight:700;font-size:.93rem;margin-bottom:8px}
+    .method-card p{color:var(--muted);font-size:.84rem;line-height:1.65}
+    .dataset-table{width:100%;border-collapse:collapse;font-size:.82rem;margin:20px 0}
+    .dataset-table th{background:var(--bg);padding:10px;text-align:left;border:1px solid var(--border);font-weight:700;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+    .dataset-table td{padding:10px;border:1px solid var(--border);line-height:1.5}
+    .dataset-table tr:hover td{background:#fafff8}
+    .tag{display:inline-block;background:var(--green-bg);color:var(--primary);padding:2px 9px;border-radius:50px;font-size:.72rem;font-weight:700}
+    .disclaimer-box{background:var(--yellow-bg);border-radius:var(--r);padding:32px 36px;border-left:4px solid var(--accent)}
+    .disclaimer-box h3{font-size:1rem;font-weight:700;margin-bottom:10px;color:#7a5c00}
+    .disclaimer-box p{font-size:.9rem;color:#7a5c00;line-height:1.75}
+    @media(max-width:900px){.about-hero{padding:36px 20px}.about-content{padding:36px 20px 60px}.two-col{grid-template-columns:1fr;gap:32px}.method-grid{grid-template-columns:1fr}.about-hero h1{font-size:2.1rem}}
+  </style>
+</head>
+<body>
+<div id="nav-ph"></div>
+
+<div class="about-hero">
+  <div class="section-tag">About</div>
+  <h1>Kaggle ML Olympiad — Autism Prediction</h1>
+  <p>This platform is built on the published Kaggle notebook by <strong>desalegngeb</strong> — ML Olympiad Autism Prediction Challenge. Using real clinical ASD screening data with the validated AQ-10 questionnaire.</p>
+</div>
+
+<div class="about-content">
+
+  <!-- DATASET INFO -->
+  <div class="two-col">
+    <div>
+      <div class="section-tag">Dataset</div>
+      <h2>ML Olympiad Autism Prediction</h2>
+      <p>The dataset comes from the <a href="https://www.kaggle.com/competitions/autism-prediction" target="_blank" style="color:var(--primary)">Kaggle ML Olympiad - Autism Prediction Challenge</a>, originally sourced from ASD screening data collected across multiple countries.</p>
+      <p>The dataset contains <strong>800 records</strong> with <strong>21 features</strong> per record, including 10 AQ-10 behavioural screening scores (A1–A10), demographic variables, and clinical history.</p>
+      <ul class="check-list">
+        <li>800 records from real ASD screening sessions</li>
+        <li>AQ-10 questions: A1_Score to A10_Score (0 or 1)</li>
+        <li>Demographics: age, gender, ethnicity, country</li>
+        <li>Clinical: jaundice at birth, family ASD history</li>
+        <li>Target: Class/ASD (0 = negative, 1 = positive)</li>
+        <li>46% ASD positive, 54% ASD negative</li>
+      </ul>
+    </div>
+    <div>
+      <div class="visual-box">
+        <h4>📊 Dataset Feature Schema (Kaggle)</h4>
+        <table class="dataset-table">
+          <thead><tr><th>Feature</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>A1_Score – A10_Score</td><td><span class="tag">int</span></td><td>AQ-10 answers (0/1)</td></tr>
+            <tr><td>age</td><td><span class="tag">float</span></td><td>Age in years</td></tr>
+            <tr><td>gender</td><td><span class="tag">str</span></td><td>m / f</td></tr>
+            <tr><td>ethnicity</td><td><span class="tag">str</span></td><td>Ethnic group</td></tr>
+            <tr><td>jaundice</td><td><span class="tag">str</span></td><td>Jaundice at birth (yes/no)</td></tr>
+            <tr><td>austim</td><td><span class="tag">str</span></td><td>Family member with ASD</td></tr>
+            <tr><td>contry_of_res</td><td><span class="tag">str</span></td><td>Country of residence</td></tr>
+            <tr><td>used_app_before</td><td><span class="tag">str</span></td><td>Used ASD app before</td></tr>
+            <tr><td>result</td><td><span class="tag">float</span></td><td>AQ-10 total score</td></tr>
+            <tr><td>relation</td><td><span class="tag">str</span></td><td>Who completed the test</td></tr>
+            <tr><td><strong>Class/ASD</strong></td><td><span class="tag">int</span></td><td>Target (0/1)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- AQ-10 QUESTIONS -->
+  <div style="margin-bottom:64px">
+    <div class="section-tag">AQ-10 Protocol</div>
+    <h2 style="font-family:var(--font-d);font-size:2rem;margin-bottom:16px">Official AQ-10 Questions Used in Dataset</h2>
+    <p style="color:var(--muted);margin-bottom:24px;font-size:.93rem;max-width:680px">The AQ-10 (Autism Spectrum Quotient) is a 10-item screening tool. Each question is scored 1 (ASD indicator) or 0. A score ≥ 6 meets the referral threshold per clinical guidelines.</p>
+    <table class="dataset-table">
+      <thead>
+        <tr><th>Column</th><th>Question</th><th>ASD Score Direction</th><th>Weight (RF)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>A1_Score</td><td>I often notice small sounds when others do not.</td><td><span class="tag">Agree = 1</span></td><td>0.62</td></tr>
+        <tr><td>A2_Score</td><td>I usually concentrate more on the whole picture, rather than the small details.</td><td><span style="background:var(--blue-bg);color:#1a6fa8" class="tag">Disagree = 1</span></td><td>0.41</td></tr>
+        <tr><td>A3_Score</td><td>I find it easy to do more than one thing at once.</td><td><span style="background:var(--blue-bg);color:#1a6fa8" class="tag">Disagree = 1</span></td><td>0.38</td></tr>
+        <tr><td>A4_Score</td><td>If there is an interruption, I can switch back to what I was doing very quickly.</td><td><span style="background:var(--blue-bg);color:#1a6fa8" class="tag">Disagree = 1</span></td><td>0.44</td></tr>
+        <tr><td>A5_Score</td><td>I find it easy to 'read between the lines' when someone is talking to me.</td><td><span style="background:var(--blue-bg);color:#1a6fa8" class="tag">Disagree = 1</span></td><td>0.51</td></tr>
+        <tr><td>A6_Score</td><td>I know how to tell if someone listening to me is getting bored.</td><td><span style="background:var(--blue-bg);color:#1a6fa8" class="tag">Disagree = 1</span></td><td>0.46</td></tr>
+        <tr><td>A7_Score</td><td>When I'm reading a story I find it difficult to work out the characters' intentions.</td><td><span class="tag">Agree = 1</span></td><td>0.78 ★</td></tr>
+        <tr><td>A8_Score</td><td>I like to collect information about categories of things.</td><td><span class="tag">Agree = 1</span></td><td>0.53</td></tr>
+        <tr><td>A9_Score</td><td>I find it easy to work out what someone is thinking or feeling just by looking at their face.</td><td><span style="background:var(--blue-bg);color:#1a6fa8" class="tag">Disagree = 1</span></td><td>0.69</td></tr>
+        <tr><td>A10_Score</td><td>I find it difficult to work out people's intentions.</td><td><span class="tag">Agree = 1</span></td><td>0.74 ★</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:.78rem;color:var(--muted);margin-top:8px">★ = Top 2 predictive features in Kaggle Random Forest model. Referral threshold: AQ-10 total ≥ 6.</div>
+  </div>
+
+  <!-- METHODOLOGY -->
+  <div style="margin-bottom:64px">
+    <div class="section-tag">Methodology</div>
+    <h2 style="font-family:var(--font-d);font-size:2rem;margin:12px 0 20px">Model Approach (Kaggle Notebook)</h2>
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="method-icon">🧹</div>
+        <div>
+          <h4>Data Preprocessing</h4>
+          <p>Missing values handled, '?' and 'Others' normalised. Yes/No binary encoded. Age log-transformed to remove positive skew. Random OverSampler used to balance minority class.</p>
+        </div>
+      </div>
+      <div class="method-card">
+        <div class="method-icon">🌲</div>
+        <div>
+          <h4>Random Forest Classifier</h4>
+          <p>Best-performing model across 6 classifiers tested. Achieves 98.7% accuracy. Feature importance ranks A7, A10, A1, and result (AQ-10 sum) as top predictors.</p>
+        </div>
+      </div>
+      <div class="method-card">
+        <div class="method-icon">📏</div>
+        <div>
+          <h4>AQ-10 Scoring Logic</h4>
+          <p>Sum of A1–A10 answers. Class/ASD=1 when score ≥ 6 (or ≥ 7 in some variants). This threshold corresponds to the clinical referral guideline from NICE/Cambridge ARC.</p>
+        </div>
+      </div>
+      <div class="method-card">
+        <div class="method-icon">📊</div>
+        <div>
+          <h4>Feature Selection</h4>
+          <p>Used feature importance from RF and correlation analysis. A1–A10 scores are dominant predictors. Demographic features (age, gender, jaundice, family) provide secondary weight.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISCLAIMER -->
+  <div class="disclaimer-box">
+    <h3>⚠️ Important Disclaimer</h3>
+    <p>This platform is built for <strong>educational and demonstration purposes</strong>, using publicly available Kaggle data. It does not provide, replace, or constitute a formal clinical diagnosis of Autism Spectrum Disorder. The AQ-10 is a screening tool only — a high score indicates that referral for professional assessment may be warranted, but does not mean a person has ASD. All results should be reviewed by a qualified healthcare professional. If you or someone you know has concerns about ASD, please seek a comprehensive evaluation from a licensed clinician.</p>
+  </div>
+
+</div>
+
+<div id="footer-ph"></div>
+<div id="modals-ph"></div>
+<script src="../data/kaggle-dataset.js"></script>
+<script type="module" src="../js/shared.js"></script>
+</body>
+</html>

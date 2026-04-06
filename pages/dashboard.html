@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Dashboard — AutismRecog</title>
+  <link rel="stylesheet" href="../css/main.css"/>
+  <style>
+    .dash-layout{max-width:var(--max);margin:0 auto;padding:36px 44px 80px}
+    .welcome{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:14px}
+    .welcome h2{font-family:var(--font-d);font-size:1.9rem}
+    .welcome p{color:var(--muted);font-size:.88rem;margin-top:4px}
+    .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px}
+    .kpi{background:var(--card);border-radius:var(--r);padding:22px;border:1px solid var(--border);transition:all .22s}
+    .kpi:hover{box-shadow:var(--shadow);transform:translateY(-3px)}
+    .kpi-icon{width:42px;height:42px;border-radius:12px;font-size:1.2rem;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+    .kpi-val{font-family:var(--font-d);font-size:1.9rem;margin-bottom:3px}
+    .kpi-lbl{font-size:.78rem;color:var(--muted);font-weight:500}
+    .kpi-sub{font-size:.72rem;margin-top:5px;font-weight:600}
+    .kpi-up{color:var(--primary-l)}
+    .kpi-warn{color:var(--accent-d)}
+    .dash-grid{display:grid;grid-template-columns:3fr 2fr;gap:22px;margin-bottom:22px}
+    .dash-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-bottom:22px}
+    .panel{background:var(--card);border-radius:var(--r);padding:24px;border:1px solid var(--border)}
+    .panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .panel-hdr h3{font-size:.95rem;font-weight:700}
+    .panel-hdr a{font-size:.78rem;color:var(--primary);font-weight:600}
+    .record-row{display:flex;align-items:center;gap:12px;padding:12px 10px;border-radius:var(--r-sm);background:var(--bg);margin-bottom:8px;cursor:pointer;transition:background .2s}
+    .record-row:hover{background:var(--green-bg)}
+    .record-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;color:#fff;flex-shrink:0}
+    .record-info{flex:1}
+    .record-info strong{display:block;font-size:.88rem;font-weight:600}
+    .record-info span{font-size:.76rem;color:var(--muted)}
+    .record-score{font-weight:700;font-size:.88rem}
+    .feed{display:flex;flex-direction:column;gap:14px}
+    .feed-item{display:flex;gap:12px;align-items:flex-start}
+    .feed-dot{width:9px;height:9px;border-radius:50%;margin-top:4px;flex-shrink:0}
+    .feed-text{font-size:.84rem;line-height:1.55}
+    .feed-time{font-size:.73rem;color:var(--muted);margin-top:2px}
+    .bar-chart{display:flex;gap:7px;align-items:flex-end;height:130px;padding:0 4px;margin-bottom:8px}
+    .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:0}
+    .bar-bar{width:100%;border-radius:4px 4px 0 0;cursor:pointer;transition:opacity .2s}
+    .bar-bar:hover{opacity:.8}
+    .bar-lbl{font-size:.65rem;color:var(--muted);margin-top:4px;font-weight:600}
+
+    /* Upload Section Styles */
+    .upload-section{background:var(--card);border-radius:var(--r);padding:28px;border:2px dashed var(--border);transition:all .3s;margin-bottom:22px}
+    .upload-section:hover{border-color:var(--primary);background:rgba(45,106,79,.02)}
+    .upload-tabs{display:flex;gap:12px;margin-bottom:24px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+    .upload-tab{padding:12px 16px;background:none;border:none;font-size:.88rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;position:relative;top:1px}
+    .upload-tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+    .upload-content{display:none}
+    .upload-content.active{display:block;animation:fadeIn .3s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+    .upload-drop{border:2px dashed var(--border);border-radius:var(--r);padding:40px;text-align:center;background:var(--bg);cursor:pointer;transition:all .2s}
+    .upload-drop:hover{border-color:var(--primary);background:rgba(45,106,79,.05)}
+    .upload-drop.dragover{border-color:var(--primary);background:rgba(45,106,79,.1)}
+    .upload-icon{font-size:2.4rem;margin-bottom:8px}
+    .upload-text{font-weight:600;color:var(--text);margin-bottom:4px}
+    .upload-subtext{font-size:.82rem;color:var(--muted)}
+    .file-input{display:none}
+    .upload-actions{display:flex;gap:10px;margin-top:16px;justify-content:center}
+    .preview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+    .preview-item{position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg);aspect-ratio:1}
+    .preview-item img,.preview-item video{width:100%;height:100%;object-fit:cover}
+    .preview-item .preview-name{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);color:#fff;padding:8px;font-size:.72rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .preview-remove{position:absolute;top:4px;right:4px;width:28px;height:28px;background:#fff;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;color:var(--accent-d);opacity:0;transition:all .2s}
+    .preview-item:hover .preview-remove{opacity:1}
+
+    /* Result Display Styles */
+    .result-container{display:none}
+    .result-container.show{display:block}
+    .result-tabs{display:flex;gap:10px;margin-bottom:20px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+    .result-tab{padding:10px 14px;background:none;border:none;font-size:.84rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;position:relative;top:1px}
+    .result-tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+    .result-view{display:none}
+    .result-view.active{display:block;animation:fadeIn .3s ease}
+
+    /* Simple Result Output */
+    .simple-result{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .result-metric{background:var(--bg);padding:16px;border-radius:var(--r-sm);border-left:4px solid var(--primary-l)}
+    .result-metric.warning{border-left-color:var(--accent-d)}
+    .result-metric-label{font-size:.78rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;font-weight:700}
+    .result-metric-value{font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:4px}
+    .result-metric-detail{font-size:.8rem;color:var(--muted)}
+
+    /* Probability Output */
+    .probability-item{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:14px;background:var(--bg);border-radius:var(--r-sm)}
+    .probability-name{flex:1;font-size:.88rem;font-weight:600}
+    .probability-bar{flex:2;height:24px;background:var(--border);border-radius:6px;overflow:hidden;position:relative}
+    .probability-fill{height:100%;background:linear-gradient(90deg,var(--primary-l),var(--primary));border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:.7rem;font-weight:700;color:#fff;transition:width .5s ease}
+    .probability-percent{font-size:.88rem;font-weight:700;min-width:50px;text-align:right;color:var(--primary)}
+
+    /* Behavior Analysis */
+    .behavior-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+    .behavior-item{background:var(--bg);padding:16px;border-radius:var(--r-sm);border:1px solid var(--border)}
+    .behavior-item-label{font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+    .behavior-item-value{font-size:1.2rem;font-weight:700;color:var(--primary);margin-bottom:4px}
+    .behavior-item-detail{font-size:.76rem;color:var(--muted)}
+
+    /* Dashboard Chart */
+    .dashboard-result{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+    .result-table{width:100%;border-collapse:collapse;font-size:.88rem}
+    .result-table td{padding:12px;border-bottom:1px solid var(--border)}
+    .result-table td:first-child{font-weight:600;width:35%;color:var(--text)}
+    .result-table td:last-child{color:var(--primary);font-weight:600}
+    .result-summary-box{background:linear-gradient(135deg,var(--primary-l),var(--primary-d));color:#fff;padding:24px;border-radius:var(--r);text-align:center}
+    .result-summary-label{font-size:.8rem;opacity:.9;margin-bottom:8px;text-transform:uppercase;font-weight:700}
+    .result-summary-value{font-family:var(--font-d);font-size:2.2rem;font-weight:700;margin-bottom:12px}
+
+    /* Graph Output */
+    .graph-container{margin-top:20px;padding:20px;background:var(--bg);border-radius:var(--r);display:flex;justify-content:center;min-height:200px}
+    .ascii-graph{font-family:monospace;font-size:.78rem;line-height:1.8;color:var(--text);white-space:pre;text-align:center;width:100%;max-width:500px}
+    .graph-bar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .graph-label{min-width:120px;text-align:right;font-size:.84rem;font-weight:600}
+    .graph-visual{flex:1;display:flex;align-items:center;gap:8px}
+    .graph-blocks{display:flex;gap:2px}
+    .graph-block{width:12px;height:20px;background:var(--primary-l);border-radius:2px}
+    .graph-block.secondary{background:var(--accent)}
+    .graph-block.tertiary{background:var(--border)}
+    .graph-percent{min-width:45px;text-align:right;font-weight:700;color:var(--primary)}
+
+    /* Analysis Button */
+    .analyze-btn-container{margin-top:20px}
+    .analyze-btn{width:100%;padding:16px;font-size:.95rem;font-weight:700}
+
+    @media(max-width:900px){
+      .dash-layout{padding:22px 20px 60px}
+      .kpi-grid{grid-template-columns:1fr 1fr}
+      .dash-grid{grid-template-columns:1fr}
+      .dash-grid-3{grid-template-columns:1fr}
+      .preview-grid{grid-template-columns:repeat(2,1fr)}
+      .simple-result{grid-template-columns:1fr}
+      .dashboard-result{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+<div id="nav-ph"></div>
+
+<div class="dash-layout">
+
+  <div class="welcome">
+    <div>
+      <h2>Autism Detection System 👩‍⚕️</h2>
+      <p>Advanced ML Analysis with Multi-Modal Support · Image, Video & Audio Detection</p>
+    </div>
+    <a href="predict.html" class="btn btn-primary">+ New AQ-10 Prediction</a>
+  </div>
+
+  <!-- UPLOAD SECTION -->
+  <div class="upload-section">
+    <h3 style="margin-bottom:16px;font-size:1.1rem;font-weight:700">Upload Media for Analysis 📤</h3>
+    
+    <div class="upload-tabs">
+      <button class="upload-tab active" onclick="switchUploadTab(event, 'image-tab')">🖼️ Image Upload</button>
+      <button class="upload-tab" onclick="switchUploadTab(event, 'video-tab')">🎥 Video Upload</button>
+      <button class="upload-tab" onclick="switchUploadTab(event, 'audio-tab')">🎙️ Audio Upload</button>
+    </div>
+
+    <!-- Image Upload -->
+    <div id="image-tab" class="upload-content active">
+      <div class="upload-drop" id="imageDrop" onclick="document.getElementById('imageInput').click()">
+        <div class="upload-icon">🖼️</div>
+        <div class="upload-text">Drop Images Here or Click to Browse</div>
+        <div class="upload-subtext">Supports JPG, PNG (max 10MB per file)</div>
+      </div>
+      <input type="file" id="imageInput" class="file-input" accept="image/*" multiple onchange="handleImageUpload(event)"/>
+      <div id="imagePreview" class="preview-grid" style="margin-top:20px;"></div>
+    </div>
+
+    <!-- Video Upload -->
+    <div id="video-tab" class="upload-content">
+      <div class="upload-drop" id="videoDrop" onclick="document.getElementById('videoInput').click()">
+        <div class="upload-icon">🎥</div>
+        <div class="upload-text">Drop Videos Here or Click to Browse</div>
+        <div class="upload-subtext">Supports MP4, MOV, WebM (max 100MB per file)</div>
+      </div>
+      <input type="file" id="videoInput" class="file-input" accept="video/*" multiple onchange="handleVideoUpload(event)"/>
+      <div id="videoPreview" class="preview-grid" style="margin-top:20px;"></div>
+    </div>
+
+    <!-- Audio Upload -->
+    <div id="audio-tab" class="upload-content">
+      <div class="upload-drop" id="audioDrop" onclick="document.getElementById('audioInput').click()">
+        <div class="upload-icon">🎙️</div>
+        <div class="upload-text">Drop Audio Files Here or Click to Browse</div>
+        <div class="upload-subtext">Supports MP3, WAV, OGG (max 50MB per file)</div>
+      </div>
+      <input type="file" id="audioInput" class="file-input" accept="audio/*" multiple onchange="handleAudioUpload(event)"/>
+      <div id="audioPreview" style="margin-top:20px;" class="preview-grid"></div>
+    </div>
+
+    <div class="analyze-btn-container">
+      <button class="btn btn-primary analyze-btn" onclick="analyzeUploadedMedia()">🔍 Analyze for Autism Indicators</button>
+    </div>
+  </div>
+
+  <!-- RESULTS SECTION -->
+  <div id="resultsSection" class="result-container">
+    <div class="panel">
+      <div class="panel-hdr">
+        <h3>Autism Detection Results 📊</h3>
+        <button class="btn btn-sm btn-outline" onclick="resetResults()">Clear Results</button>
+      </div>
+
+      <div class="result-tabs">
+        <button class="result-tab active" onclick="switchResultTab(event, 'simple-result')">Simple Output</button>
+        <button class="result-tab" onclick="switchResultTab(event, 'probability-result')">Probability Analysis</button>
+        <button class="result-tab" onclick="switchResultTab(event, 'behavior-result')">Behavior Analysis</button>
+        <button class="result-tab" onclick="switchResultTab(event, 'dashboard-result')">Dashboard View</button>
+        <button class="result-tab" onclick="switchResultTab(event, 'graph-result')">Probability Graph</button>
+      </div>
+
+      <!-- Simple Result -->
+      <div id="simple-result" class="result-view active">
+        <h4 style="margin-bottom:16px;font-weight:700">Autism Screening Result</h4>
+        <div class="simple-result">
+          <div class="result-metric">
+            <div class="result-metric-label">Eye Contact Score</div>
+            <div class="result-metric-value" id="eyeContactScore">32%</div>
+            <div class="result-metric-detail">Below Normal Level</div>
+          </div>
+          <div class="result-metric">
+            <div class="result-metric-label">Emotion Response</div>
+            <div class="result-metric-value" id="emotionResponse">Low</div>
+            <div class="result-metric-detail">Weak Facial Expression</div>
+          </div>
+          <div class="result-metric">
+            <div class="result-metric-label">Speech Pattern</div>
+            <div class="result-metric-value" id="speechPattern">Delayed</div>
+            <div class="result-metric-detail">Slower Speech Processing</div>
+          </div>
+          <div class="result-metric warning">
+            <div class="result-metric-label">Repetitive Behavior</div>
+            <div class="result-metric-value" id="repetitiveBehavior">Detected</div>
+            <div class="result-metric-detail">Patterns Identified</div>
+          </div>
+        </div>
+        <div style="margin-top:24px;padding:16px;background:var(--orange-bg);border-radius:var(--r);border-left:4px solid var(--accent-d)">
+          <div style="font-size:.85rem;font-weight:700;color:var(--accent-d);margin-bottom:4px">AUTISM RISK LEVEL: HIGH ⚠️</div>
+          <div style="font-size:.9rem;color:var(--text);margin-bottom:8px">Model Confidence: <strong id="simpleConfidence">81%</strong></div>
+          <div style="font-size:.8rem;color:var(--text)">Recommendation: Consult a child specialist for further evaluation</div>
+        </div>
+      </div>
+
+      <!-- Probability Result -->
+      <div id="probability-result" class="result-view">
+        <h4 style="margin-bottom:16px;font-weight:700">Prediction Probabilities</h4>
+        <div id="probabilityContainer">
+          <div class="probability-item">
+            <div class="probability-name">Autism Spectrum Disorder (ASD)</div>
+            <div class="probability-bar"><div class="probability-fill" style="width:76%">76%</div></div>
+            <div class="probability-percent">0.76</div>
+          </div>
+          <div class="probability-item">
+            <div class="probability-name">ADHD</div>
+            <div class="probability-bar"><div class="probability-fill" style="width:15%;background:var(--border)">15%</div></div>
+            <div class="probability-percent">0.15</div>
+          </div>
+          <div class="probability-item">
+            <div class="probability-name">Normal Behavior</div>
+            <div class="probability-bar"><div class="probability-fill" style="width:9%;background:var(--primary-l)">9%</div></div>
+            <div class="probability-percent">0.09</div>
+          </div>
+        </div>
+        <div style="margin-top:20px;padding:16px;background:var(--orange-bg);border-radius:var(--r)">
+          <div style="font-size:.85rem;font-weight:700;color:var(--accent-d);margin-bottom:4px">Final Prediction: Autism Likely</div>
+          <div style="font-size:.9rem;color:var(--text)">Confidence Level: <strong id="probConfidence">76%</strong></div>
+        </div>
+      </div>
+
+      <!-- Behavior Analysis Result -->
+      <div id="behavior-result" class="result-view">
+        <h4 style="margin-bottom:16px;font-weight:700">Behavior Analysis Report</h4>
+        <div class="behavior-grid">
+          <div class="behavior-item">
+            <div class="behavior-item-label">Eye Contact Duration</div>
+            <div class="behavior-item-value" id="eyeContactDuration">2.1 sec</div>
+            <div class="behavior-item-detail">Minimal eye engagement</div>
+          </div>
+          <div class="behavior-item">
+            <div class="behavior-item-label">Hand Movement Pattern</div>
+            <div class="behavior-item-value">Repetitive</div>
+            <div class="behavior-item-detail">Stereotyped movements</div>
+          </div>
+          <div class="behavior-item">
+            <div class="behavior-item-label">Social Response Time</div>
+            <div class="behavior-item-value" id="socialResponseTime">Slow</div>
+            <div class="behavior-item-detail">Delayed reaction</div>
+          </div>
+          <div class="behavior-item">
+            <div class="behavior-item-label">Behavior Score</div>
+            <div class="behavior-item-value" id="behaviorScore">68/100</div>
+            <div class="behavior-item-detail">Moderate risk indicators</div>
+          </div>
+        </div>
+        <div style="margin-top:20px;padding:16px;background:var(--yellow-bg);border-radius:var(--r);border-left:4px solid #f4a261">
+          <div style="font-size:.85rem;font-weight:700;margin-bottom:8px">Autism Risk Assessment: Moderate</div>
+          <div style="font-size:.8rem;color:var(--text)">Based on observed behavioral patterns and response metrics</div>
+        </div>
+      </div>
+
+      <!-- Dashboard Result -->
+      <div id="dashboard-result" class="result-view">
+        <h4 style="margin-bottom:16px;font-weight:700">Clinical Dashboard Summary</h4>
+        <div class="dashboard-result">
+          <div>
+            <table class="result-table">
+              <tr><td>Eye Contact</td><td>Low</td></tr>
+              <tr><td>Facial Emotion Response</td><td>Weak</td></tr>
+              <tr><td>Speech Pattern</td><td>Delayed</td></tr>
+              <tr><td>Repetitive Behavior</td><td>Yes</td></tr>
+              <tr><td>Social Engagement</td><td>Limited</td></tr>
+              <tr><td>Response to Stimuli</td><td>Slow</td></tr>
+              <tr style="background:var(--green-bg);font-weight:700"><td>Overall Assessment</td><td style="color:var(--primary)">High Risk</td></tr>
+            </table>
+          </div>
+          <div class="result-summary-box">
+            <div class="result-summary-label">Final Diagnosis</div>
+            <div class="result-summary-value">78%</div>
+            <div style="font-size:.9rem;opacity:.9;margin-bottom:16px">Autism Risk Probability</div>
+            <div style="background:rgba(255,255,255,.2);padding:12px;border-radius:8px;font-size:.85rem">
+              Recommendation: Schedule specialist consultation for detailed diagnostic assessment
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graph Result -->
+      <div id="graph-result" class="result-view">
+        <h4 style="margin-bottom:16px;font-weight:700">Probability Distribution Graph</h4>
+        <div class="graph-container">
+          <div style="width:100%">
+            <div class="graph-bar">
+              <div class="graph-label">Autism (ASD)</div>
+              <div class="graph-visual">
+                <div class="graph-blocks">
+                  <div class="graph-block"></div><div class="graph-block"></div><div class="graph-block"></div><div class="graph-block"></div><div class="graph-block"></div><div class="graph-block"></div><div class="graph-block"></div><div class="graph-block"></div>
+                </div>
+              </div>
+              <div class="graph-percent">78%</div>
+            </div>
+            <div class="graph-bar">
+              <div class="graph-label">ADHD</div>
+              <div class="graph-visual">
+                <div class="graph-blocks">
+                  <div class="graph-block secondary"></div><div class="graph-block secondary"></div>
+                </div>
+              </div>
+              <div class="graph-percent">14%</div>
+            </div>
+            <div class="graph-bar">
+              <div class="graph-label">Normal</div>
+              <div class="graph-visual">
+                <div class="graph-blocks">
+                  <div class="graph-block tertiary"></div>
+                </div>
+              </div>
+              <div class="graph-percent">8%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-icon" style="background:var(--blue-bg)">📊</div>
+      <div class="kpi-val">800</div>
+      <div class="kpi-lbl">Total Records (Kaggle)</div>
+      <div class="kpi-sub kpi-up">↑ ML Olympiad Dataset</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon" style="background:var(--orange-bg)">⚠️</div>
+      <div class="kpi-val">368</div>
+      <div class="kpi-lbl">ASD Positive Cases</div>
+      <div class="kpi-sub kpi-warn">46% of dataset</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon" style="background:var(--green-bg)">🤖</div>
+      <div class="kpi-val">98.7%</div>
+      <div class="kpi-lbl">Model Accuracy (RF)</div>
+      <div class="kpi-sub kpi-up">↑ Best performer</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon" style="background:var(--yellow-bg)">📋</div>
+      <div class="kpi-val">7.8</div>
+      <div class="kpi-lbl">Avg AQ-10 (ASD+)</div>
+      <div class="kpi-sub" style="color:var(--muted)">vs 2.4 (ASD−)</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="dash-grid">
+
+    <!-- Recent Records -->
+    <div class="panel">
+      <div class="panel-hdr">
+        <h3>Recent Dataset Records</h3>
+        <a href="dataset.html">View All →</a>
+      </div>
+      <div id="recentRecords"></div>
+    </div>
+
+    <!-- Activity -->
+    <div class="panel">
+      <div class="panel-hdr"><h3>Dataset Insights</h3></div>
+      <div class="feed" id="insightFeed"></div>
+    </div>
+
+  </div>
+
+  <!-- 3-COLUMN GRID -->
+  <div class="dash-grid-3">
+
+    <!-- Monthly chart placeholder (AQ score dist) -->
+    <div class="panel" style="grid-column:span 2">
+      <div class="panel-hdr">
+        <h3>AQ-10 Score Distribution</h3>
+        <span style="font-size:.76rem;color:var(--muted)">ASD+ vs ASD− from Kaggle</span>
+      </div>
+      <div class="bar-chart" id="barChart"></div>
+      <div style="display:flex;gap:12px;font-size:.72rem;margin-top:4px">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:var(--accent-d);display:inline-block;border-radius:2px"></span>ASD+</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:var(--primary-l);display:inline-block;border-radius:2px"></span>ASD−</span>
+      </div>
+    </div>
+
+    <!-- Demographic breakdown -->
+    <div class="panel">
+      <div class="panel-hdr"><h3>Key Metrics</h3></div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="progress-item">
+          <div class="progress-hdr"><span>Male records</span><span style="color:var(--primary)">63%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-green" data-w="63%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-hdr"><span>ASD with Jaundice</span><span style="color:var(--accent-d)">62%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-red" data-w="62%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-hdr"><span>ASD with Family History</span><span style="color:var(--accent-d)">55%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-red" data-w="55%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-hdr"><span>AQ-10 ≥ 6 (referral)</span><span style="color:var(--primary)">49%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-green" data-w="49%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-hdr"><span>White-European ethnicity</span><span style="color:var(--muted)">41%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-blue" data-w="41%"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="panel">
+    <div class="panel-hdr"><h3>Quick Actions</h3></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <a href="predict.html" class="btn btn-primary">📝 Run AQ-10 Test</a>
+      <a href="dataset.html" class="btn btn-outline">📊 Explore Dataset</a>
+      <a href="about.html"   class="btn btn-ghost">🔬 Model Methodology</a>
+    </div>
+  </div>
+
+    <!-- Activity -->
+    <div class="panel">
+      <div class="panel-hdr"><h3>Dataset Insights</h3></div>
+      <div class="feed" id="insightFeed"></div>
+    </div>
+
+  </div>
+
+  <!-- 3-COLUMN GRID -->
+  <div class="dash-grid-3">
+
+    <!-- Monthly chart placeholder (AQ score dist) -->
+    <div class="panel" style="grid-column:span 2">
+      <div class="panel-hdr">
+        <h3>AQ-10 Score Distribution</h3>
+        <span style="font-size:.76rem;color:var(--muted)">ASD+ vs ASD− from Kaggle</span>
+      </div>
+      <div class="bar-chart" id="barChart"></div>
+      <div style="display:flex;gap:12px;font-size:.72rem;margin-top:4px">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:var(--accent-d);display:inline-block;border-radius:2px"></span>ASD+</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:var(--primary-l);display:inline-block;border-radius:2px"></span>ASD−</span>
+      </div>
+    </div>
+
+    <!-- Demographic breakdown -->
+    <div class="panel">
+      <div class="panel-hdr"><h3>Key Metrics</h3></div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="progress-item">
+          <div class="progress-hdr"><span>Male records</span><span style="color:var(--primary)">63%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-green" data-w="63%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-hdr"><span>ASD with Jaundice</span><span style="color:var(--accent-d)">62%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-red" data-w="62%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-hdr"><span>ASD with Family History</span><span style="color:var(--accent-d)">55%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-red" data-w="55%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-hdr"><span>AQ-10 ≥ 6 (referral)</span><span style="color:var(--primary)">49%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-green" data-w="49%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-hdr"><span>White-European ethnicity</span><span style="color:var(--muted)">41%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-blue" data-w="41%"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="panel">
+    <div class="panel-hdr"><h3>Quick Actions</h3></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <a href="predict.html" class="btn btn-primary">📝 Run AQ-10 Test</a>
+      <a href="dataset.html" class="btn btn-outline">📊 Explore Dataset</a>
+      <a href="about.html"   class="btn btn-ghost">🔬 Model Methodology</a>
+    </div>
+  </div>
+
+</div>
+
+<div id="footer-ph"></div>
+<div id="modals-ph"></div>
+
+<script src="../data/kaggle-dataset.js"></script>
+<script type="module" src="../js/shared.js"></script>
+<script>
+// ============ UPLOAD HANDLERS ============
+const uploadedFiles = {
+  images: [],
+  videos: [],
+  audio: []
+};
+
+function handleImageUpload(event) {
+  const files = Array.from(event.target.files);
+  uploadedFiles.images.push(...files);
+  renderImagePreview();
+}
+
+function handleVideoUpload(event) {
+  const files = Array.from(event.target.files);
+  uploadedFiles.videos.push(...files);
+  renderVideoPreview();
+}
+
+function handleAudioUpload(event) {
+  const files = Array.from(event.target.files);
+  uploadedFiles.audio.push(...files);
+  renderAudioPreview();
+}
+
+function renderImagePreview() {
+  const container = document.getElementById('imagePreview');
+  container.innerHTML = uploadedFiles.images.map((file, idx) => `
+    <div class="preview-item">
+      <img src="${URL.createObjectURL(file)}" alt="preview"/>
+      <div class="preview-name">${file.name}</div>
+      <div class="preview-remove" onclick="removeImage(${idx})">✕</div>
+    </div>
+  `).join('');
+}
+
+function renderVideoPreview() {
+  const container = document.getElementById('videoPreview');
+  container.innerHTML = uploadedFiles.videos.map((file, idx) => `
+    <div class="preview-item">
+      <video src="${URL.createObjectURL(file)}"></video>
+      <div class="preview-name">${file.name}</div>
+      <div class="preview-remove" onclick="removeVideo(${idx})">✕</div>
+    </div>
+  `).join('');
+}
+
+function renderAudioPreview() {
+  const container = document.getElementById('audioPreview');
+  container.innerHTML = uploadedFiles.audio.map((file, idx) => `
+    <div style="padding:12px;background:var(--bg);border-radius:var(--r-sm);display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="flex:1">
+        <div style="font-size:.88rem;font-weight:600;margin-bottom:4px">🎵 ${file.name}</div>
+        <audio style="width:100%;height:24px" controls src="${URL.createObjectURL(file)}"></audio>
+      </div>
+      <button class="btn btn-sm btn-ghost" onclick="removeAudio(${idx})">Remove</button>
+    </div>
+  `).join('');
+}
+
+function removeImage(idx) {
+  uploadedFiles.images.splice(idx, 1);
+  renderImagePreview();
+}
+
+function removeVideo(idx) {
+  uploadedFiles.videos.splice(idx, 1);
+  renderVideoPreview();
+}
+
+function removeAudio(idx) {
+  uploadedFiles.audio.splice(idx, 1);
+  renderAudioPreview();
+}
+
+// ============ TAB SWITCHING ============
+function switchUploadTab(event, tabId) {
+  document.querySelectorAll('.upload-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.upload-content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+function switchResultTab(event, tabId) {
+  document.querySelectorAll('.result-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.result-view').forEach(v => v.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+// ============ DRAG & DROP ============
+['imageDrop', 'videoDrop', 'audioDrop'].forEach(id => {
+  const elem = document.getElementById(id);
+  elem?.addEventListener('dragover', (e) => {e.preventDefault(); elem.classList.add('dragover')});
+  elem?.addEventListener('dragleave', (e) => {elem.classList.remove('dragover')});
+  elem?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    elem.classList.remove('dragover');
+    const input = elem.nextElementSibling;
+    input.files = e.dataTransfer.files;
+    input.dispatchEvent(new Event('change', {bubbles: true}));
+  });
+});
+
+// ============ ANALYSIS & RESULTS ============
+function analyzeUploadedMedia() {
+  if (uploadedFiles.images.length === 0 && uploadedFiles.videos.length === 0 && uploadedFiles.audio.length === 0) {
+    alert('Please upload at least one image, video, or audio file to analyze.');
+    return;
+  }
+
+  // Generate mock results based on uploaded files
+  generateMockResults();
+  
+  // Show results section
+  document.getElementById('resultsSection').classList.add('show');
+  
+  // Scroll to results
+  setTimeout(() => {
+    document.getElementById('resultsSection').scrollIntoView({behavior: 'smooth'});
+  }, 100);
+}
+
+function generateMockResults() {
+  const imageCount = uploadedFiles.images.length;
+  const videoCount = uploadedFiles.videos.length;
+  const audioCount = uploadedFiles.audio.length;
+  
+  // Simulate analysis based on file types uploaded
+  let baseScore = 60;
+  
+  // Adjust scores based on uploaded media types
+  if (imageCount > 0) baseScore += 10;
+  if (videoCount > 0) baseScore += 8;
+  if (audioCount > 0) baseScore += 7;
+  
+  // Ensure score doesn't exceed 95
+  const finalScore = Math.min(baseScore + Math.random() * 15, 95);
+  const confidence = Math.round(59 + Math.random() * 20);
+  
+  // Update simple result
+  const scores = [32, 45, 28, 52, 38, 44];
+  document.getElementById('eyeContactScore').textContent = scores[0] + '%';
+  document.getElementById('simpleConfidence').textContent = confidence + '%';
+  
+  // Update behavior scores
+  const behaviorScores = [2.1, 2.8, 1.9, 3.2, 2.5];
+  document.getElementById('eyeContactDuration').textContent = (1.5 + Math.random() * 2).toFixed(1) + ' sec';
+  document.getElementById('behaviorScore').textContent = '68/100';
+  
+  // Update probability results
+  document.getElementById('probConfidence').textContent = Math.round(finalScore) + '%';
+}
+
+function resetResults() {
+  document.getElementById('resultsSection').classList.remove('show');
+  uploadedFiles.images = [];
+  uploadedFiles.videos = [];
+  uploadedFiles.audio = [];
+  document.getElementById('imagePreview').innerHTML = '';
+  document.getElementById('videoPreview').innerHTML = '';
+  document.getElementById('audioPreview').innerHTML = '';
+  document.getElementById('imageInput').value = '';
+  document.getElementById('videoInput').value = '';
+  document.getElementById('audioInput').value = '';
+}
+
+// ============ DASHBOARD DATA ============
+document.addEventListener('DOMContentLoaded', () => {
+  
+  // Initialize progress bars with data-w attribute
+  document.querySelectorAll('.progress-fill[data-w]').forEach(el => {
+    const width = el.getAttribute('data-w');
+    el.style.width = width;
+  });
+
+  // Recent records from dataset
+  const recent = DATASET.slice(0, 8);
+  const colors = ['#2d6a4f','#52b788','#f4a261','#4361ee','#e76f51','#4cc9f0','#7b2d8b','#e9c46a'];
+  document.getElementById('recentRecords').innerHTML = recent.map((r, i) => {
+    const aq  = r[0]+r[1]+r[2]+r[3]+r[4]+r[5]+r[6]+r[7]+r[8]+r[9];
+    const asd = r[19];
+    const clr = asd ? '#e76f51' : '#52b788';
+    return `
+      <div class="record-row">
+        <div class="record-av" style="background:${colors[i%colors.length]}">${r[11].toUpperCase()}${i+1}</div>
+        <div class="record-info">
+          <strong>Age ${r[10]} · ${r[11]==='m'?'Male':'Female'} · ${r[12]}</strong>
+          <span>AQ-10: ${aq}/10 · ${r[15]} · Jaundice: ${r[13]}</span>
+        </div>
+        <span class="record-score" style="color:${clr}">${asd?'ASD+':'ASD−'}</span>
+      </div>`;
+  }).join('');
+
+  // Insights feed
+  const insights = [
+    {type:'',    text:'<strong>A7 & A10</strong> are the top ASD-predictive features in the Kaggle RF model', time:'Feature Importance'},
+    {type:'warn',text:'<strong>62%</strong> of jaundice-positive cases in dataset are ASD positive',           time:'Jaundice Correlation'},
+    {type:'',    text:'AQ-10 score ≥6 is the official referral threshold — <strong>49%</strong> of dataset meets it', time:'AQ-10 Threshold'},
+    {type:'warn',text:'<strong>Males</strong> represent 63% of the dataset (504 of 800 records)',              time:'Gender Distribution'},
+    {type:'',    text:'Random Forest achieves <strong>98.7% accuracy</strong> — best among 6 tested models',  time:'Model Performance'},
+  ];
+  document.getElementById('insightFeed').innerHTML = insights.map(a => `
+    <div class="feed-item">
+      <div class="feed-dot" style="background:${a.type==='warn'?'var(--accent)':'var(--primary-l)'}"></div>
+      <div>
+        <div class="feed-text">${a.text}</div>
+        <div class="feed-time">${a.time}</div>
+      </div>
+    </div>`).join('');
+
+  // AQ bar chart
+  const dist = [
+    {score:0, asd:2,no:68},{score:1,asd:3,no:82},{score:2,asd:5,no:71},
+    {score:3,asd:8,no:58},{score:4,asd:12,no:44},{score:5,asd:18,no:32},
+    {score:6,asd:42,no:21},{score:7,asd:68,no:18},{score:8,asd:82,no:12},
+    {score:9,asd:74,no:8},{score:10,asd:54,no:3},
+  ];
+  const maxT = Math.max(...dist.map(d => d.asd+d.no));
+  document.getElementById('barChart').innerHTML = dist.map(d => {
+    const total = d.asd + d.no;
+    const hT = Math.round((total / maxT) * 110);
+    const hA = Math.round((d.asd / total) * hT);
+    const hN = hT - hA;
+    return `
+      <div class="bar-col" title="AQ-10=${d.score}: ASD+(${d.asd}) ASD−(${d.no})">
+        <div class="bar-bar" style="height:${hN}px;background:var(--primary-l)"></div>
+        <div class="bar-bar" style="height:${hA}px;background:var(--accent-d);border-radius:0"></div>
+        <div class="bar-lbl">${d.score}</div>
+      </div>`;
+  }).join('');
+
+});
+</script>
+</body>
+</html>

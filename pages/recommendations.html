@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Personalized Recommendations — NeuroScan</title>
+  <link rel="stylesheet" href="../css/main.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    .recs-header {
+      background: linear-gradient(135deg, #1b3a5c, #2d6a4f); color:#fff;
+      padding: 48px 44px; position:relative; overflow:hidden;
+    }
+    .recs-header::before {
+      content:'💊'; position:absolute; right:60px; top:50%; transform:translateY(-50%);
+      font-size:8rem; opacity:.08;
+    }
+    .recs-header h1 { font-family:var(--font-d); font-size:2.4rem; margin:0 0 10px; }
+    .recs-header p { color:rgba(255,255,255,.75); max-width:560px; line-height:1.65; }
+    .recs-inner { max-width:1100px; margin:0 auto; }
+
+    .recs-layout {
+      max-width:1100px; margin:0 auto; padding:36px 44px 80px;
+    }
+    @media(max-width:768px){.recs-layout{padding:20px}}
+
+    /* Tab nav */
+    .recs-tabs {
+      display:flex; gap:4px; margin-bottom:28px; background:var(--card);
+      border-radius:var(--r); padding:5px; border:1px solid var(--border);
+      overflow-x:auto; flex-wrap:nowrap;
+    }
+    .recs-tab {
+      flex-shrink:0; padding:10px 18px; border:none; background:transparent;
+      font-size:.85rem; font-weight:700; cursor:pointer; border-radius:calc(var(--r) - 4px);
+      transition:all .2s; color:var(--muted); white-space:nowrap;
+    }
+    .recs-tab.active { background:#fff; color:var(--primary); box-shadow:0 2px 10px rgba(0,0,0,.08); }
+
+    .recs-section { display:none; }
+    .recs-section.active { display:block; }
+
+    /* Therapy cards */
+    .therapy-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:18px; }
+    .therapy-card {
+      background:var(--card); border-radius:var(--r); padding:24px;
+      border:1px solid var(--border); transition:all .3s;
+    }
+    .therapy-card:hover { transform:translateY(-3px); box-shadow:0 8px 28px rgba(0,0,0,.08); }
+    .therapy-icon { font-size:2rem; margin-bottom:12px; }
+    .therapy-name { font-size:1rem; font-weight:800; margin-bottom:6px; }
+    .therapy-disorder-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px; }
+    .therapy-disorder-tag {
+      padding:2px 10px; border-radius:50px; font-size:.68rem; font-weight:700;
+      background:var(--green-bg); color:var(--primary); border:1px solid var(--primary-l);
+    }
+    .therapy-desc { font-size:.83rem; color:var(--muted); line-height:1.6; margin-bottom:12px; }
+    .therapy-meta { display:flex; flex-wrap:wrap; gap:8px; }
+    .therapy-meta-pill {
+      padding:4px 12px; border-radius:50px; font-size:.72rem; font-weight:700;
+      background:var(--bg); color:var(--text); border:1px solid var(--border);
+    }
+    .therapy-evidence {
+      display:inline-flex; align-items:center; gap:4px;
+      padding:4px 12px; border-radius:50px; font-size:.72rem; font-weight:800;
+    }
+    .evidence-high { background:#e8f5e9; color:#2d6a4f; }
+    .evidence-moderate { background:#fff8e1; color:#7a5c00; }
+    .evidence-emerging { background:#f3e5f5; color:#7b1fa2; }
+
+    /* Daily plan */
+    .daily-plan-timeline { position:relative; padding-left:32px; }
+    .daily-plan-timeline::before {
+      content:''; position:absolute; left:14px; top:0; bottom:0; width:2px; background:var(--border);
+    }
+    .plan-item { position:relative; margin-bottom:20px; }
+    .plan-dot {
+      position:absolute; left:-26px; top:4px; width:24px; height:24px;
+      border-radius:50%; background:var(--primary); display:flex; align-items:center;
+      justify-content:center; font-size:.75rem; flex-shrink:0; box-shadow:0 0 0 4px var(--bg);
+    }
+    .plan-card {
+      background:var(--card); border-radius:var(--r-sm); padding:16px 18px;
+      border:1px solid var(--border);
+    }
+    .plan-time { font-size:.72rem; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; }
+    .plan-activity { font-size:.9rem; font-weight:700; margin-bottom:4px; }
+    .plan-detail { font-size:.8rem; color:var(--muted); line-height:1.5; }
+
+    /* Diet cards */
+    .diet-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
+    .diet-card {
+      background:var(--card); border-radius:var(--r); padding:20px;
+      border:1px solid var(--border);
+    }
+    .diet-icon { font-size:2rem; margin-bottom:10px; }
+    .diet-food { font-size:.95rem; font-weight:800; margin-bottom:6px; }
+    .diet-why { font-size:.8rem; color:var(--muted); line-height:1.55; margin-bottom:10px; }
+    .diet-tag {
+      display:inline-block; padding:3px 10px; border-radius:50px;
+      font-size:.68rem; font-weight:700; background:var(--green-bg);
+      color:var(--primary); border:1px solid var(--primary-l);
+    }
+
+    /* Exercise cards */
+    .exercise-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
+    .exercise-card {
+      background:var(--card); border-radius:var(--r); padding:20px;
+      border:1px solid var(--border); display:flex; flex-direction:column;
+    }
+    .exercise-icon { font-size:2rem; margin-bottom:10px; }
+    .exercise-name { font-size:.95rem; font-weight:800; margin-bottom:6px; }
+    .exercise-desc { font-size:.8rem; color:var(--muted); line-height:1.55; flex:1; margin-bottom:10px; }
+    .exercise-meta { display:flex; gap:6px; flex-wrap:wrap; }
+    .exercise-pill {
+      padding:3px 10px; border-radius:50px; font-size:.68rem; font-weight:700;
+      border:1.5px solid var(--border); color:var(--muted);
+    }
+
+    /* Specialists */
+    .specialist-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
+    .specialist-card {
+      background:var(--card); border-radius:var(--r); padding:20px;
+      border:1px solid var(--border); text-align:center;
+    }
+    .specialist-avatar { font-size:2.2rem; margin-bottom:8px; }
+    .specialist-title { font-size:.9rem; font-weight:800; margin-bottom:4px; }
+    .specialist-role { font-size:.78rem; color:var(--muted); margin-bottom:12px; line-height:1.5; }
+    .specialist-badge {
+      display:inline-block; padding:3px 12px; border-radius:50px;
+      font-size:.7rem; font-weight:700; background:var(--green-bg);
+      color:var(--primary); border:1px solid var(--primary-l);
+    }
+
+    /* Section title */
+    .section-title { font-family:var(--font-d); font-size:1.5rem; margin:0 0 6px; }
+    .section-sub { font-size:.88rem; color:var(--muted); margin-bottom:24px; line-height:1.6; }
+
+    /* Alert card */
+    .alert-card {
+      background:#ffe5d9; border-radius:var(--r); padding:18px 22px;
+      border-left:4px solid #c44b1b; margin-bottom:24px; font-size:.88rem;
+      color:#6b2a0e; line-height:1.65;
+    }
+  </style>
+</head>
+<body>
+<script type="module" src="../js/shared.js"></script>
+
+<div class="recs-header">
+  <div class="recs-inner">
+    <span style="background:rgba(255,255,255,.12);padding:4px 14px;border-radius:50px;font-size:.75rem;font-weight:700;border:1px solid rgba(255,255,255,.2);display:inline-block;margin-bottom:14px">🎯 Personalized Recommendations Engine</span>
+    <h1>Therapy & Care Plan</h1>
+    <p>Evidence-based therapies, diet guidance, daily improvement plans, and specialist referrals — personalized based on neurological assessment results.</p>
+  </div>
+</div>
+
+<div class="recs-layout">
+  <div class="alert-card">
+    ⚠️ <strong>Medical Disclaimer:</strong> These recommendations are AI-generated educational suggestions based on general neurodevelopmental research. They do not constitute a medical diagnosis or treatment plan. Always consult qualified healthcare professionals before implementing any therapeutic intervention.
+  </div>
+
+  <div class="recs-tabs">
+    <button class="recs-tab active" onclick="showRecsTab('therapies')">💊 Therapies</button>
+    <button class="recs-tab" onclick="showRecsTab('daily')">🗓️ Daily Plan</button>
+    <button class="recs-tab" onclick="showRecsTab('diet')">🥗 Diet & Nutrition</button>
+    <button class="recs-tab" onclick="showRecsTab('exercise')">🏃 Exercise</button>
+    <button class="recs-tab" onclick="showRecsTab('specialists')">👨‍⚕️ Specialists</button>
+    <button class="recs-tab" onclick="showRecsTab('resources')">📚 Resources</button>
+  </div>
+
+  <!-- THERAPIES -->
+  <div class="recs-section active" id="tab-therapies">
+    <div class="section-title">Evidence-Based Therapies</div>
+    <div class="section-sub">Leading therapeutic interventions for neurodevelopmental conditions, organized by evidence strength and applicability.</div>
+    <div class="therapy-grid" id="therapyGrid"></div>
+  </div>
+
+  <!-- DAILY PLAN -->
+  <div class="recs-section" id="tab-daily">
+    <div class="section-title">Daily Improvement Plan</div>
+    <div class="section-sub">A structured 24-hour routine designed to support neurological development, behavioral regulation, and skill-building.</div>
+    <div class="daily-plan-timeline" id="dailyPlanTimeline"></div>
+  </div>
+
+  <!-- DIET -->
+  <div class="recs-section" id="tab-diet">
+    <div class="section-title">Nutrition & Diet Guidance</div>
+    <div class="section-sub">Research-supported dietary recommendations that may support neurodevelopmental function and behavioral regulation.</div>
+    <div class="diet-grid" id="dietGrid"></div>
+  </div>
+
+  <!-- EXERCISE -->
+  <div class="recs-section" id="tab-exercise">
+    <div class="section-title">Therapeutic Exercise & Movement</div>
+    <div class="section-sub">Physical activities with evidence for improving attention, sensory regulation, emotional control, and social skills.</div>
+    <div class="exercise-grid" id="exerciseGrid"></div>
+  </div>
+
+  <!-- SPECIALISTS -->
+  <div class="recs-section" id="tab-specialists">
+    <div class="section-title">Specialist Referral Guide</div>
+    <div class="section-sub">Key healthcare professionals involved in neurodevelopmental assessment and treatment.</div>
+    <div class="specialist-grid" id="specialistGrid"></div>
+  </div>
+
+  <!-- RESOURCES -->
+  <div class="recs-section" id="tab-resources">
+    <div class="section-title">Trusted Resources</div>
+    <div class="section-sub">Vetted organizations, reading materials, and support networks for families and clinicians.</div>
+    <div id="resourcesList"></div>
+  </div>
+</div>
+
+<script>
+window.showRecsTab = function(name) {
+  document.querySelectorAll('.recs-tab').forEach((t,i) => {
+    const tabs = ['therapies','daily','diet','exercise','specialists','resources'];
+    t.classList.toggle('active', tabs[i] === name);
+  });
+  document.querySelectorAll('.recs-section').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(`tab-${name}`);
+  if (el) el.classList.add('active');
+};
+
+// ── THERAPIES DATA ────────────────────────────────────────────
+const THERAPIES = [
+  {
+    icon:'🧩', name:'Applied Behavior Analysis (ABA)',
+    disorders:['ASD'], evidence:'high',
+    desc:'Scientifically validated behavioral intervention that improves specific behaviors and teaches new skills using reinforcement. Gold standard for ASD treatment.',
+    frequency:'20-40 hrs/week intensive', age:'2+ years', setting:'Home, clinic, school',
+    goals:['Communication','Social skills','Adaptive behavior','Reducing challenging behaviors']
+  },
+  {
+    icon:'💬', name:'Speech-Language Therapy (SLP)',
+    disorders:['ASD','Speech Delay','Dyslexia'], evidence:'high',
+    desc:'Professional therapy targeting communication — articulation, language comprehension, expression, phonological awareness, and pragmatic communication.',
+    frequency:'2-3 sessions/week', age:'12 months+', setting:'Clinic, school',
+    goals:['Expressive language','Articulation','Reading/phonics','Social communication']
+  },
+  {
+    icon:'🧠', name:'Cognitive Behavioral Therapy (CBT)',
+    disorders:['ADHD','Social Anxiety'], evidence:'high',
+    desc:'Structured therapy addressing thought patterns, emotional regulation, and behavioral responses. Highly effective for anxiety disorders and executive function.',
+    frequency:'1 session/week', age:'6+ years', setting:'Therapist office',
+    goals:['Anxiety reduction','Emotional regulation','Coping strategies','Executive function']
+  },
+  {
+    icon:'✋', name:'Sensory Integration Therapy (OT)',
+    disorders:['ASD','SPD'], evidence:'moderate',
+    desc:'Occupational therapy using controlled sensory activities to improve how the brain processes and responds to sensory input from the environment.',
+    frequency:'1-2 sessions/week', age:'2+ years', setting:'OT clinic',
+    goals:['Sensory processing','Motor coordination','Self-regulation','Daily function']
+  },
+  {
+    icon:'📖', name:'Orton-Gillingham Reading',
+    disorders:['Dyslexia'], evidence:'high',
+    desc:'Structured, systematic, multisensory literacy program specifically designed for dyslexia. Uses visual, auditory, and kinesthetic-tactile pathways simultaneously.',
+    frequency:'3-5 sessions/week', age:'5+ years', setting:'School or private tutor',
+    goals:['Phonological awareness','Decoding','Fluency','Spelling']
+  },
+  {
+    icon:'👥', name:'Social Skills Training (SST)',
+    disorders:['ASD','Social Anxiety','ADHD'], evidence:'moderate',
+    desc:'Structured group and individual sessions teaching specific social skills through modeling, role-play, and feedback in natural contexts.',
+    frequency:'2 sessions/week', age:'4+ years', setting:'Clinic, school groups',
+    goals:['Conversation skills','Friendship building','Reading social cues','Conflict resolution']
+  },
+  {
+    icon:'🎵', name:'Music Therapy',
+    disorders:['ASD','Speech Delay','ID'], evidence:'emerging',
+    desc:'Using music as a therapeutic tool to improve communication, social interaction, emotional expression, and cognitive skills.',
+    frequency:'1-2 sessions/week', age:'Any', setting:'Music therapy clinic',
+    goals:['Communication','Emotional expression','Social bonding','Attention']
+  },
+  {
+    icon:'🐾', name:'Animal-Assisted Therapy',
+    disorders:['ASD','Social Anxiety'], evidence:'emerging',
+    desc:'Structured interaction with trained therapy animals to reduce anxiety, improve social communication, and build emotional regulation skills.',
+    frequency:'1 session/week', age:'Any', setting:'Specialized AAT center',
+    goals:['Anxiety reduction','Social engagement','Emotional regulation','Motivation']
+  },
+  {
+    icon:'🧘', name:'Mindfulness-Based Therapy',
+    disorders:['ADHD','Social Anxiety'], evidence:'moderate',
+    desc:'Mindfulness and meditation practices adapted for children to improve attention, self-regulation, reduce anxiety, and build emotional awareness.',
+    frequency:'Daily practice + weekly session', age:'7+ years', setting:'Clinic, home',
+    goals:['Attention','Self-regulation','Anxiety reduction','Emotional awareness']
+  },
+  {
+    icon:'🎭', name:'Play Therapy',
+    disorders:['ASD','Speech Delay','Social Anxiety'], evidence:'moderate',
+    desc:'Child-centered therapy using play as the therapeutic medium, allowing children to express feelings, process experiences, and develop social skills.',
+    frequency:'1 session/week', age:'3-12 years', setting:'Therapist playroom',
+    goals:['Emotional processing','Social skills','Communication','Self-esteem']
+  },
+  {
+    icon:'📚', name:'Special Education (IEP)',
+    disorders:['Intellectual Disability','Dyslexia','ASD'], evidence:'high',
+    desc:'Individualized Education Program providing tailored academic support, accommodations, and specialized instruction within school settings.',
+    frequency:'Daily, school-based', age:'3-21 years', setting:'School',
+    goals:['Academic progress','Adaptive skills','Functional independence','Transition planning']
+  },
+  {
+    icon:'💻', name:'Augmentative & Alternative Communication (AAC)',
+    disorders:['ASD','Speech Delay','ID'], evidence:'high',
+    desc:'Communication devices and systems (apps, picture boards, speech-generating devices) for individuals with limited verbal communication.',
+    frequency:'Daily use', age:'18 months+', setting:'All environments',
+    goals:['Communication independence','Vocabulary','Reduce frustration','Academic access']
+  },
+];
+
+const evidenceLabels = { high:'🟢 High Evidence', moderate:'🟡 Moderate Evidence', emerging:'🔵 Emerging Research' };
+const evidenceClass = { high:'evidence-high', moderate:'evidence-moderate', emerging:'evidence-emerging' };
+
+document.getElementById('therapyGrid').innerHTML = THERAPIES.map(t => `
+  <div class="therapy-card">
+    <div class="therapy-icon">${t.icon}</div>
+    <div class="therapy-name">${t.name}</div>
+    <div class="therapy-disorder-tags">${t.disorders.map(d=>`<span class="therapy-disorder-tag">${d}</span>`).join('')}</div>
+    <div class="therapy-desc">${t.desc}</div>
+    <div style="margin-bottom:8px">
+      <div style="font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:4px">KEY GOALS:</div>
+      <div style="font-size:.78rem;line-height:1.7">${t.goals.map(g=>`• ${g}`).join('<br>')}</div>
+    </div>
+    <div class="therapy-meta">
+      <span class="therapy-meta-pill">⏱ ${t.frequency}</span>
+      <span class="therapy-meta-pill">🏠 ${t.setting}</span>
+      <span class="therapy-evidence ${evidenceClass[t.evidence]}">${evidenceLabels[t.evidence]}</span>
+    </div>
+  </div>
+`).join('');
+
+// ── DAILY PLAN ────────────────────────────────────────────────
+const DAILY_PLAN = [
+  { time:'6:30 – 7:00 AM', icon:'🌅', activity:'Gentle Wake-Up Routine', detail:'Consistent wake time every day. Natural light exposure. Avoid screens for the first hour. Calming morning music.' },
+  { time:'7:00 – 7:30 AM', icon:'🥗', activity:'Nutritious Breakfast', detail:'High-protein breakfast with omega-3 rich foods. Avoid high-sugar cereals. Include eggs, nuts, or avocado. Hydrate well.' },
+  { time:'7:30 – 8:00 AM', icon:'🏃', activity:'Morning Movement', detail:'20-30 minutes of aerobic activity or jumping. Improves attention and executive function for the day ahead.' },
+  { time:'8:00 – 8:30 AM', icon:'📋', activity:'Visual Schedule Review', detail:'Review the day\'s schedule with visual supports. Prepare for transitions. Set clear expectations for the day.' },
+  { time:'8:30 – 12:00 PM', icon:'📚', activity:'School / Learning Time', detail:'Use visual timers. Take sensory breaks every 45 minutes. Flexible seating. Fidget tools available if needed.' },
+  { time:'12:00 – 12:30 PM', icon:'🍱', activity:'Lunch Break', detail:'Quiet, low-stimulation environment preferred. Avoid food dyes and additives. Social lunch with peers if comfortable.' },
+  { time:'12:30 – 1:00 PM', icon:'😴', activity:'Rest or Quiet Activity', detail:'Brief rest period. Reduces sensory overload and prepares for afternoon focus. Reading or drawing encouraged.' },
+  { time:'1:00 – 3:30 PM', icon:'🧩', activity:'Therapy / Intervention Session', detail:'ABA, SLP, OT, or other prescribed therapy sessions. Homework with structured support. Positive reinforcement.' },
+  { time:'3:30 – 4:30 PM', icon:'🌳', activity:'Outdoor Free Play', detail:'Unstructured outdoor time. Allows sensory regulation, peer interaction, and physical activity in natural environment.' },
+  { time:'4:30 – 5:30 PM', icon:'🎨', activity:'Special Interest / Creative Time', detail:'Dedicated time for the child\'s special interests or creative pursuits. Builds confidence and intrinsic motivation.' },
+  { time:'5:30 – 6:30 PM', icon:'🍽️', activity:'Family Dinner', detail:'No screens at dinner. Predictable, structured mealtime. Family conversation. Introduce one new food weekly.' },
+  { time:'6:30 – 7:30 PM', icon:'📖', activity:'Calming Wind-Down', detail:'Low-stimulation activities: reading, puzzles, drawing. Dim lights gradually. Avoid high-energy play.' },
+  { time:'7:30 – 8:00 PM', icon:'🛁', activity:'Bedtime Routine', detail:'Consistent sequence: bath, pajamas, teeth, book. Deep pressure (weighted blanket). Same time every night.' },
+  { time:'8:00 PM', icon:'🌙', activity:'Sleep', detail:'Target 9-11 hours for children. Dark, cool, quiet room. White noise if helpful. Remove all screens from bedroom.' },
+];
+
+document.getElementById('dailyPlanTimeline').innerHTML = DAILY_PLAN.map(p => `
+  <div class="plan-item">
+    <div class="plan-dot">${p.icon}</div>
+    <div class="plan-card">
+      <div class="plan-time">${p.time}</div>
+      <div class="plan-activity">${p.activity}</div>
+      <div class="plan-detail">${p.detail}</div>
+    </div>
+  </div>
+`).join('');
+
+// ── DIET ──────────────────────────────────────────────────────
+const DIET_ITEMS = [
+  { icon:'🐟', food:'Omega-3 Fatty Acids', why:'Found in salmon, sardines, walnuts, flaxseed, and chia seeds. Supports neural development, reduces inflammation, and may improve attention and behavior.', tag:'🧠 Brain Health' },
+  { icon:'🥦', food:'Magnesium-Rich Vegetables', why:'Spinach, kale, broccoli, and avocado. Magnesium supports nervous system function, reduces anxiety, and may decrease hyperactivity.', tag:'😴 Calming' },
+  { icon:'🥚', food:'High-Quality Protein', why:'Eggs, legumes, lean meat. Protein provides amino acids needed for neurotransmitter production (dopamine, serotonin, GABA).', tag:'⚡ Neurotransmitters' },
+  { icon:'🫐', food:'Antioxidant-Rich Berries', why:'Blueberries, strawberries, raspberries contain antioxidants that protect neural tissue and support cognitive function and memory.', tag:'🧠 Cognitive Function' },
+  { icon:'🥛', food:'Vitamin D Sources', why:'Fortified milk, egg yolks, fatty fish, and sunlight. Vitamin D deficiency is linked to higher ASD and ADHD risk. Supplementation often recommended.', tag:'☀️ Development' },
+  { icon:'🥜', food:'Zinc-Rich Foods', why:'Pumpkin seeds, chickpeas, cashews. Zinc supports brain development, immune function, and behavior regulation. Often low in neurodevelopmental conditions.', tag:'🔬 Micronutrient' },
+  { icon:'🍓', food:'Gut-Health Probiotics', why:'Yogurt, kefir, kimchi, sauerkraut. The gut-brain axis is increasingly linked to neurodevelopmental conditions. A healthy microbiome supports mood and behavior.', tag:'🦠 Gut-Brain Axis' },
+  { icon:'💧', food:'Adequate Hydration', why:'Even mild dehydration impairs attention, memory, and behavior. Target body-weight × 0.033 liters per day. Avoid sugary drinks.', tag:'💧 Cognitive Performance' },
+  { icon:'🚫', food:'Avoid: Artificial Dyes & Additives', why:'Red 40, Yellow 5, and sodium benzoate have been linked to increased hyperactivity in children. Read food labels carefully.', tag:'⚠️ Avoid' },
+  { icon:'🍬', food:'Limit: Processed Sugars', why:'High sugar intake causes blood glucose spikes and crashes that exacerbate mood dysregulation, irritability, and inattention.', tag:'⚠️ Limit' },
+  { icon:'🍞', food:'Gluten/Casein Trial (ASD)', why:'Some families report behavioral improvements with gluten-free, casein-free (GFCF) diets for ASD, though evidence is inconclusive. Consult a dietitian.', tag:'🔬 Investigate' },
+  { icon:'🌿', food:'Iron-Rich Foods', why:'Iron deficiency is common in children with ADHD and ASD. Include lean meat, leafy greens, and fortified cereals. Monitor ferritin levels.', tag:'🔬 Micronutrient' },
+];
+
+document.getElementById('dietGrid').innerHTML = DIET_ITEMS.map(d => `
+  <div class="diet-card">
+    <div class="diet-icon">${d.icon}</div>
+    <div class="diet-food">${d.food}</div>
+    <div class="diet-why">${d.why}</div>
+    <span class="diet-tag">${d.tag}</span>
+  </div>
+`).join('');
+
+// ── EXERCISES ─────────────────────────────────────────────────
+const EXERCISES = [
+  { icon:'🏊', name:'Swimming', desc:'Full-body workout providing deep pressure sensory input, rhythmic movement, and proprioceptive feedback. Excellent for sensory regulation and focus.', duration:'30 min/session', freq:'3×/week', benefits:['Sensory regulation','Focus','Motor coordination'] },
+  { icon:'🧘', name:'Yoga & Mindfulness', desc:'Improves body awareness, self-regulation, attention, and reduces anxiety. Child-adapted yoga practices are highly effective.', duration:'20-30 min', freq:'Daily', benefits:['Self-regulation','Flexibility','Mindfulness'] },
+  { icon:'🤸', name:'Trampoline Jumping', desc:'Provides intense vestibular and proprioceptive stimulation for sensory seekers. Improves coordination and is highly motivating for many children.', duration:'10-15 min', freq:'Daily', benefits:['Sensory input','Coordination','Regulation'] },
+  { icon:'🥋', name:'Martial Arts (Karate/Judo)', desc:'Builds attention, self-control, sequential processing, and social respect. Structured environment with clear rules benefits neurodevelopmental profiles.', duration:'45-60 min', freq:'2-3×/week', benefits:['Focus','Discipline','Social skills'] },
+  { icon:'🚴', name:'Cycling', desc:'Aerobic activity improving cardiovascular health, balance, and executive function. Outdoor cycling adds natural sensory input benefits.', duration:'20-30 min', freq:'Daily or alternate days', benefits:['Cardiovascular','Balance','Executive function'] },
+  { icon:'💃', name:'Dance Therapy', desc:'Combines movement with music to improve coordination, emotional expression, social bonding, and motor planning. Highly engaging format.', duration:'30-45 min', freq:'2×/week', benefits:['Emotional expression','Motor planning','Social bonds'] },
+  { icon:'🧗', name:'Climbing / Obstacle Course', desc:'Builds proprioception, problem-solving, risk assessment, and upper body strength. Indoor climbing walls provide safe, structured challenge.', duration:'30-45 min', freq:'1-2×/week', benefits:['Proprioception','Problem-solving','Strength'] },
+  { icon:'🏃', name:'Running & Aerobic Activity', desc:'30 minutes of moderate aerobic exercise significantly improves executive function, attention, and working memory. Daily is ideal.', duration:'30 min', freq:'Daily', benefits:['Executive function','Attention','Mood'] },
+  { icon:'🎾', name:'Ball Sports (Tennis/Badminton)', desc:'Improves hand-eye coordination, tracking, reaction time, and social interaction through structured competitive play.', duration:'30-45 min', freq:'2-3×/week', benefits:['Coordination','Social interaction','Focus'] },
+  { icon:'🌊', name:'Hydrotherapy', desc:'Water-based therapy using the unique properties of water (warmth, buoyancy, resistance) to improve sensory processing and motor function.', duration:'30-45 min', freq:'1-2×/week', benefits:['Sensory processing','Muscle tone','Relaxation'] },
+];
+
+document.getElementById('exerciseGrid').innerHTML = EXERCISES.map(e => `
+  <div class="exercise-card">
+    <div class="exercise-icon">${e.icon}</div>
+    <div class="exercise-name">${e.name}</div>
+    <div class="exercise-desc">${e.desc}</div>
+    <div class="exercise-meta">
+      <span class="exercise-pill">⏱ ${e.duration}</span>
+      <span class="exercise-pill">📅 ${e.freq}</span>
+    </div>
+    <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">
+      ${e.benefits.map(b=>`<span style="padding:2px 8px;border-radius:50px;font-size:.65rem;font-weight:700;background:var(--green-bg);color:var(--primary);border:1px solid var(--primary-l)">${b}</span>`).join('')}
+    </div>
+  </div>
+`).join('');
+
+// ── SPECIALISTS ───────────────────────────────────────────────
+const SPECIALISTS = [
+  { icon:'👨‍⚕️', title:'Developmental Pediatrician', role:'First point of contact. Diagnoses neurodevelopmental disorders, coordinates care, and refers to specialists.', badge:'Primary Referral' },
+  { icon:'🧠', title:'Child Psychiatrist', role:'Evaluates and treats psychiatric components of neurodevelopmental disorders. Can prescribe medication when appropriate.', badge:'Psychiatric Care' },
+  { icon:'🔬', title:'Neuropsychologist', role:'Conducts comprehensive cognitive and behavioral testing to identify specific learning profiles and cognitive strengths/weaknesses.', badge:'Psychological Testing' },
+  { icon:'💬', title:'Speech-Language Pathologist (SLP)', role:'Assesses and treats communication disorders including speech, language, articulation, and augmentative communication.', badge:'Communication' },
+  { icon:'🤲', title:'Occupational Therapist (OT)', role:'Addresses sensory processing, fine motor skills, daily living activities, and school-related functional tasks.', badge:'Sensory & Motor' },
+  { icon:'📚', title:'Educational Psychologist', role:'Assesses learning disabilities, develops IEP plans, and advises schools on educational accommodations and interventions.', badge:'Educational' },
+  { icon:'🧘', title:'Child Psychologist (CBT)', role:'Provides individual therapy for anxiety, behavior issues, emotional regulation, and social skills using evidence-based approaches.', badge:'Behavioral Therapy' },
+  { icon:'🧬', title:'Clinical Geneticist', role:'Evaluates genetic causes of neurodevelopmental disorders and provides family counseling about genetic risk factors.', badge:'Genetics' },
+  { icon:'🏃', title:'Physical Therapist', role:'Addresses gross motor delays, coordination issues, balance, and movement disorders common in neurodevelopmental conditions.', badge:'Motor Development' },
+  { icon:'👁️', title:'Pediatric Ophthalmologist', role:'Rules out visual processing issues that may contribute to learning difficulties, reading problems, and behavioral challenges.', badge:'Vision' },
+  { icon:'👂', title:'Audiologist', role:'Assesses hearing function and auditory processing disorders that may mimic or co-occur with language and attention difficulties.', badge:'Hearing & Auditory' },
+  { icon:'🍽️', title:'Pediatric Dietitian', role:'Provides targeted nutritional guidance for neurodevelopmental conditions including selective eating, GFCF diets, and micronutrient assessment.', badge:'Nutrition' },
+];
+
+document.getElementById('specialistGrid').innerHTML = SPECIALISTS.map(s => `
+  <div class="specialist-card">
+    <div class="specialist-avatar">${s.icon}</div>
+    <div class="specialist-title">${s.title}</div>
+    <div class="specialist-role">${s.role}</div>
+    <span class="specialist-badge">${s.badge}</span>
+  </div>
+`).join('');
+
+// ── RESOURCES ─────────────────────────────────────────────────
+const RESOURCES = [
+  { category:'🧩 Autism (ASD)', items:[
+    { name:'Autism Speaks', url:'https://autismspeaks.org', desc:'Leading ASD organization with resources, toolkits, and research updates.' },
+    { name:'Autism Science Foundation', url:'https://autismsciencefoundation.org', desc:'Evidence-based research and science education about autism.' },
+    { name:'ASAN (Autistic Self Advocacy Network)', url:'https://autisticadvocacy.org', desc:'Organization run by and for autistic people promoting acceptance.' },
+  ]},
+  { category:'⚡ ADHD', items:[
+    { name:'CHADD', url:'https://chadd.org', desc:'Children and Adults with ADHD — comprehensive support and resources.' },
+    { name:'ADDitude Magazine', url:'https://additudemag.com', desc:'Practical advice, expert guidance, and community for ADHD families.' },
+  ]},
+  { category:'📖 Learning Disabilities', items:[
+    { name:'International Dyslexia Association', url:'https://dyslexiaida.org', desc:'Research, advocacy, and resources for dyslexia and related learning differences.' },
+    { name:'Learning Disabilities Association of America', url:'https://ldaamerica.org', desc:'Resources for all types of learning and attention differences.' },
+  ]},
+  { category:'🌍 India-Specific', items:[
+    { name:'NIMHANS', url:'https://nimhans.ac.in', desc:'National Institute of Mental Health and Neurosciences, Bangalore — leading research and clinical center.' },
+    { name:'Action for Autism (India)', url:'https://autism-india.org', desc:'India\'s leading autism advocacy and resource organization.' },
+  ]},
+];
+
+document.getElementById('resourcesList').innerHTML = RESOURCES.map(r => `
+  <div style="margin-bottom:24px">
+    <div style="font-size:1rem;font-weight:800;margin-bottom:12px">${r.category}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
+      ${r.items.map(i=>`<a href="${i.url}" target="_blank" rel="noopener" style="display:block;background:var(--card);border-radius:var(--r);padding:16px 18px;border:1px solid var(--border);text-decoration:none;color:var(--text);transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-weight:700;font-size:.9rem;margin-bottom:4px;color:var(--primary)">${i.name} ↗</div>
+        <div style="font-size:.8rem;color:var(--muted);line-height:1.5">${i.desc}</div>
+      </a>`).join('')}
+    </div>
+  </div>
+`).join('');
+</script>
+</body>
+</html>

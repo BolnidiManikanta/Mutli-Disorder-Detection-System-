@@ -1,0 +1,11 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start NeuroScan Server",
+			"type": "shell",
+			"command": "cd server && npm run dev",
+			"isBackground": true
+		}
+	]
+}
