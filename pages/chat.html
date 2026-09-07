@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>AI Chat Assistant — AutismRecog</title>
+  <title>AI Chat Assistant — NeuroScan AI</title>
   <link rel="stylesheet" href="../css/main.css"/>
   <style>
     .chat-page{max-width:900px;margin:0 auto;padding:32px 44px 80px;display:flex;flex-direction:column;height:calc(100vh - var(--nav-h))}
@@ -186,19 +186,16 @@ window.sendMessage = async () => {
   const typingId = showTyping();
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 800,
-        system: SYSTEM_PROMPT,
         messages: messages.slice(-10)  // last 10 messages for context
       })
     });
 
     const data    = await response.json();
-    const aiText  = data.content?.[0]?.text || 'Sorry, I could not get a response. Please try again.';
+    const aiText  = data.reply || 'Sorry, I could not get a response. Please try again.';
 
     removeTyping(typingId);
     appendMessage('ai', aiText);

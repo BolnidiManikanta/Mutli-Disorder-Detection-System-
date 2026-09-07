@@ -1,0 +1,28 @@
+{
+  "total_records": 79,
+  "exact_full_row_duplicates": 0,
+  "exact_aq10_profile_duplicates": 18,
+  "pairwise_hamming_distance_distribution": {
+    "0": 24,
+    "1": 131,
+    "2": 292,
+    "3": 428,
+    "4": 425,
+    "5": 431,
+    "6": 498,
+    "7": 443,
+    "8": 261,
+    "9": 115,
+    "10": 33
+  },
+  "discordant_pairs_same_aq10_diff_label": 0,
+  "discordant_pairs_dist_1_diff_label": 0,
+  "train_test_split": {
+    "train_size": 59,
+    "test_size": 20,
+    "exact_train_test_overlap_count": 4,
+    "near_train_test_overlap_dist_1_count": 14,
+    "mean_min_hamming_distance": 0.9,
+    "min_hamming_distance_overall": 0
+  }
+}

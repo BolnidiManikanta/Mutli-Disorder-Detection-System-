@@ -26,8 +26,8 @@ const FIREBASE_CONFIG = {
   appId:             '1:843399983215:web:37a364aba10051a3659d9a',
 };
 
-// MongoDB backend API URL — update if deployed elsewhere
-const API_BASE = window.NEUROSCAN_API_URL || 'http://localhost:3001/api';
+// Backend API URL — default to relative /api on current origin
+const API_BASE = window.NEUROSCAN_API_URL || '/api';
 
 // ── FIREBASE AUTH INIT ────────────────────────────────────────
 const firebaseApp    = initializeApp(FIREBASE_CONFIG);

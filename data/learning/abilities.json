@@ -1,0 +1,572 @@
+[
+  {
+    "code": "CFU",
+    "name": "Cognition of Figural Units",
+    "domain": "Figural",
+    "operation": "Cognition",
+    "contentType": "Figural",
+    "construct": "Visual Closure & Object Recognition",
+    "isCorePLA": true,
+    "description": "Ability to visually identify and recognize whole objects, figures, or geometric forms even when partially obscured, incomplete, or presented in unfamiliar orientations.",
+    "educationalSignificance": "Fundamental for quick visual perception, sight-word recognition, reading speed, diagram interpretation, and spatial orientation.",
+    "ageRange": "4-18+",
+    "gradeRange": "K-Adult",
+    "assessmentMappings": ["pla_sec_01", "ala_sec_01"],
+    "activityMappings": ["ACT-CFU-01", "ACT-CFU-02", "ACT-CFU-03"],
+    "interpretationRules": {
+      "strength": "Exceptional visual closure skills; rapidly perceives visual wholes and decodes complex graphic material with minimal effort.",
+      "priority": "Difficulty with visual closure may lead to hesitations when interpreting partial diagrams, cluttered worksheets, or unfamiliar font typography."
+    }
+  },
+  {
+    "code": "CFC",
+    "name": "Cognition of Figural Classes",
+    "domain": "Figural",
+    "operation": "Cognition",
+    "contentType": "Figural",
+    "construct": "Visual Classification & Categorization",
+    "isCorePLA": true,
+    "description": "Ability to group, categorize, and discover sorting rules for visual objects and geometric figures based on abstract physical properties (shape, orientation, symmetry, texture).",
+    "educationalSignificance": "Underpins early scientific classification, geometric intuition, visual organization, and the ability to find common features among visual concepts.",
+    "ageRange": "4-18+",
+    "gradeRange": "K-Adult",
+    "assessmentMappings": ["pla_sec_02", "ala_sec_02"],
+    "activityMappings": ["ACT-CFC-01", "ACT-CFC-02"],
+    "interpretationRules": {
+      "strength": "Quickly discovers underlying structural visual patterns and creates logical groupings of abstract visual stimuli.",
+      "priority": "May struggle to notice subtle categorizing rules in visual data; benefits from explicit visual attribute checklists."
+    }
+  },
+  {
+    "code": "CFR",
+    "name": "Cognition of Figural Relations",
+    "domain": "Figural",
+    "operation": "Cognition",
+    "contentType": "Figural",
+    "construct": "Spatial Analogies & Visual Reasoning",
+    "isCorePLA": true,
+    "description": "Ability to understand the spatial rule or geometric transformation connecting one figure to another and apply that identical relationship to a novel target (A : B :: C : D).",
+    "educationalSignificance": "Critical for higher-order spatial reasoning, geometry, architectural comprehension, visual problem-solving, and STEM modeling.",
+    "ageRange": "5-18+",
+    "gradeRange": "K-Adult",
+    "assessmentMappings": ["pla_sec_03", "ala_sec_03"],
+    "activityMappings": ["ACT-CFR-01", "ACT-CFR-02", "ACT-CFR-03"],
+    "interpretationRules": {
+      "strength": "Superior ability to deduce geometric transformations (rotations, reflections, topological changes) and extrapolate spatial rules.",
+      "priority": "Visual analogical reasoning requires systematic step-by-step feature breakdown and guided transformation training."
+    }
+  },
+  {
+    "code": "MFU",
+    "name": "Memory for Figural Units",
+    "domain": "Figural",
+    "operation": "Memory",
+    "contentType": "Figural",
+    "construct": "Visual Working Memory & Detail Recall",
+    "isCorePLA": true,
+    "description": "Ability to retain and accurately recall specific visual figures, symbols, patterns, or spatial layouts after a brief exposure delay.",
+    "educationalSignificance": "Vital for retaining board notes, copying from distance, spelling retention through visual imagery, and remembering map features.",
+    "ageRange": "4-18+",
+    "gradeRange": "K-Adult",
+    "assessmentMappings": ["pla_sec_04", "ala_sec_04"],
+    "activityMappings": ["ACT-MFU-01", "ACT-MFU-02"],
+    "interpretationRules": {
+      "strength": "High-capacity visual memory buffer; effortlessly preserves precise geometric arrangements and visual details.",
+      "priority": "Tends to lose visual detail over short delays; benefits from multimodal encoding (labeling visuals with words)."
+    }
+  },
+  {
+    "code": "EFU",
+    "name": "Evaluation of Figural Units",
+    "domain": "Figural",
+    "operation": "Evaluation",
+    "contentType": "Figural",
+    "construct": "Visual Discrimination & Error Detection",
+    "isCorePLA": true,
+    "description": "Ability to critically compare multiple visual objects and make rapid, exact judgments about identity, minute discrepancy, or geometric flaws.",
+    "educationalSignificance": "Essential for proofreading, catching editing errors in written work, technical drawing accuracy, and fine visual motor precision.",
+    "ageRange": "4-18+",
+    "gradeRange": "K-Adult",
+    "assessmentMappings": ["pla_sec_05", "ala_sec_05"],
+    "activityMappings": ["ACT-EFU-01", "ACT-EFU-02"],
+    "interpretationRules": {
+      "strength": "Acute visual error detection and discernment; rapidly spots minor anomalies and precision inconsistencies.",
+      "priority": "May overlook fine details or jump to conclusions without systematic scanning of visual boundaries."
+    }
+  },
+  {
+    "code": "EFC",
+    "name": "Evaluation of Figural Classes",
+    "domain": "Figural",
+    "operation": "Evaluation",
+    "contentType": "Figural",
+    "construct": "Visual Outlier Discrimination & Rule Verification",
+    "isCorePLA": true,
+    "description": "Ability to evaluate a collection of visual items, verify whether they satisfy a common rule, and accurately reject items that do not belong.",
+    "educationalSignificance": "Supports analytical sorting, quality control in design and technical tasks, and validation of visual solutions.",
+    "ageRange": "5-18+",
+    "gradeRange": "K-Adult",
+    "assessmentMappings": ["pla_sec_06", "ala_sec_06"],
+    "activityMappings": ["ACT-EFC-01", "ACT-EFC-02"],
+    "interpretationRules": {
+      "strength": "Quickly validates class boundaries and spots subtle inconsistencies across complex visual sets.",
+      "priority": "Requires targeted practice verifying each item's characteristics against explicit criteria before judging."
+    }
+  },
+  {
+    "code": "NFU",
+    "name": "Convergent Production of Figural Units",
+    "domain": "Figural",
+    "operation": "Problem Solving",
+    "contentType": "Figural",
+    "construct": "Visual Construction & Spatial Assembly",
+    "isCorePLA": true,
+    "description": "Ability to synthesize individual visual pieces, components, or geometric shapes into a unified, correct target structure (tangram-style synthesis).",
+    "educationalSignificance": "Crucial for engineering design, physical modeling, map assembly, puzzle solving, and mechanical comprehension.",
+    "ageRange": "5-18+",
+    "gradeRange": "K-Adult",
+    "assessmentMappings": ["pla_sec_07", "ala_sec_07"],
+    "activityMappings": ["ACT-NFU-01", "ACT-NFU-02"],
+    "interpretationRules": {
+      "strength": "Outstanding spatial synthesis and mental rotation; easily arranges parts into coherent functional wholes.",
+      "priority": "Needs scaffolded visual assembly tasks starting from 2-piece composites to multi-element configurations."
+    }
+  },
+  {
+    "code": "CSS",
+    "name": "Cognition of Symbolic Systems",
+    "domain": "Symbolic",
+    "operation": "Cognition",
+    "contentType": "Symbolic",
+    "construct": "Mathematical Pattern & Sequence Rules",
+    "isCorePLA": true,
+    "description": "Ability to discover underlying organizational principles, mathematical progressions, numeric intervals, and alphanumeric rule systems.",
+    "educationalSignificance": "Core foundation for algebra, number sense, algorithmic reasoning, computer programming, and formula comprehension.",
+    "ageRange": "6-18+",
+    "gradeRange": "1-Adult",
+    "assessmentMappings": ["pla_sec_08", "ala_sec_08"],
+    "activityMappings": ["ACT-CSS-01", "ACT-CSS-02", "ACT-CSS-03"],
+    "interpretationRules": {
+      "strength": "Rapidly extracts mathematical rules and sequential logic from numeric or code-based sequences.",
+      "priority": "Benefits from concrete number-line representations and verbalization of step-by-step arithmetic transitions."
+    }
+  },
+  {
+    "code": "MSU",
+    "name": "Memory for Symbolic Units",
+    "domain": "Symbolic",
+    "operation": "Memory",
+    "contentType": "Symbolic",
+    "construct": "Symbolic & Code Recall",
+    "isCorePLA": true,
+    "description": "Ability to accurately retain and recall arbitrary letters, numbers, digits, symbols, or phone/ID codes over short-term holding intervals.",
+    "educationalSignificance": "Critical for mental math, following multi-digit arithmetic steps, remembering passwords, formulas, and spelling sequences.",
+    "ageRange": "5-18+",
+    "gradeRange": "K-Adult",
+    "assessmentMappings": ["pla_sec_09", "ala_sec_09"],
+    "activityMappings": ["ACT-MSU-01", "ACT-MSU-02"],
+    "interpretationRules": {
+      "strength": "High symbolic working-memory span; comfortably manipulates multi-digit numeric items without dropping characters.",
+      "priority": "Vulnerable to symbolic cognitive overload; benefits from chunking techniques and written scratchpads."
+    }
+  },
+  {
+    "code": "MSUA",
+    "name": "Memory for Symbolic Units (Auditory)",
+    "domain": "Symbolic",
+    "operation": "Memory",
+    "contentType": "Symbolic",
+    "construct": "Auditory Digit & Phonological Recall",
+    "isCorePLA": true,
+    "description": "Ability to encode, hold, and reproduce spoken sequences of numbers, letters, or phonemes presented strictly in the auditory channel.",
+    "educationalSignificance": "Essential for following spoken classroom directions, retaining oral phone numbers, and phonological processing during language acquisition.",
+    "ageRange": "5-18+",
+    "gradeRange": "K-Adult",
+    "assessmentMappings": ["pla_sec_10", "ala_sec_10"],
+    "activityMappings": ["ACT-MSUA-01", "ACT-MSUA-02"],
+    "interpretationRules": {
+      "strength": "Strong auditory-verbal memory loop; effortlessly repeats complex oral instructions and multi-part data.",
+      "priority": "Easily drops oral instructions; requires visual reinforcement and sub-vocal rehearsal strategies."
+    }
+  },
+  {
+    "code": "NST",
+    "name": "Convergent Production of Symbolic Transformations",
+    "domain": "Symbolic",
+    "operation": "Problem Solving",
+    "contentType": "Symbolic",
+    "construct": "Symbolic Transformation & Math Problem Solving",
+    "isCorePLA": true,
+    "description": "Ability to manipulate, rearrange, and transform symbolic equations, code strings, or mathematical representations to achieve a specified target output.",
+    "educationalSignificance": "Drives algebraic manipulation, coding logic, equation solving, cipher decoding, and chemical formula balancing.",
+    "ageRange": "7-18+",
+    "gradeRange": "2-Adult",
+    "assessmentMappings": ["pla_sec_11", "ala_sec_11"],
+    "activityMappings": ["ACT-NST-01", "ACT-NST-02"],
+    "interpretationRules": {
+      "strength": "Nimble symbolic flexibility; effortlessly solves algebraic unknowns and transforms expressions.",
+      "priority": "May become rigid in applying initial formulas; needs explicit training in reverse operations and algebraic factoring."
+    }
+  },
+  {
+    "code": "CMUr",
+    "name": "Cognition of Semantic Units (Reading)",
+    "domain": "Semantic",
+    "operation": "Cognition",
+    "contentType": "Semantic",
+    "construct": "Reading Comprehension & Vocabulary Breadth",
+    "isCorePLA": true,
+    "description": "Ability to accurately grasp the precise meaning of words, concepts, idiomatic terms, and contextual nuances in written language.",
+    "educationalSignificance": "The primary predictor of reading comprehension, textbook learning, academic vocabulary mastery, and essay writing.",
+    "ageRange": "6-18+",
+    "gradeRange": "1-Adult",
+    "assessmentMappings": ["pla_sec_12", "ala_sec_12"],
+    "activityMappings": ["ACT-CMUR-01", "ACT-CMUR-02"],
+    "interpretationRules": {
+      "strength": "Rich vocabulary knowledge and acute contextual deduction when encountering complex text.",
+      "priority": "Benefits from explicit morphology instruction, root word analysis, and semantic mapping."
+    }
+  },
+  {
+    "code": "CMR",
+    "name": "Cognition of Semantic Relations",
+    "domain": "Semantic",
+    "operation": "Cognition",
+    "contentType": "Semantic",
+    "construct": "Verbal Analogies & Conceptual Connections",
+    "isCorePLA": true,
+    "description": "Ability to discern the conceptual relationship connecting two words or ideas and apply that exact relationship to another semantic pair (e.g., Cause : Effect, Part : Whole).",
+    "educationalSignificance": "Core component of verbal IQ, standardized admissions tests, critical reading, scientific reasoning, and essay argumentation.",
+    "ageRange": "7-18+",
+    "gradeRange": "2-Adult",
+    "assessmentMappings": ["pla_sec_13", "ala_sec_13"],
+    "activityMappings": ["ACT-CMR-01", "ACT-CMR-02", "ACT-CMR-03"],
+    "interpretationRules": {
+      "strength": "High verbal reasoning facility; quickly grasps hierarchical, functional, and causal analogies.",
+      "priority": "Needs structured relationship taxonomy practice (synonym, antonym, degree, part-whole, cause-effect)."
+    }
+  },
+  {
+    "code": "CMS",
+    "name": "Cognition of Semantic Systems",
+    "domain": "Semantic",
+    "operation": "Cognition",
+    "contentType": "Semantic",
+    "construct": "Complex Paragraph & Paragraph Logic Comprehension",
+    "isCorePLA": true,
+    "description": "Ability to comprehend interconnected structures of ideas, argumentative threads, sequential narratives, and inferential logic in multi-sentence passages.",
+    "educationalSignificance": "Critical for reading complex literature, understanding historical narratives, following extended scientific explanations, and academic synthesis.",
+    "ageRange": "8-18+",
+    "gradeRange": "3-Adult",
+    "assessmentMappings": ["pla_sec_14", "ala_sec_14"],
+    "activityMappings": ["ACT-CMS-01", "ACT-CMS-02"],
+    "interpretationRules": {
+      "strength": "Superb deep comprehension and synthesis across complex thematic passages.",
+      "priority": "Tends to fixate on isolated sentences; benefits from paragraph structure mapping and main-idea extraction protocols."
+    }
+  },
+  {
+    "code": "CFS",
+    "name": "Cognition of Figural Systems",
+    "domain": "Figural",
+    "operation": "Cognition",
+    "contentType": "Figural",
+    "construct": "Spatial Matrices & 3D Topologies",
+    "isCorePLA": false,
+    "description": "Ability to understand complex 2D and 3D geometric grids, coordinate layouts, isometric projections, and spatial matrix systems.",
+    "educationalSignificance": "High value for mechanical drafting, trigonometry, physics vector spaces, and advanced 3D modeling.",
+    "ageRange": "9-18+",
+    "gradeRange": "4-Adult",
+    "assessmentMappings": ["ala_sec_15"],
+    "activityMappings": ["ACT-CFS-01"],
+    "interpretationRules": {
+      "strength": "Easily navigates complex multi-dimensional spatial representations.",
+      "priority": "Needs practice with grid coordinate transformations and folded cube projections."
+    }
+  },
+  {
+    "code": "CFT",
+    "name": "Cognition of Figural Transformations",
+    "domain": "Figural",
+    "operation": "Cognition",
+    "contentType": "Figural",
+    "construct": "Mental Rotation & Folding",
+    "isCorePLA": false,
+    "description": "Ability to mentally rotate, fold, unfold, or invert complex 2D surfaces and 3D solids to predict their altered appearance.",
+    "educationalSignificance": "Essential for dental/surgical spatial skills, organic chemistry stereochemistry, engineering CAD design.",
+    "ageRange": "9-18+",
+    "gradeRange": "4-Adult",
+    "assessmentMappings": ["ala_sec_16"],
+    "activityMappings": ["ACT-CFT-01"],
+    "interpretationRules": {
+      "strength": "Swift, accurate mental rotation and surface-folding visualization.",
+      "priority": "Requires physical paper folding and interactive 3D rotation manipulation exercises."
+    }
+  },
+  {
+    "code": "MFS",
+    "name": "Memory for Figural Systems",
+    "domain": "Figural",
+    "operation": "Memory",
+    "contentType": "Figural",
+    "construct": "Spatial Layout & Map Memory",
+    "isCorePLA": false,
+    "description": "Ability to retain and reproduce the exact spatial coordinates, routes, or relative positions of multiple objects across a map or board.",
+    "educationalSignificance": "Vital for geography, tactical navigation, lab layout retention, and sports play execution.",
+    "ageRange": "8-18+",
+    "gradeRange": "3-Adult",
+    "assessmentMappings": ["ala_sec_17"],
+    "activityMappings": ["ACT-MFS-01"],
+    "interpretationRules": {
+      "strength": "Exceptional photographic spatial memory for map layouts and positions.",
+      "priority": "Benefits from landmark-anchoring and grid-cell mental tagging."
+    }
+  },
+  {
+    "code": "DFU",
+    "name": "Divergent Production of Figural Units",
+    "domain": "Figural",
+    "operation": "Creativity",
+    "contentType": "Figural",
+    "construct": "Figural Fluency & Visual Ideation",
+    "isCorePLA": false,
+    "description": "Ability to rapidly generate numerous distinct, original visual designs, shapes, or functional interpretations starting from simple geometric prompts.",
+    "educationalSignificance": "Key driver of artistic creativity, architectural ideation, UI/UX concept sketching, and industrial design.",
+    "ageRange": "6-18+",
+    "gradeRange": "1-Adult",
+    "assessmentMappings": ["ala_sec_18"],
+    "activityMappings": ["ACT-DFU-01"],
+    "interpretationRules": {
+      "strength": "Prolific visual brainstorming; produces diverse, unconventional graphical concepts.",
+      "priority": "Benefits from morphological matrix brainstorming and visual attribute modification drills."
+    }
+  },
+  {
+    "code": "CSR",
+    "name": "Cognition of Symbolic Relations",
+    "domain": "Symbolic",
+    "operation": "Cognition",
+    "contentType": "Symbolic",
+    "construct": "Symbolic Analogies & Mathematical Proportions",
+    "isCorePLA": false,
+    "description": "Ability to deduce relational rules connecting alphanumeric or mathematical terms and project those relations onto corresponding symbolic pairs.",
+    "educationalSignificance": "Essential for mastering algebraic ratios, unit conversions, physics ratios, and formal logic syntax.",
+    "ageRange": "9-18+",
+    "gradeRange": "4-Adult",
+    "assessmentMappings": ["ala_sec_19"],
+    "activityMappings": ["ACT-CSR-01"],
+    "interpretationRules": {
+      "strength": "Precise mathematical ratio intuition and symbolic correspondence discovery.",
+      "priority": "Requires step-by-step fractional and relational reduction modeling."
+    }
+  },
+  {
+    "code": "MSS",
+    "name": "Memory for Symbolic Systems",
+    "domain": "Symbolic",
+    "operation": "Memory",
+    "contentType": "Symbolic",
+    "construct": "Alphanumeric Sequence & Equation Memory",
+    "isCorePLA": false,
+    "description": "Ability to retain and reproduce structured symbolic sequences (like math proofs, coding routines, or musical sheet patterns).",
+    "educationalSignificance": "Supports multi-step mental calculus, code debugging without reference docs, and musical sight-reading.",
+    "ageRange": "9-18+",
+    "gradeRange": "4-Adult",
+    "assessmentMappings": ["ala_sec_20"],
+    "activityMappings": ["ACT-MSS-01"],
+    "interpretationRules": {
+      "strength": "High-capacity symbolic string memory buffer.",
+      "priority": "Benefits from hierarchical mnemonic tagging and rhythm-based grouping."
+    }
+  },
+  {
+    "code": "ESS",
+    "name": "Evaluation of Symbolic Systems",
+    "domain": "Symbolic",
+    "operation": "Evaluation",
+    "contentType": "Symbolic",
+    "construct": "Mathematical Proof & Code Verification",
+    "isCorePLA": false,
+    "description": "Ability to audit mathematical operations, balance checks, or code structures to spot logical inconsistencies or computation syntax errors.",
+    "educationalSignificance": "Crucial for mathematical error-checking, accounting audits, software code testing, and logic verification.",
+    "ageRange": "9-18+",
+    "gradeRange": "4-Adult",
+    "assessmentMappings": ["ala_sec_21"],
+    "activityMappings": ["ACT-ESS-01"],
+    "interpretationRules": {
+      "strength": "Rigorous symbolic proof-checking and computational flaw detection.",
+      "priority": "Needs structured line-by-line verification protocols and assertion testing habits."
+    }
+  },
+  {
+    "code": "DSR",
+    "name": "Divergent Production of Symbolic Relations",
+    "domain": "Symbolic",
+    "operation": "Creativity",
+    "contentType": "Symbolic",
+    "construct": "Alternative Mathematical Formulations",
+    "isCorePLA": false,
+    "description": "Ability to generate multiple different valid mathematical equations, algebraic pathways, or algorithmic solutions for a single numerical goal.",
+    "educationalSignificance": "Fosters flexible mathematical thinking, algorithmic optimization, and creative quantitative problem solving.",
+    "ageRange": "10-18+",
+    "gradeRange": "5-Adult",
+    "assessmentMappings": ["ala_sec_22"],
+    "activityMappings": ["ACT-DSR-01"],
+    "interpretationRules": {
+      "strength": "Remarkable numeric agility; discovers non-standard mathematical paths to reach targets.",
+      "priority": "Benefits from Target-Number challenges (e.g. 24 Game) and equation diversification drills."
+    }
+  },
+  {
+    "code": "CMC",
+    "name": "Cognition of Semantic Classes",
+    "domain": "Semantic",
+    "operation": "Cognition",
+    "contentType": "Semantic",
+    "construct": "Abstract Concept Categorization",
+    "isCorePLA": false,
+    "description": "Ability to categorize abstract verbal ideas, scientific concepts, or thematic arguments into overarching taxonomic categories.",
+    "educationalSignificance": "Underpins essay structuring, scientific taxonomy, social science classifications, and philosophical analysis.",
+    "ageRange": "8-18+",
+    "gradeRange": "3-Adult",
+    "assessmentMappings": ["ala_sec_23"],
+    "activityMappings": ["ACT-CMC-01"],
+    "interpretationRules": {
+      "strength": "Quickly organizes complex verbal knowledge into robust hierarchical categories.",
+      "priority": "Benefits from concept webbing, semantic Venn diagrams, and taxonomic outlines."
+    }
+  },
+  {
+    "code": "CMT",
+    "name": "Cognition of Semantic Transformations",
+    "domain": "Semantic",
+    "operation": "Cognition",
+    "contentType": "Semantic",
+    "construct": "Figurative Language & Metaphor Comprehension",
+    "isCorePLA": false,
+    "description": "Ability to interpret metaphorical shifts, idioms, puns, double meanings, and conceptual reinterpretations in language.",
+    "educationalSignificance": "Essential for literary analysis, understanding irony/satire, high-level negotiation, and rhetorical analysis.",
+    "ageRange": "9-18+",
+    "gradeRange": "4-Adult",
+    "assessmentMappings": ["ala_sec_24"],
+    "activityMappings": ["ACT-CMT-01"],
+    "interpretationRules": {
+      "strength": "Effortlessly navigates nuanced figurative language, irony, and layered metaphors.",
+      "priority": "May interpret idioms too literally; benefits from explicit figurative idiom breakdowns."
+    }
+  },
+  {
+    "code": "CMI",
+    "name": "Cognition of Semantic Implications",
+    "domain": "Semantic",
+    "operation": "Cognition",
+    "contentType": "Semantic",
+    "construct": "Extrapolation & Logical Deduction",
+    "isCorePLA": false,
+    "description": "Ability to foresee subsequent consequences, unstated intentions, and logical ramifications emerging from a scenario or argument.",
+    "educationalSignificance": "Key for critical reading, anticipating counterarguments, scientific hypothesis prediction, and strategic decision making.",
+    "ageRange": "9-18+",
+    "gradeRange": "4-Adult",
+    "assessmentMappings": ["ala_sec_25"],
+    "activityMappings": ["ACT-CMI-01"],
+    "interpretationRules": {
+      "strength": "Sharp deductive foresight; accurately projects future implications of complex situations.",
+      "priority": "Needs explicit 'What If?' causal chain worksheets and hypothesis-testing frameworks."
+    }
+  },
+  {
+    "code": "MMU",
+    "name": "Memory for Semantic Units",
+    "domain": "Semantic",
+    "operation": "Memory",
+    "contentType": "Semantic",
+    "construct": "Verbal Fact & Information Retention",
+    "isCorePLA": false,
+    "description": "Ability to retain and recall meaningful verbal facts, definitions, names, and biographical information over delayed intervals.",
+    "educationalSignificance": "Critical for history, biology, law, medicine, and fact-heavy academic disciplines.",
+    "ageRange": "7-18+",
+    "gradeRange": "2-Adult",
+    "assessmentMappings": ["ala_sec_26"],
+    "activityMappings": ["ACT-MMU-01"],
+    "interpretationRules": {
+      "strength": "High-retention verbal fact reservoir; readily retrieves declarative knowledge.",
+      "priority": "Benefits from spaced retrieval practice and semantic association networks."
+    }
+  },
+  {
+    "code": "EMS",
+    "name": "Evaluation of Semantic Systems",
+    "domain": "Semantic",
+    "operation": "Evaluation",
+    "contentType": "Semantic",
+    "construct": "Critical Thinking & Argument Evaluation",
+    "isCorePLA": false,
+    "description": "Ability to critically evaluate an extended argumentative essay, detect logical fallacies, assess evidentiary credibility, and evaluate internal coherence.",
+    "educationalSignificance": "The ultimate skill in critical thinking, scientific peer review, debate, media literacy, and academic research.",
+    "ageRange": "10-18+",
+    "gradeRange": "5-Adult",
+    "assessmentMappings": ["ala_sec_27"],
+    "activityMappings": ["ACT-EMS-01"],
+    "interpretationRules": {
+      "strength": "Rigorous critical reasoning; immediately pinpoints logical fallacies and weak premises.",
+      "priority": "Needs structured Toulmin argument modeling and fallacy identification practice."
+    }
+  },
+  {
+    "code": "NMS",
+    "name": "Convergent Production of Semantic Systems",
+    "domain": "Semantic",
+    "operation": "Problem Solving",
+    "contentType": "Semantic",
+    "construct": "Logical Synthesis & Essay Organization",
+    "isCorePLA": false,
+    "description": "Ability to synthesize disparate factual points, evidence, and premises into a unified, logically organized narrative or explanatory essay.",
+    "educationalSignificance": "Crucial for research report writing, synthesizing complex technical documentation, and coherent presentation.",
+    "ageRange": "10-18+",
+    "gradeRange": "5-Adult",
+    "assessmentMappings": ["ala_sec_28"],
+    "activityMappings": ["ACT-NMS-01"],
+    "interpretationRules": {
+      "strength": "Outstanding synthesis capacity; unites fragmented data points into cohesive logical structures.",
+      "priority": "Requires structured outlining protocols and paragraph transition scaffolding."
+    }
+  },
+  {
+    "code": "DMU",
+    "name": "Divergent Production of Semantic Units",
+    "domain": "Semantic",
+    "operation": "Creativity",
+    "contentType": "Semantic",
+    "construct": "Verbal Fluency & Creative Brainstorming",
+    "isCorePLA": false,
+    "description": "Ability to rapidly generate a large number of diverse, imaginative ideas, word associations, or creative titles under open-ended criteria.",
+    "educationalSignificance": "Drives creative writing, advertising copywriting, innovative business brainstorming, and lateral thinking.",
+    "ageRange": "8-18+",
+    "gradeRange": "3-Adult",
+    "assessmentMappings": ["ala_sec_29"],
+    "activityMappings": ["ACT-DMU-01"],
+    "interpretationRules": {
+      "strength": "Prolific verbal creativity; excels in unconstrained idea generation and creative writing.",
+      "priority": "Benefits from SCAMPER ideation prompts and lateral thinking drills."
+    }
+  },
+  {
+    "code": "DMR",
+    "name": "Divergent Production of Semantic Relations",
+    "domain": "Semantic",
+    "operation": "Creativity",
+    "contentType": "Semantic",
+    "construct": "Novel Conceptual Metaphors & Analogies",
+    "isCorePLA": false,
+    "description": "Ability to bridge two completely unrelated domains by inventing novel analogies, poetic metaphors, or innovative cross-disciplinary connections.",
+    "educationalSignificance": "Underlies visionary scientific breakthroughs, evocative literary poetry, and cross-disciplinary innovation.",
+    "ageRange": "10-18+",
+    "gradeRange": "5-Adult",
+    "assessmentMappings": ["ala_sec_30"],
+    "activityMappings": ["ACT-DMR-01"],
+    "interpretationRules": {
+      "strength": "Visionary cross-domain synthesizer; generates profound metaphors and novel conceptual bridges.",
+      "priority": "Needs guided exercises linking disparate sciences/humanities concepts."
+    }
+  }
+]

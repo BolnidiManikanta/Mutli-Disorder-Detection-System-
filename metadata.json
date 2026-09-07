@@ -1,0 +1,11 @@
+{
+  "name": "NeuroScan AI",
+  "description": "Advanced neurodevelopmental assessment and multi-disorder detection system with AI screenings, primary & advanced learning abilities (PLA/ALA) evaluation, personalized training programs, and longitudinal progress tracking.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

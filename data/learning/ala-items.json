@@ -1,0 +1,468 @@
+{
+  "assessmentId": "ALA-v1.0",
+  "title": "Advanced Learning Abilities (ALA) Assessment",
+  "version": "1.0.0",
+  "targetDurationMinutes": 150,
+  "description": "Comprehensive 30-construct cognitive evaluation spanning Figural, Symbolic, and Semantic operations with advanced divergent thinking and critical evaluation tasks.",
+  "constructCount": 30,
+  "sections": [
+    {
+      "sectionId": "ala_sec_01",
+      "abilityCode": "CFU",
+      "title": "Figural Unit Cognition (Closure)",
+      "items": [
+        {
+          "id": "ala_cfu_01",
+          "stimulus": "A 3D wireframe dodecahedron with 4 missing pentagonal faces in the rear quadrant.",
+          "questionText": "Mentally completing all missing face planes yields how many total vertices in the solid?",
+          "options": ["20 vertices", "12 vertices", "30 vertices", "24 vertices"],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "id": "ala_cfu_02",
+          "stimulus": "Fragmented blueprint of an architectural spiral staircase displaying only step radians from 0° to 270°.",
+          "questionText": "If each 30° radial sector contains 1 riser, how many risers complete the full 360° turn?",
+          "options": ["12 risers", "10 risers", "14 risers", "8 risers"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_02",
+      "abilityCode": "CFC",
+      "title": "Figural Classification & Topology",
+      "items": [
+        {
+          "id": "ala_cfc_01",
+          "stimulus": "Shapes: [Möbius strip, Klein bottle surface, Projective plane model, Standard Torus]",
+          "questionText": "Which shape is distinct from the other three regarding orientability?",
+          "options": ["Standard Torus (Orientable surface; others are non-orientable)", "Möbius strip", "Klein bottle", "Projective plane"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_03",
+      "abilityCode": "CFR",
+      "title": "Spatial Analogies & Orthogonal Projections",
+      "items": [
+        {
+          "id": "ala_cfr_01",
+          "stimulus": "Solid Cube : Orthogonal Hexagonal Projection :: Regular Tetrahedron : ?",
+          "questionText": "What 2D boundary shape is formed by the orthogonal silhouette of a regular tetrahedron along its optimal view axis?",
+          "options": ["Equilateral triangle or Square silhouette", "Regular hexagon", "Circle", "Pentagon"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_04",
+      "abilityCode": "MFU",
+      "title": "Figural Working Memory",
+      "items": [
+        {
+          "id": "ala_mfu_01",
+          "stimulus": "8-element geometric constellation with specific quadrant coordinates and color hues.",
+          "questionText": "Recall the exact color hue of the shape located in the 3rd quadrant at coordinates (-3, -4):",
+          "options": ["Cobalt Blue", "Crimson", "Amber Gold", "Emerald Green"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_05",
+      "abilityCode": "EFU",
+      "title": "Figural Unit Precision & Flaw Detection",
+      "items": [
+        {
+          "id": "ala_efu_01",
+          "stimulus": "CAD Wireframe drawing comparing a pure involute gear profile with a machined test artifact.",
+          "questionText": "Where is the root relief undercut deviation situated?",
+          "options": ["At the base dedendum circle fillet", "At the pitch point tip", "On the addendum crest", "Along the center bore"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_06",
+      "abilityCode": "EFC",
+      "title": "Figural Class Verification",
+      "items": [
+        {
+          "id": "ala_efc_01",
+          "stimulus": "Set of 5 convex polyhedra. Four obey Euler's formula V - E + F = 2.",
+          "questionText": "Which irregular compound figure violates Euler's characteristic for simply connected polyhedra?",
+          "options": ["Toroidal nested polyhedron (V - E + F = 0)", "Regular Octahedron", "Triangular Dipyramid", "Truncated Icosahedron"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_07",
+      "abilityCode": "NFU",
+      "title": "Figural Spatial Assembly",
+      "items": [
+        {
+          "id": "ala_nfu_01",
+          "stimulus": "Three irregular polyhedral interlocking puzzle pieces (Piece A: 4 voxels, Piece B: 8 voxels, Piece C: 15 voxels).",
+          "questionText": "What is the dimensions of the solid rectangular prism formed by their union (27 voxels total)?",
+          "options": ["3 x 3 x 3 cube", "1 x 1 x 27 bar", "2 x 3 x 4 block", "3 x 3 x 4 block"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_08",
+      "abilityCode": "CSS",
+      "title": "Symbolic Systems & Mathematical Algorithms",
+      "items": [
+        {
+          "id": "ala_css_01",
+          "stimulus": "Recurrence relation: a_0 = 1, a_1 = 3, a_n = 2*a_(n-1) - a_(n-2) + 2.",
+          "questionText": "What is the value of a_4?",
+          "options": ["17", "15", "19", "21"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_09",
+      "abilityCode": "MSU",
+      "title": "Symbolic Buffer Recall",
+      "items": [
+        {
+          "id": "ala_msu_01",
+          "stimulus": "High-entropy alphanumeric token string: '7X#9Q@42K$B8'",
+          "questionText": "What character was positioned directly between '9Q' and '42'?",
+          "options": ["@", "#", "$", "K"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_10",
+      "abilityCode": "MSUA",
+      "title": "Auditory Complex Span",
+      "items": [
+        {
+          "id": "ala_msua_01",
+          "stimulus": "Auditory instruction with 4 conditional branching criteria for sorting data folders.",
+          "questionText": "If a document is dated 2023, marked 'Urgent', and contains financial figures, to which folder does it route?",
+          "options": ["Folder Green-Alpha (Immediate Executive Review)", "Folder Blue (General Archive)", "Folder Amber (Standard Billing)", "Folder Red (Legal Hold)"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_11",
+      "abilityCode": "NST",
+      "title": "Symbolic Matrix Transformations",
+      "items": [
+        {
+          "id": "ala_nst_01",
+          "stimulus": "Matrix equation: [[2, 1], [1, 3]] * [[x], [y]] = [[8], [9]].",
+          "questionText": "Solve for the vector [x, y]:",
+          "options": ["x = 3, y = 2", "x = 2, y = 3", "x = 4, y = 1", "x = 1, y = 4"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_12",
+      "abilityCode": "CMUr",
+      "title": "Advanced Semantic Units (Lexicon)",
+      "items": [
+        {
+          "id": "ala_cmur_01",
+          "stimulus": "Context: 'The philosopher warned against REIFYING abstract mathematical entities into physical substances.'",
+          "questionText": "What does 'reifying' mean in epistemology and ontology?",
+          "options": ["Treating an abstract concept as if it were a concrete material reality", "Simplifying complex calculations", "Translating Greek manuscripts", "Disproving empirical observations"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_13",
+      "abilityCode": "CMR",
+      "title": "Advanced Semantic Relations",
+      "items": [
+        {
+          "id": "ala_cmr_01",
+          "stimulus": "ENTROPY : THERMODYNAMICS :: ANOMIE : ?",
+          "questionText": "Complete the foundational conceptual analogy:",
+          "options": ["Sociology / Social Theory", "Organic Chemistry", "Astrophysics", "Fluid Mechanics"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_14",
+      "abilityCode": "CMS",
+      "title": "Semantic System Integration",
+      "items": [
+        {
+          "id": "ala_cms_01",
+          "stimulus": "Complex scientific argument detailing epigenetic methylation changes across twin cohorts under disparate environmental stresses.",
+          "questionText": "Which overarching synthesis is validated by the premises?",
+          "options": ["Environmental factors can alter gene expression profiles without altering underlying nucleotide sequence", "Genetics is 100% determinative of all phenotypic health outcomes", "Identical twins retain identical methylation throughout life", "Epigenetic markers cannot be quantified"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_15",
+      "abilityCode": "CFS",
+      "title": "Cognition of Figural Systems (3D Matrices)",
+      "items": [
+        {
+          "id": "ala_cfs_01",
+          "stimulus": "3x3x3 Rubik-style block with shaded isometric faces following a rotational rule.",
+          "questionText": "Determine the orientation of the unseen bottom-rear corner block:",
+          "options": ["Face shaded on bottom and left plane", "Face shaded on top only", "Completely unshaded", "Face shaded on all 3 exposed planes"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_16",
+      "abilityCode": "CFT",
+      "title": "Figural Transformations & Mental Folding",
+      "items": [
+        {
+          "id": "ala_cft_01",
+          "stimulus": "A flat sheet of paper is folded in half twice, a triangular hole is punched in the center, and the paper is unfolded.",
+          "questionText": "How many holes appear in the unfolded sheet, and what symmetry pattern do they form?",
+          "options": ["4 holes arranged in a 4-fold reflective symmetry", "2 holes along the fold line", "1 single central hole", "8 holes along the perimeter"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_17",
+      "abilityCode": "MFS",
+      "title": "Memory for Figural Systems (Maps)",
+      "items": [
+        {
+          "id": "ala_mfs_01",
+          "stimulus": "Topological subway transit map showing 4 intersecting lines (Red, Blue, Green, Gold) with 12 interchange stations.",
+          "questionText": "At which station did the Green Line intersect both the Blue and Gold Lines simultaneously?",
+          "options": ["Central Junction Station", "North Terminal", "West Crossing", "Harbor Station"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_18",
+      "abilityCode": "DFU",
+      "title": "Divergent Production of Figural Units",
+      "items": [
+        {
+          "id": "ala_dfu_01",
+          "stimulus": "Prompt: 'Given two concentric circles and one straight line, how many distinct functional symbols (e.g., target, magnifying glass, planet with ring, monocle) can be constructed?'",
+          "questionText": "Select the option presenting the greatest variety of distinct semantic interpretations of this geometry:",
+          "options": ["Magnifying glass, celestial planet with ring, archery bullseye with arrow, submarine periscope", "Four variations of a circular coin", "Four variations of a circle with a tangent line", "Four identical clock hands"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_19",
+      "abilityCode": "CSR",
+      "title": "Symbolic Relations & Proportions",
+      "items": [
+        {
+          "id": "ala_csr_01",
+          "stimulus": "Proportion: [log_2(8) : log_3(27)] :: [log_4(256) : ?]",
+          "questionText": "Solve for the corresponding logarithmic term:",
+          "options": ["log_5(625) (since 3:3 = 1 and 4:4 = 1)", "log_2(32)", "log_10(100)", "log_3(9)"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_20",
+      "abilityCode": "MSS",
+      "title": "Memory for Symbolic Systems",
+      "items": [
+        {
+          "id": "ala_mss_01",
+          "stimulus": "Algorithm flow: 'STEP 1: Init i=0 -> STEP 2: i += 3 -> STEP 3: If i < 15 goto STEP 2 -> STEP 4: Output i*2'.",
+          "questionText": "What final value was produced by the executed algorithm string?",
+          "options": ["30 (i reaches 15, then 15 * 2 = 30)", "24", "36", "15"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_21",
+      "abilityCode": "ESS",
+      "title": "Evaluation of Symbolic Proofs",
+      "items": [
+        {
+          "id": "ala_ess_01",
+          "stimulus": "Fallacious Proof: 'Let a = b. Then a^2 = ab -> a^2 - b^2 = ab - b^2 -> (a-b)(a+b) = b(a-b) -> a+b = b -> 2b = b -> 2 = 1.'",
+          "questionText": "In which step did the mathematical violation occur?",
+          "options": ["Dividing both sides by (a - b), which equals zero since a = b", "Subtracting b^2 from both sides", "Factoring (a^2 - b^2) into (a-b)(a+b)", "Multiplying both sides by a"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_22",
+      "abilityCode": "DSR",
+      "title": "Divergent Symbolic Formulations",
+      "items": [
+        {
+          "id": "ala_dsr_01",
+          "stimulus": "Target Number = 24. Available integers = {3, 3, 8, 8}. Allowed operations = {+, -, *, /}.",
+          "questionText": "Which valid equation uses each integer exactly once to reach 24?",
+          "options": ["8 / (3 - 8/3) = 24", "(8 + 8) + (3 * 3) = 25", "8 * 3 * (8 - 3) = 120", "3 * 8 + 8 - 3 = 29"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_23",
+      "abilityCode": "CMC",
+      "title": "Cognition of Semantic Classes",
+      "items": [
+        {
+          "id": "ala_cmc_01",
+          "stimulus": "Concepts: [Mitosis, Meiosis, Binary Fission, Budding]",
+          "questionText": "What is the unifying superordinate biological category?",
+          "options": ["Mechanisms of Cellular Reproduction and Division", "Types of Photosynthetic Pathways", "Cellular Respiration stages", "Protein Synthesis steps"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_24",
+      "abilityCode": "CMT",
+      "title": "Metaphor & Figurative Transformations",
+      "items": [
+        {
+          "id": "ala_cmt_01",
+          "stimulus": "Poetic Metaphor: 'Time is a river that carries us away from our own reflections.'",
+          "questionText": "What underlying transformation of meaning does this metaphor express?",
+          "options": ["The irreversible, fluid progression of temporal existence that alters personal identity and memory", "That rivers physically reflect light accurately", "That clocks require water power to operate", "That geographical travel causes memory loss"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_25",
+      "abilityCode": "CMI",
+      "title": "Semantic Implications & Deductive Foresight",
+      "items": [
+        {
+          "id": "ala_cmi_01",
+          "stimulus": "Economic Scenario: 'A central bank enacts a surprise 150 basis point interest rate hike during high consumer demand and low unemployment.'",
+          "questionText": "What is the most probable multi-order consequence over the subsequent 12-month horizon?",
+          "options": ["Borrowing costs increase, slowing capital expenditure and dampening inflationary pressure", "Immediate hyperinflation and wage collapse", "Zero impact on credit markets", "Immediate drop in all bank lending rates"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_26",
+      "abilityCode": "MMU",
+      "title": "Semantic Fact Memory",
+      "items": [
+        {
+          "id": "ala_mmu_01",
+          "stimulus": "Historical dossier: 'The Treaty of Utrecht was ratified in 1713, concluding the War of the Spanish Succession and establishing maritime territorial bounds.'",
+          "questionText": "In what year was the Treaty of Utrecht ratified?",
+          "options": ["1713", "1789", "1648", "1815"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_27",
+      "abilityCode": "EMS",
+      "title": "Evaluation of Semantic Systems & Fallacies",
+      "items": [
+        {
+          "id": "ala_ems_01",
+          "stimulus": "Argument: 'We should not adopt Dr. Thorne's climate model because he was once fined for a parking violation ten years ago.'",
+          "questionText": "What informal logical fallacy invalidates this argument?",
+          "options": ["Ad Hominem (attacking the character of the proponent rather than the empirical validity of the model)", "Post Hoc Ergo Propter Hoc", "Straw Man Fallacy", "Begging the Question"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_28",
+      "abilityCode": "NMS",
+      "title": "Convergent Semantic Synthesis",
+      "items": [
+        {
+          "id": "ala_nms_01",
+          "stimulus": "Data points: (1) Increasing urban heat island effect, (2) High storm runoff volume, (3) Lack of public green spaces in Sector 4.",
+          "questionText": "What single municipal civil-engineering initiative directly addresses all three challenges simultaneously?",
+          "options": ["Extensive green roof infrastructure and bioswale urban park network", "Constructing an underground highway tunnel", "Installing high-voltage street lighting", "Repaving all roadways with traditional dark asphalt"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_29",
+      "abilityCode": "DMU",
+      "title": "Divergent Semantic Production (Fluency)",
+      "items": [
+        {
+          "id": "ala_dmu_01",
+          "stimulus": "Brainstorming Challenge: 'Identify innovative uses for recycled industrial carbon fiber offcuts.'",
+          "questionText": "Which selection demonstrates the highest conceptual divergence and commercial feasibility?",
+          "options": ["Ultra-light prosthetic limbs, drone chassis reinforcement, conductive acoustic guitar soundboards, high-strength bicycle rims", "Making identical carbon fiber bookmarks in 4 different colors", "Using it only as landfill packing", "Burning it for steam energy"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "sectionId": "ala_sec_30",
+      "abilityCode": "DMR",
+      "title": "Divergent Semantic Analogies & Metaphor",
+      "items": [
+        {
+          "id": "ala_dmr_01",
+          "stimulus": "Conceptual Bridge: 'How is the architectural immune system of a biological cell analogous to modern computer cybersecurity?'",
+          "questionText": "Which mapping demonstrates the deepest structural analogy between the two systems?",
+          "options": ["Cell membrane receptors act as firewall packet filters, antibodies act as malware signature detectors, and lysosomes digest quarantined threats", "Both systems require electricity to turn on", "Both systems are colored green in textbook diagrams", "Both systems operate using magnetic disk drives"],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}

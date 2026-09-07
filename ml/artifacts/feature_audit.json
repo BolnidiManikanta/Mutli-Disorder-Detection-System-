@@ -1,0 +1,86 @@
+{
+  "A1_Score": {
+    "classification": "Allowed predictor (Screening item)",
+    "rationale": "AQ-10 item 1. Demonstrates 100% sample separation on this subset."
+  },
+  "A2_Score": {
+    "classification": "Allowed predictor (Screening item)",
+    "rationale": "AQ-10 item 2. Detail focus."
+  },
+  "A3_Score": {
+    "classification": "Allowed predictor (Screening item)",
+    "rationale": "AQ-10 item 3. Attention switching."
+  },
+  "A4_Score": {
+    "classification": "Allowed predictor (Screening item)",
+    "rationale": "AQ-10 item 4. Task interruption."
+  },
+  "A5_Score": {
+    "classification": "Allowed predictor (Screening item)",
+    "rationale": "AQ-10 item 5. Social subtleties."
+  },
+  "A6_Score": {
+    "classification": "Allowed predictor (Screening item)",
+    "rationale": "AQ-10 item 6. Listener engagement."
+  },
+  "A7_Score": {
+    "classification": "Allowed predictor (Screening item)",
+    "rationale": "AQ-10 item 7. Intention attribution."
+  },
+  "A8_Score": {
+    "classification": "Allowed predictor (Screening item)",
+    "rationale": "AQ-10 item 8. Catalog information."
+  },
+  "A9_Score": {
+    "classification": "Allowed predictor (Screening item)",
+    "rationale": "AQ-10 item 9. Facial expression reading."
+  },
+  "A10_Score": {
+    "classification": "Allowed predictor (Screening item)",
+    "rationale": "AQ-10 item 10. Demonstrates 100% sample separation on this subset."
+  },
+  "age": {
+    "classification": "Demographic/confounder",
+    "rationale": "Chronological age in years."
+  },
+  "gender": {
+    "classification": "Demographic/confounder",
+    "rationale": "Biological sex marker (m/f). Encoded as gender_num."
+  },
+  "jaundice": {
+    "classification": "Demographic/confounder",
+    "rationale": "Neonatal jaundice history (yes/no). Encoded as jaundice_num."
+  },
+  "austim": {
+    "classification": "Demographic/confounder",
+    "rationale": "Family history of ASD (yes/no). Encoded as austim_num."
+  },
+  "ethnicity": {
+    "classification": "Potential leakage / demographic",
+    "rationale": "Categorical ethnicity; omitted from baseline 14-feature model to avoid bias."
+  },
+  "country": {
+    "classification": "Administrative metadata / potential confounder",
+    "rationale": "Country of residence; omitted from model."
+  },
+  "used_app_before": {
+    "classification": "Administrative metadata",
+    "rationale": "Software usage metadata; omitted from model."
+  },
+  "relation": {
+    "classification": "Administrative metadata",
+    "rationale": "Test taker relation (Self/Parent); omitted from model."
+  },
+  "result": {
+    "classification": "TARGET_DERIVED (STRICT LEAKAGE)",
+    "rationale": "Sum of positive screening scores. Strictly PURGED from model inputs."
+  },
+  "aq10_sum": {
+    "classification": "TARGET_DERIVED (STRICT LEAKAGE)",
+    "rationale": "Synthetic sum of A1-A10. Strictly PURGED from model inputs."
+  },
+  "Class_ASD": {
+    "classification": "TARGET",
+    "rationale": "Binary screening outcome label."
+  }
+}

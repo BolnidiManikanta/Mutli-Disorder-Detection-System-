@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-09-02T11:18:01.593527",
+  "python_version": "3.11.2 (main, May 12 2026, 05:17:27) [GCC 12.2.0]",
+  "platform": "Linux-4.19.0-gvisor-x86_64-with-glibc2.36",
+  "libraries": {
+    "scikit_learn": "1.9.0",
+    "xgboost": "3.2.0",
+    "shap": "0.51.0",
+    "numpy": "2.4.6",
+    "pandas": "3.0.5",
+    "scipy": "unknown"
+  },
+  "reproducibility": {
+    "random_seed": 42,
+    "stratified_kfold_splits": 5,
+    "test_split_size": 0.25
+  }
+}

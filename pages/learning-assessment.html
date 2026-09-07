@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learning Ability Assessment | NeuroScan AI</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/learning.css">
+</head>
+<body>
+  <div id="nav-ph"></div>
+
+  <main class="learning-page-container">
+    <!-- HERO HEADER -->
+    <header class="learning-hero">
+      <div class="learning-hero-badge">🎓 Cognitive Diagnostic Suite</div>
+      <h1>Primary & Advanced Learning Abilities Assessment</h1>
+      <p>
+        Systematic, timed evaluation across <strong>Figural</strong>, <strong>Symbolic</strong>, and <strong>Semantic</strong> operations. Calibrated diagnostic assessment to construct a granular cognitive learning profile and personalized developmental curriculum.
+      </p>
+
+      <div class="learning-quick-tabs">
+        <a href="learning-assessment.html" class="learning-tab-btn active">📝 Active Assessment</a>
+        <a href="learning-profile.html" class="learning-tab-btn">📊 Ability Profile</a>
+        <a href="learning-program.html" class="learning-tab-btn">🎯 Training Program</a>
+        <a href="learning-progress.html" class="learning-tab-btn">📈 Progress & Reassessment</a>
+      </div>
+    </header>
+
+    <!-- SETUP STAGE (If not in session) -->
+    <section id="assessmentSetupSection" class="question-stage-card">
+      <div class="stage-header">
+        <div>
+          <h2 style="margin:0 0 4px;font-size:1.3rem;">Select Assessment Battery</h2>
+          <span style="color:var(--learn-muted);font-size:.9rem;">Choose assessment battery or enter learner details to begin</span>
+        </div>
+        <span class="stage-construct-badge">Standardized Protocol</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+        <!-- PLA Card -->
+        <div style="border:2px solid var(--learn-primary);border-radius:12px;padding:20px;background:rgba(37,99,235,0.03);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <h3 style="margin:0;color:var(--learn-primary);">PLA Assessment (14 Constructs)</h3>
+            <span style="background:var(--learn-primary);color:#fff;padding:2px 8px;border-radius:12px;font-size:.75rem;font-weight:700;">~90 Min</span>
+          </div>
+          <p style="font-size:.9rem;color:#475569;margin-bottom:14px;">
+            Comprehensive evaluation of 14 primary abilities (CFU, CFC, CFR, MFU, EFU, EFC, NFU, CSS, MSU, MSUA, NST, CMUr, CMR, CMS).
+          </p>
+          <button id="btnStartPLA" class="btn btn-primary btn-sm" style="width:100%;">Start PLA Assessment</button>
+        </div>
+
+        <!-- ALA Card -->
+        <div style="border:1px solid var(--learn-border);border-radius:12px;padding:20px;background:#fff;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <h3 style="margin:0;color:var(--learn-text);">ALA Assessment (30 Constructs)</h3>
+            <span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:.75rem;font-weight:700;">~150 Min</span>
+          </div>
+          <p style="font-size:.9rem;color:#475569;margin-bottom:14px;">
+            In-depth evaluation across 30 cognitive constructs, including divergent production, systems synthesis, and formal proofs.
+          </p>
+          <button id="btnStartALA" class="btn btn-outline btn-sm" style="width:100%;">Start ALA Assessment</button>
+        </div>
+      </div>
+
+      <!-- Learner Meta Selector -->
+      <div style="background:#f8fafc;padding:16px;border-radius:8px;border:1px solid #e2e8f0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+        <label style="font-size:.9rem;font-weight:600;">Learner Profile:</label>
+        <select id="learnerSelect" style="padding:6px 12px;border-radius:6px;border:1px solid #cbd5e1;background:#fff;font-size:.9rem;">
+          <option value="learner-001">Leo Tanaka (Age 10 · Grade 5)</option>
+          <option value="learner-002">Maya Rodriguez (Age 8 · Grade 3)</option>
+          <option value="learner-guest">Guest Assessment</option>
+        </select>
+        <span style="font-size:.8rem;color:#64748b;">(Specialist session logs & autosaves will attach to this profile)</span>
+      </div>
+    </section>
+
+    <!-- LIVE ASSESSMENT RUNNER (Active during session) -->
+    <div id="assessmentActiveSection" class="assessment-layout" style="display:none;">
+      <!-- SIDEBAR -->
+      <aside class="assessment-sidebar">
+        <div class="sidebar-timer-box">
+          <div style="font-size:.75rem;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;">Total Elapsed Time</div>
+          <div id="timerDisplay" class="sidebar-timer-val">00:00:00</div>
+          <button id="btnTogglePause" class="btn btn-outline btn-sm" style="margin-top:10px;width:100%;border-color:#334155;color:#f8fafc;">
+            ⏸️ Pause Session
+          </button>
+        </div>
+
+        <div style="margin-bottom:12px;display:flex;justify-content:space-between;font-size:.85rem;font-weight:700;">
+          <span>Sections Progress</span>
+          <span id="progressSummary">0%</span>
+        </div>
+        <div class="sidebar-section-list" id="sectionNavList">
+          <!-- Dynamically populated -->
+        </div>
+      </aside>
+
+      <!-- MAIN STAGE -->
+      <section class="question-stage-card" id="questionStage">
+        <div class="stage-header">
+          <div>
+            <span id="currentAbilityBadge" class="stage-construct-badge">Construct: CFU</span>
+            <h3 id="sectionTitleDisplay" style="margin:6px 0 0;font-size:1.15rem;">Visual Closure & Form Perception</h3>
+          </div>
+          <div style="text-align:right;">
+            <span id="itemCounterBadge" style="font-size:.85rem;font-weight:700;color:var(--learn-muted);">Item 1 of 4</span>
+          </div>
+        </div>
+
+        <div id="sectionInstructionText" style="font-size:.9rem;color:#475569;margin-bottom:16px;background:#f8fafc;padding:10px 14px;border-radius:8px;">
+          Instruction: Identify which complete object or geometric shape is represented.
+        </div>
+
+        <div id="stimulusBox" class="stage-stimulus-box">
+          <!-- Stimulus content -->
+        </div>
+
+        <div id="questionText" class="stage-question-text">
+          Question prompt loading...
+        </div>
+
+        <div id="optionsGrid" class="stage-options-grid">
+          <!-- Options dynamically rendered -->
+        </div>
+
+        <div class="stage-footer-actions">
+          <button id="btnPrevItem" class="btn btn-outline btn-sm" disabled>← Previous</button>
+          <div style="display:flex;gap:10px;">
+            <button id="btnSkipItem" class="btn btn-outline btn-sm">Skip for Now</button>
+            <button id="btnNextItem" class="btn btn-primary btn-sm">Next Item →</button>
+            <button id="btnFinishAssessment" class="btn btn-primary btn-sm" style="display:none;background:#2d6a4f;">Complete & Score</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="footer-ph"></div>
+
+  <script type="module">
+    import '../js/shared.js';
+    import { AssessmentSession } from '../js/learning/assessment-engine.js';
+    import { ScoringEngine } from '../js/learning/scoring-engine.js';
+
+    let activeSession = null;
+    let plaConfig = null;
+    let alaConfig = null;
+    let abilitiesList = [];
+    let startTime = Date.now();
+
+    // Fetch initial datasets
+    async function initData() {
+      try {
+        const [resPLA, resALA, resAb] = await Promise.all([
+          fetch('/api/learning/assessment-items/pla'),
+          fetch('/api/learning/assessment-items/ala'),
+          fetch('/api/learning/abilities')
+        ]);
+        plaConfig = await resPLA.json();
+        alaConfig = await resALA.json();
+        abilitiesList = await resAb.json();
+      } catch (e) {
+        console.warn('API fetch fallback:', e);
+      }
+    }
+
+    initData();
+
+    document.getElementById('btnStartPLA').addEventListener('click', () => {
+      startAssessment('PLA', plaConfig || { sections: [] });
+    });
+
+    document.getElementById('btnStartALA').addEventListener('click', () => {
+      startAssessment('ALA', alaConfig || { sections: [] });
+    });
+
+    function startAssessment(type, config) {
+      const learnerId = document.getElementById('learnerSelect').value;
+      const learnerName = document.getElementById('learnerSelect').selectedOptions[0].text;
+
+      document.getElementById('assessmentSetupSection').style.display = 'none';
+      document.getElementById('assessmentActiveSection').style.display = 'grid';
+
+      activeSession = new AssessmentSession({
+        assessmentId: `${type}-v1.0`,
+        title: `${type} Diagnostic Assessment`,
+        type,
+        targetDurationMinutes: type === 'ALA' ? 150 : 90,
+        sections: config.sections || [],
+        learner: { id: learnerId, name: learnerName },
+        onStateChange: renderSessionState,
+        onComplete: handleSessionCompletion
+      }).init();
+    }
+
+    function renderSessionState(state) {
+      // Format timer
+      const hrs = String(Math.floor(state.totalElapsedSeconds / 3600)).padStart(2, '0');
+      const mins = String(Math.floor((state.totalElapsedSeconds % 3600) / 60)).padStart(2, '0');
+      const secs = String(state.totalElapsedSeconds % 60).padStart(2, '0');
+      document.getElementById('timerDisplay').innerText = `${hrs}:${mins}:${secs}`;
+      document.getElementById('progressSummary').innerText = `${state.percentComplete}%`;
+
+      // Render Section Nav List
+      const navList = document.getElementById('sectionNavList');
+      if (activeSession.sections) {
+        navList.innerHTML = activeSession.sections.map((sec, idx) => {
+          const isActive = idx === state.currentSectionIndex;
+          const isDone = false; // can check response map
+          return `
+            <div class="section-nav-item ${isActive ? 'active' : ''} ${isDone ? 'completed' : ''}" onclick="window.jumpSec(${idx})">
+              <span><strong>${sec.abilityCode}</strong> · ${sec.title}</span>
+              <span>${sec.items.length} items</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      window.jumpSec = (idx) => activeSession.jumpToSection(idx);
+
+      // Render Question Stage
+      const sec = state.currentSection;
+      const item = state.currentItem;
+
+      if (!sec || !item) {
+        if (state.isCompleted) return;
+        return;
+      }
+
+      document.getElementById('currentAbilityBadge').innerText = `Construct: ${sec.abilityCode || 'PLA'}`;
+      document.getElementById('sectionTitleDisplay').innerText = sec.title || '';
+      document.getElementById('sectionInstructionText').innerText = sec.instruction || 'Carefully evaluate the stimulus and select the best answer.';
+      document.getElementById('itemCounterBadge').innerText = `Item ${state.currentItemIndex + 1} of ${state.totalSectionItems}`;
+
+      document.getElementById('stimulusBox').innerText = item.stimulus || '(Inspect question options)';
+      document.getElementById('questionText').innerText = item.questionText || '';
+
+      const resp = state.currentResponse;
+      const optionsContainer = document.getElementById('optionsGrid');
+      optionsContainer.innerHTML = (item.options || []).map((opt, idx) => {
+        const isSelected = resp && resp.selectedIndex === idx;
+        return `
+          <button class="stage-option-btn ${isSelected ? 'selected' : ''}" onclick="window.pickOption(${idx})">
+            <span class="opt-index">${String.fromCharCode(65 + idx)}</span>
+            <span>${opt}</span>
+          </button>
+        `;
+      }).join('');
+
+      window.pickOption = (idx) => {
+        const latency = Date.now() - startTime;
+        activeSession.recordAnswer(idx, latency);
+        startTime = Date.now();
+      };
+
+      document.getElementById('btnPrevItem').disabled = (state.currentSectionIndex === 0 && state.currentItemIndex === 0);
+
+      const isLast = (state.currentSectionIndex === activeSession.sections.length - 1 && state.currentItemIndex === sec.items.length - 1);
+      document.getElementById('btnNextItem').style.display = isLast ? 'none' : 'inline-flex';
+      document.getElementById('btnFinishAssessment').style.display = isLast ? 'inline-flex' : 'none';
+    }
+
+    document.getElementById('btnNextItem').addEventListener('click', () => {
+      startTime = Date.now();
+      activeSession.nextItem();
+    });
+
+    document.getElementById('btnPrevItem').addEventListener('click', () => {
+      activeSession.previousItem();
+    });
+
+    document.getElementById('btnSkipItem').addEventListener('click', () => {
+      startTime = Date.now();
+      activeSession.nextItem();
+    });
+
+    document.getElementById('btnFinishAssessment').addEventListener('click', () => {
+      activeSession.completeSession();
+    });
+
+    document.getElementById('btnTogglePause').addEventListener('click', () => {
+      const paused = activeSession.togglePause();
+      document.getElementById('btnTogglePause').innerText = paused ? '▶️ Resume Session' : '⏸️ Pause Session';
+    });
+
+    async function handleSessionCompletion(payload) {
+      try {
+        const scoring = new ScoringEngine(abilitiesList);
+        const scoredProfile = scoring.scoreAssessment(payload);
+
+        // Submit to backend
+        await fetch('/api/learning/assessment/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...payload, scoredProfile })
+        });
+
+        // Store active profile locally and route to profile page
+        localStorage.setItem('neuroscan_latest_learning_profile', JSON.stringify(scoredProfile));
+        window.location.href = 'learning-profile.html';
+      } catch (e) {
+        console.error('Session complete scoring failed:', e);
+        window.location.href = 'learning-profile.html';
+      }
+    }
+  </script>
+</body>
+</html>

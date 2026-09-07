@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Advanced AI Assessment — NeuroScan</title>
+  <title>Advanced AI Assessment — NeuroScan AI</title>
   <link rel="stylesheet" href="../css/main.css"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -247,16 +247,17 @@
   </style>
 </head>
 <body>
+<div id="nav-ph"></div>
 <script type="module" src="../js/shared.js"></script>
 
 <!-- PAGE HEADER -->
 <div class="assess-header">
   <div class="assess-header-inner">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-      <span style="background:rgba(255,255,255,.12);padding:6px 14px;border-radius:50px;font-size:.75rem;font-weight:700;border:1px solid rgba(255,255,255,.2)">🧠 Multi-Disorder AI Assessment</span>
+      <span style="background:rgba(255,255,255,.12);padding:6px 14px;border-radius:50px;font-size:.75rem;font-weight:700;border:1px solid rgba(255,255,255,.2)">🔬 Experimental Research Prototype — 7 Disorders</span>
     </div>
-    <h1>NeuroScan Advanced Assessment</h1>
-    <p>AI-powered adaptive questionnaire screening 7 neurodevelopmental and psychiatric conditions. Powered by an ensemble of Logistic Regression, Random Forest & XGBoost models with SHAP explanations.</p>
+    <h1>NeuroScan Multi-Disorder Assessment</h1>
+    <p>Adaptive questionnaire screening across 7 neurodevelopmental conditions. Powered by calibrated Scikit-Learn ensemble models (Random Forest, Gradient Boosting, Logistic Regression) with real-time SHAP explanations.</p>
     <div class="disorder-badges">
       <span class="disorder-badge">🧩 ASD</span>
       <span class="disorder-badge">⚡ ADHD</span>
@@ -588,6 +589,7 @@ async function runAnalysis() {
   await new Promise(r => setTimeout(r, 400));
 
   const demographics = {
+    name: document.getElementById('demoName').value || 'Participant',
     age: parseInt(document.getElementById('demoAge').value) || 8,
     gender: document.getElementById('demoGender').value || 'male',
     family_history: document.getElementById('demoFamily').checked,
@@ -595,12 +597,35 @@ async function runAnalysis() {
     premature: document.getElementById('demoPremature').checked,
   };
 
-  currentResults = ensemblePredict(answers, demographics);
-  currentRecs = generateRecommendations(currentResults);
+  let primaryId = 'asd';
+  let shapValues = [];
+  let docExplanation = '';
 
-  const primaryId = Object.entries(currentResults).sort((a,b) => b[1].probability - a[1].probability)[0][0];
-  const shapValues = computeSHAP(answers, primaryId);
-  const docExplanation = generateDoctorExplanation(currentResults, shapValues, demographics);
+  try {
+    const resp = await fetch('/api/ml/assess', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answers, demographics })
+    });
+
+    if (resp.ok) {
+      const mlData = await resp.json();
+      currentResults = mlData.disorder_results;
+      primaryId = mlData.primary_disorder || Object.keys(currentResults)[0];
+      shapValues = mlData.shap_values || [];
+      docExplanation = mlData.doctor_explanation || '';
+      currentRecs = mlData.recommendations || generateRecommendations(currentResults);
+    } else {
+      throw new Error(`Server returned status ${resp.status}`);
+    }
+  } catch (err) {
+    console.warn('Backend ML assess fallback to client engine:', err);
+    currentResults = ensemblePredict(answers, demographics);
+    currentRecs = generateRecommendations(currentResults);
+    primaryId = Object.entries(currentResults).sort((a,b) => b[1].probability - a[1].probability)[0][0];
+    shapValues = computeSHAP(answers, primaryId);
+    docExplanation = generateDoctorExplanation(currentResults, shapValues, demographics);
+  }
 
   // Hide overlay, show results
   document.getElementById('analyzingOverlay').classList.remove('show');
@@ -891,5 +916,6 @@ async function generateReport() {
 // ── INIT ──────────────────────────────────────────────────────
 renderQuestions();
 </script>
+<div id="footer-ph"></div>
 </body>
 </html>

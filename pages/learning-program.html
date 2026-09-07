@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personalized Training Program | NeuroScan AI</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/learning.css">
+</head>
+<body>
+  <div id="nav-ph"></div>
+
+  <main class="learning-page-container">
+    <!-- HERO HEADER -->
+    <header class="learning-hero">
+      <div class="learning-hero-badge">🎯 Personalized Development Engine</div>
+      <h1>Personalized Learning Training Program</h1>
+      <p>
+        Systematic multi-week cognitive training curriculum mapped from assessment priority constructs. Structured as <strong>Ability → Module → Exercises</strong> with digital interactive practice, specialist sessions, and weekend enrichment.
+      </p>
+
+      <div class="learning-quick-tabs">
+        <a href="learning-assessment.html" class="learning-tab-btn">📝 Active Assessment</a>
+        <a href="learning-profile.html" class="learning-tab-btn">📊 Ability Profile</a>
+        <a href="learning-program.html" class="learning-tab-btn active">🎯 Training Program</a>
+        <a href="learning-progress.html" class="learning-tab-btn">📈 Progress & Reassessment</a>
+      </div>
+    </header>
+
+    <!-- PROGRAM SUMMARY CARD -->
+    <section class="question-stage-card" style="margin-bottom:28px;">
+      <div class="stage-header">
+        <div>
+          <h2 id="programTitleDisplay" style="margin:0 0 4px;font-size:1.3rem;">Curriculum for Leo Tanaka</h2>
+          <span style="color:var(--learn-muted);font-size:.9rem;">Status: <strong style="color:var(--learn-figural);">Active</strong> · 8-Week Intervention Plan · 25 Min / Day</span>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button id="btnPrintWorksheet" class="btn btn-outline btn-sm">🖨️ Printable Worksheets</button>
+          <button id="btnLaunchExercise" class="btn btn-primary btn-sm">▶️ Start Today's Activity</button>
+        </div>
+      </div>
+
+      <!-- TARGETED ABILITY MODULES STRIP -->
+      <h4 style="margin:0 0 12px;font-size:1rem;">Targeted Priority Abilities & Modules:</h4>
+      <div id="targetedModulesList" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:16px;margin-bottom:20px;">
+        <!-- Dynamically rendered -->
+      </div>
+
+      <div style="background:#f8fafc;padding:14px 18px;border-radius:8px;border:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div style="font-size:.85rem;color:#334155;">
+          <strong>Specialist Directive:</strong> Focus on step-by-step visual analogy scaffolding and arithmetic series rules before introducing interleaved streams.
+        </div>
+        <button id="btnEditProgram" class="btn btn-outline btn-sm" style="font-size:.8rem;">✏️ Specialist Customization</button>
+      </div>
+    </section>
+
+    <!-- WEEKLY TIMETABLE SCHEDULE -->
+    <section>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h3 style="margin:0;font-size:1.25rem;">Weekly Training Timetable (Week 1 of 8)</h3>
+        <span class="week-title-badge">Theme: Foundation & Strategy Acquisition</span>
+      </div>
+
+      <div class="program-week-card">
+        <div class="daily-schedule-grid" id="dailyScheduleGrid">
+          <!-- Dynamically populated daily cards -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- INTERACTIVE ACTIVITY RUNNER MODAL -->
+  <div id="activityPlayerModal" class="modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
+    <div class="modal-dialog" style="background:#fff;border-radius:16px;max-width:700px;width:92%;padding:32px;box-shadow:0 12px 30px rgba(0,0,0,0.2);">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--learn-border);padding-bottom:14px;margin-bottom:18px;">
+        <div>
+          <span id="actModalBadge" class="ability-badge-domain symbolic">CFR · Spatial Analogies</span>
+          <h3 id="actModalTitle" style="margin:6px 0 0;font-size:1.2rem;">Spatial Analogy Matrix Builder</h3>
+        </div>
+        <div style="text-align:right;">
+          <span id="actLevelBadge" style="background:#f1f5f9;font-weight:700;font-size:.8rem;padding:4px 8px;border-radius:6px;">Level 2 · Adaptive</span>
+          <button onclick="window.closeActModal()" style="border:none;background:none;font-size:1.5rem;cursor:pointer;color:#64748b;margin-left:10px;">×</button>
+        </div>
+      </div>
+
+      <!-- ACTIVE EXERCISE CARD -->
+      <div id="actActiveArea">
+        <div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--learn-muted);margin-bottom:12px;">
+          <span id="actItemCounter">Question 1 of 4</span>
+          <span id="actTimerVal">00:15</span>
+        </div>
+
+        <div id="actStimulusBox" class="stage-stimulus-box" style="margin-bottom:16px;">
+          <!-- Exercise Stimulus -->
+        </div>
+
+        <div id="actQuestionPrompt" class="stage-question-text" style="font-size:1.1rem;margin-bottom:16px;">
+          Select the corresponding transformed figure:
+        </div>
+
+        <div id="actOptionsGrid" class="stage-options-grid" style="margin-bottom:20px;">
+          <!-- Options rendered -->
+        </div>
+      </div>
+
+      <!-- COMPLETION & ADAPTIVE DECISION CARD (Hidden initially) -->
+      <div id="actResultArea" style="display:none;text-align:center;padding:20px 0;">
+        <div style="font-size:2.5rem;margin-bottom:8px;">🎉</div>
+        <h3 style="margin:0 0 6px;">Exercise Session Complete!</h3>
+        <p id="actScoreSummary" style="color:var(--learn-muted);font-size:1rem;margin:0 0 16px;">Accuracy: 100% (4/4 Correct) · Avg Latency: 4.2s</p>
+
+        <div id="actAdaptationBox" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px;margin-bottom:24px;text-align:left;">
+          <strong style="color:#166534;display:block;margin-bottom:4px;">🚀 5-Level Adaptive Progression Decision:</strong>
+          <span id="actAdaptationText" style="font-size:.9rem;color:#1e293b;"></span>
+        </div>
+
+        <button onclick="window.closeActModal()" class="btn btn-primary btn-sm">Done & Sync to Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-ph"></div>
+
+  <script type="module">
+    import '../js/shared.js';
+    import { ProgramEngine } from '../js/learning/program-engine.js';
+    import { ActivitySessionRunner } from '../js/learning/activity-engine.js';
+
+    let currentProgram = null;
+    let activitiesRegistry = [];
+    let activeRunner = null;
+    let startTime = Date.now();
+
+    async function loadProgram() {
+      try {
+        const [resProg, resActs] = await Promise.all([
+          fetch('/api/learning/program/learner-001'),
+          fetch('/api/learning/activities')
+        ]);
+        currentProgram = await resProg.json();
+        activitiesRegistry = await resActs.json();
+      } catch (e) {
+        console.warn('Fallback loading program:', e);
+      }
+
+      if (currentProgram) {
+        renderProgram(currentProgram);
+      }
+    }
+
+    function renderProgram(prog) {
+      document.getElementById('programTitleDisplay').innerText = `Curriculum for ${prog.learnerName || 'Leo Tanaka'}`;
+
+      // Render Targeted Modules Strip
+      const targetContainer = document.getElementById('targetedModulesList');
+      const priorities = prog.priorityMatrix || [
+        { abilityCode: 'CSS', abilityName: 'Numerical Sequences', percentage: 48, urgency: 'HIGH' },
+        { abilityCode: 'CFR', abilityName: 'Spatial Analogies', percentage: 52, urgency: 'HIGH' },
+        { abilityCode: 'NST', abilityName: 'Symbolic Transformation', percentage: 54, urgency: 'MEDIUM' }
+      ];
+
+      targetContainer.innerHTML = priorities.slice(0, 3).map(p => `
+        <div style="background:#f8fafc;border:1px solid var(--learn-border);border-radius:10px;padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <strong style="color:var(--learn-primary);">${p.abilityCode} · ${p.abilityName}</strong>
+            <span style="font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:10px;background:${p.urgency === 'HIGH' ? '#fee2e2;color:#991b1b' : '#ffedd5;color:#9a3412'}">
+              ${p.urgency} PRIORITY
+            </span>
+          </div>
+          <div style="font-size:.85rem;color:#64748b;margin-bottom:8px;">Measured Baseline: <strong>${p.percentage}%</strong></div>
+          <div class="day-meta-tag">Target: 4 sessions / week · Scaffolded difficulty</div>
+        </div>
+      `).join('');
+
+      // Render Weekly Timetable
+      const schedule = prog.weeklySchedule?.[0]?.dailyPlan || [];
+      const grid = document.getElementById('dailyScheduleGrid');
+      grid.innerHTML = schedule.map((day, idx) => `
+        <div class="day-slot-card ${day.type === 'ENRICHMENT' ? 'enrichment' : ''}">
+          <div>
+            <div class="day-name">${day.day}</div>
+            <div class="day-act-title">${day.title}</div>
+            <div class="day-meta-tag"><strong>${day.abilityCode}</strong> · ${day.durationMinutes} Min</div>
+            <div style="font-size:.8rem;color:#64748b;margin-bottom:8px;">${day.modality} · Level ${day.difficultyLevel || 1}</div>
+          </div>
+          <button class="day-action-btn" onclick="window.playActivity('${day.abilityCode}')">
+            ${day.type === 'ENRICHMENT' ? '🌟 Play Challenge' : '▶️ Practice Now'}
+          </button>
+        </div>
+      `).join('');
+    }
+
+    window.playActivity = (abilityCode) => {
+      const act = activitiesRegistry.find(a => a.abilityCodes?.includes(abilityCode)) || activitiesRegistry[0] || {
+        id: 'ACT-CFR-01',
+        abilityCodes: ['CFR'],
+        name: 'Spatial Analogy Matrix Builder',
+        interactiveType: 'analogy_grid'
+      };
+
+      document.getElementById('actModalBadge').innerText = `${abilityCode} · Targeted Training`;
+      document.getElementById('actModalTitle').innerText = act.name;
+      document.getElementById('actActiveArea').style.display = 'block';
+      document.getElementById('actResultArea').style.display = 'none';
+
+      activeRunner = new ActivitySessionRunner(act, {
+        startingLevel: 2,
+        onProgress: renderActivityItem,
+        onFinish: handleActivityFinished
+      });
+
+      document.getElementById('activityPlayerModal').style.display = 'flex';
+      activeRunner.start();
+      startTime = Date.now();
+    };
+
+    function renderActivityItem(state) {
+      if (state.isCompleted) return;
+
+      document.getElementById('actItemCounter').innerText = `Question ${state.currentItemIndex + 1} of ${state.totalItems}`;
+      document.getElementById('actTimerVal').innerText = `Time: ${state.elapsedSeconds}s`;
+
+      const item = state.currentItem;
+      if (!item) return;
+
+      document.getElementById('actStimulusBox').innerText = item.stimulus;
+      document.getElementById('actQuestionPrompt').innerText = item.prompt;
+
+      const optGrid = document.getElementById('actOptionsGrid');
+      optGrid.innerHTML = item.options.map((opt, idx) => `
+        <button class="stage-option-btn" onclick="window.submitActAnswer(${idx})">
+          <span class="opt-index">${String.fromCharCode(65 + idx)}</span>
+          <span>${opt}</span>
+        </button>
+      `).join('');
+    }
+
+    window.submitActAnswer = (idx) => {
+      const lat = Date.now() - startTime;
+      activeRunner.submitAnswer(idx, lat);
+      startTime = Date.now();
+    };
+
+    async function handleActivityFinished(result) {
+      document.getElementById('actActiveArea').style.display = 'none';
+      document.getElementById('actResultArea').style.display = 'block';
+
+      document.getElementById('actScoreSummary').innerText = `Accuracy: ${result.accuracy}% (${result.correctCount}/${result.totalItems} Correct) · Avg Latency: ${(result.avgLatencyMs/1000).toFixed(1)}s`;
+      document.getElementById('actAdaptationText').innerText = result.adaptationReason;
+
+      // Submit attempt to backend
+      try {
+        await fetch('/api/learning/activity/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(result)
+        });
+      } catch (e) {
+        console.warn('Sync activity attempt error:', e);
+      }
+    }
+
+    window.closeActModal = () => {
+      document.getElementById('activityPlayerModal').style.display = 'none';
+    };
+
+    document.getElementById('btnLaunchExercise').addEventListener('click', () => {
+      window.playActivity('CFR');
+    });
+
+    document.getElementById('btnPrintWorksheet').addEventListener('click', () => {
+      window.location.href = 'learning-progress.html?view=report';
+    });
+
+    loadProgram();
+  </script>
+</body>
+</html>

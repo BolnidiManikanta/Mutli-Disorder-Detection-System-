@@ -1,0 +1,510 @@
+{
+  "Exp_A_All_Features": {
+    "description": "All 14 allowed features (A1-A10 + Demographics: Age, Gender, Jaundice, Family)",
+    "feature_count": 14,
+    "features": [
+      "A1_Score",
+      "A2_Score",
+      "A3_Score",
+      "A4_Score",
+      "A5_Score",
+      "A6_Score",
+      "A7_Score",
+      "A8_Score",
+      "A9_Score",
+      "A10_Score",
+      "age",
+      "gender_num",
+      "jaundice_num",
+      "austim_num"
+    ],
+    "models": {
+      "logistic_regression": {
+        "cv_accuracy": 1.0,
+        "cv_sensitivity": 1.0,
+        "cv_specificity": 1.0,
+        "cv_balanced_accuracy": 1.0,
+        "cv_f1": 1.0,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      },
+      "random_forest": {
+        "cv_accuracy": 1.0,
+        "cv_sensitivity": 1.0,
+        "cv_specificity": 1.0,
+        "cv_balanced_accuracy": 1.0,
+        "cv_f1": 1.0,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      }
+    }
+  },
+  "Exp_B_Questionnaire_Only": {
+    "description": "Questionnaire items only (A1-A10)",
+    "feature_count": 10,
+    "features": [
+      "A1_Score",
+      "A2_Score",
+      "A3_Score",
+      "A4_Score",
+      "A5_Score",
+      "A6_Score",
+      "A7_Score",
+      "A8_Score",
+      "A9_Score",
+      "A10_Score"
+    ],
+    "models": {
+      "logistic_regression": {
+        "cv_accuracy": 1.0,
+        "cv_sensitivity": 1.0,
+        "cv_specificity": 1.0,
+        "cv_balanced_accuracy": 1.0,
+        "cv_f1": 1.0,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      },
+      "random_forest": {
+        "cv_accuracy": 1.0,
+        "cv_sensitivity": 1.0,
+        "cv_specificity": 1.0,
+        "cv_balanced_accuracy": 1.0,
+        "cv_f1": 1.0,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      }
+    }
+  },
+  "Exp_C_Demographics_Only": {
+    "description": "Demographics only (Age, Gender, Jaundice, Family history)",
+    "feature_count": 4,
+    "features": [
+      "age",
+      "gender_num",
+      "jaundice_num",
+      "austim_num"
+    ],
+    "models": {
+      "logistic_regression": {
+        "cv_accuracy": 0.9667,
+        "cv_sensitivity": 0.9667,
+        "cv_specificity": 0.9667,
+        "cv_balanced_accuracy": 0.9667,
+        "cv_f1": 0.9664,
+        "cv_roc_auc": 0.9778,
+        "cv_pr_auc": 0.9813,
+        "test_accuracy": 0.95,
+        "test_sensitivity": 1.0,
+        "test_specificity": 0.9,
+        "test_f1": 0.9524,
+        "test_roc_auc": 0.97,
+        "test_pr_auc": 0.9698,
+        "test_confusion_matrix": {
+          "TN": 9,
+          "FP": 1,
+          "FN": 0,
+          "TP": 10
+        }
+      },
+      "random_forest": {
+        "cv_accuracy": 0.95,
+        "cv_sensitivity": 0.9667,
+        "cv_specificity": 0.9333,
+        "cv_balanced_accuracy": 0.95,
+        "cv_f1": 0.9513,
+        "cv_roc_auc": 0.9889,
+        "cv_pr_auc": 0.9905,
+        "test_accuracy": 0.95,
+        "test_sensitivity": 1.0,
+        "test_specificity": 0.9,
+        "test_f1": 0.9524,
+        "test_roc_auc": 0.945,
+        "test_pr_auc": 0.9263,
+        "test_confusion_matrix": {
+          "TN": 9,
+          "FP": 1,
+          "FN": 0,
+          "TP": 10
+        }
+      }
+    }
+  },
+  "Exp_D_A1_Only": {
+    "description": "Single feature A1_Score only (Noticing small sounds)",
+    "feature_count": 1,
+    "features": [
+      "A1_Score"
+    ],
+    "models": {
+      "logistic_regression": {
+        "cv_accuracy": 1.0,
+        "cv_sensitivity": 1.0,
+        "cv_specificity": 1.0,
+        "cv_balanced_accuracy": 1.0,
+        "cv_f1": 1.0,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      },
+      "random_forest": {
+        "cv_accuracy": 1.0,
+        "cv_sensitivity": 1.0,
+        "cv_specificity": 1.0,
+        "cv_balanced_accuracy": 1.0,
+        "cv_f1": 1.0,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      }
+    }
+  },
+  "Exp_E_A10_Only": {
+    "description": "Single feature A10_Score only (Reading social intentions)",
+    "feature_count": 1,
+    "features": [
+      "A10_Score"
+    ],
+    "models": {
+      "logistic_regression": {
+        "cv_accuracy": 1.0,
+        "cv_sensitivity": 1.0,
+        "cv_specificity": 1.0,
+        "cv_balanced_accuracy": 1.0,
+        "cv_f1": 1.0,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      },
+      "random_forest": {
+        "cv_accuracy": 1.0,
+        "cv_sensitivity": 1.0,
+        "cv_specificity": 1.0,
+        "cv_balanced_accuracy": 1.0,
+        "cv_f1": 1.0,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      }
+    }
+  },
+  "Exp_F_A1_Plus_A10": {
+    "description": "Dual features A1_Score + A10_Score",
+    "feature_count": 2,
+    "features": [
+      "A1_Score",
+      "A10_Score"
+    ],
+    "models": {
+      "logistic_regression": {
+        "cv_accuracy": 1.0,
+        "cv_sensitivity": 1.0,
+        "cv_specificity": 1.0,
+        "cv_balanced_accuracy": 1.0,
+        "cv_f1": 1.0,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      },
+      "random_forest": {
+        "cv_accuracy": 1.0,
+        "cv_sensitivity": 1.0,
+        "cv_specificity": 1.0,
+        "cv_balanced_accuracy": 1.0,
+        "cv_f1": 1.0,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      }
+    }
+  },
+  "Exp_G_A1_to_A9_Excl_A10": {
+    "description": "Questionnaire items A1 through A9 (strictly excluding A10)",
+    "feature_count": 9,
+    "features": [
+      "A1_Score",
+      "A2_Score",
+      "A3_Score",
+      "A4_Score",
+      "A5_Score",
+      "A6_Score",
+      "A7_Score",
+      "A8_Score",
+      "A9_Score"
+    ],
+    "models": {
+      "logistic_regression": {
+        "cv_accuracy": 1.0,
+        "cv_sensitivity": 1.0,
+        "cv_specificity": 1.0,
+        "cv_balanced_accuracy": 1.0,
+        "cv_f1": 1.0,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      },
+      "random_forest": {
+        "cv_accuracy": 1.0,
+        "cv_sensitivity": 1.0,
+        "cv_specificity": 1.0,
+        "cv_balanced_accuracy": 1.0,
+        "cv_f1": 1.0,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      }
+    }
+  },
+  "Exp_H_A2_to_A10_Excl_A1": {
+    "description": "Questionnaire items A2 through A10 (strictly excluding A1)",
+    "feature_count": 9,
+    "features": [
+      "A2_Score",
+      "A3_Score",
+      "A4_Score",
+      "A5_Score",
+      "A6_Score",
+      "A7_Score",
+      "A8_Score",
+      "A9_Score",
+      "A10_Score"
+    ],
+    "models": {
+      "logistic_regression": {
+        "cv_accuracy": 1.0,
+        "cv_sensitivity": 1.0,
+        "cv_specificity": 1.0,
+        "cv_balanced_accuracy": 1.0,
+        "cv_f1": 1.0,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      },
+      "random_forest": {
+        "cv_accuracy": 1.0,
+        "cv_sensitivity": 1.0,
+        "cv_specificity": 1.0,
+        "cv_balanced_accuracy": 1.0,
+        "cv_f1": 1.0,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      }
+    }
+  },
+  "Exp_I_A2_to_A9_No_A1_No_A10": {
+    "description": "Questionnaire items A2 through A9 (strictly excluding BOTH A1 and A10)",
+    "feature_count": 8,
+    "features": [
+      "A2_Score",
+      "A3_Score",
+      "A4_Score",
+      "A5_Score",
+      "A6_Score",
+      "A7_Score",
+      "A8_Score",
+      "A9_Score"
+    ],
+    "models": {
+      "logistic_regression": {
+        "cv_accuracy": 0.9667,
+        "cv_sensitivity": 0.9667,
+        "cv_specificity": 0.9667,
+        "cv_balanced_accuracy": 0.9667,
+        "cv_f1": 0.9664,
+        "cv_roc_auc": 0.9944,
+        "cv_pr_auc": 0.9952,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      },
+      "random_forest": {
+        "cv_accuracy": 0.9152,
+        "cv_sensitivity": 0.9333,
+        "cv_specificity": 0.9,
+        "cv_balanced_accuracy": 0.9167,
+        "cv_f1": 0.911,
+        "cv_roc_auc": 1.0,
+        "cv_pr_auc": 1.0,
+        "test_accuracy": 1.0,
+        "test_sensitivity": 1.0,
+        "test_specificity": 1.0,
+        "test_f1": 1.0,
+        "test_roc_auc": 1.0,
+        "test_pr_auc": 1.0,
+        "test_confusion_matrix": {
+          "TN": 10,
+          "FP": 0,
+          "FN": 0,
+          "TP": 10
+        }
+      }
+    }
+  }
+}

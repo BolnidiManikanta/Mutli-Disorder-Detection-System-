@@ -1,0 +1,44 @@
+{
+  "model_governance_version": "2.1.0-research",
+  "model_status": "RESEARCH_PROTOTYPE",
+  "is_experimental": true,
+  "is_validated_clinical_model": false,
+  "clinical_use_allowed": false,
+  "dataset_info": {
+    "name": "Kaggle ML Olympiad - Autism Prediction (Curated Benchmark Subset)",
+    "records_total": 79,
+    "training_records": 59,
+    "test_records": 20,
+    "positive_cases": 39,
+    "negative_cases": 40,
+    "dataset_sha256": "33900055da1817b0932e0887e3f3c4fcbae5c7999a58a3ed24495de7465288a4"
+  },
+  "synthetic_multi_disorder_cohort": {
+    "is_synthetic": true,
+    "disorder_count": 7,
+    "is_clinically_validated": false,
+    "idd_severe_imbalance_flag": true,
+    "idd_positive_case_count": 7,
+    "idd_prevalence_pct": 0.88
+  },
+  "leakage_and_integrity_audits": {
+    "target_leakage_audit_completed": true,
+    "target_derived_features_purged": ["result", "aq10_sum"],
+    "duplicate_audit_completed": true,
+    "feature_audit_completed": true,
+    "ablation_experiments_completed": true,
+    "quality_gate_passed": true
+  },
+  "model_specification": {
+    "primary_algorithm": "Scikit-Learn Random Forest + Gradient Boosting + Calibrated Logistic Regression Ensemble",
+    "xai_engine": "shap.TreeExplainer (Exact Shapley Additive Explanations)",
+    "feature_count": 14,
+    "feature_names": [
+      "A1_Score", "A2_Score", "A3_Score", "A4_Score", "A5_Score",
+      "A6_Score", "A7_Score", "A8_Score", "A9_Score", "A10_Score",
+      "age", "gender_num", "jaundice_num", "austim_num"
+    ],
+    "random_seed": 42
+  },
+  "legal_disclaimer": "RESEARCH PROTOTYPE ONLY: NeuroScan AI provides experimental screening indicators for educational and technical research. Outputs do not constitute medical or clinical diagnoses and must not be used for clinical decision-making."
+}

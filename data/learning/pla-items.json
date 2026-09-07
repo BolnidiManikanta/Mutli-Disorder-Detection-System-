@@ -1,0 +1,757 @@
+{
+  "assessmentId": "PLA-v1.0",
+  "title": "Primary Learning Abilities (PLA) Assessment",
+  "version": "1.0.0",
+  "targetDurationMinutes": 90,
+  "description": "Comprehensive 14-construct diagnostic evaluation across Figural, Symbolic, and Semantic learning dimensions.",
+  "constructCount": 14,
+  "totalItems": 56,
+  "sections": [
+    {
+      "sectionId": "pla_sec_01",
+      "abilityCode": "CFU",
+      "title": "Visual Closure & Form Perception",
+      "instruction": "Identify which complete object or geometric shape is represented by the fragmented, partially obscured, or rotated stimulus.",
+      "timeLimitSeconds": 360,
+      "items": [
+        {
+          "id": "pla_cfu_01",
+          "abilityCode": "CFU",
+          "stimulusType": "ascii_diagram",
+          "stimulus": "  /\\___/\\\n (  o.o  )\n  > ^ <",
+          "questionText": "If this silhouette were completed, which animal figure does it clearly represent?",
+          "options": ["A domestic cat", "An owl in flight", "A geometric pyramid", "A fish underwater"],
+          "correctIndex": 0,
+          "difficulty": 1,
+          "points": 1,
+          "explanation": "Triangular ears, whisker markers (> ^ <), and rounded feline face profile indicate a cat."
+        },
+        {
+          "id": "pla_cfu_02",
+          "abilityCode": "CFU",
+          "stimulusType": "fragment_description",
+          "stimulus": "Three concentric circular arcs with 45-degree gaps at the top-right, aligned with a central radiating focal point.",
+          "questionText": "Mentally completing all missing segments reveals which standard symbol?",
+          "options": ["Target / Bullseye", "Square maze", "Interlocking gear teeth", "Parallel rail lines"],
+          "correctIndex": 0,
+          "difficulty": 2,
+          "points": 1,
+          "explanation": "Concentric circles sharing a common center form a target/bullseye structure."
+        },
+        {
+          "id": "pla_cfu_03",
+          "abilityCode": "CFU",
+          "stimulusType": "ascii_diagram",
+          "stimulus": "[■ ■ _ ■]\n[■ _ ■ ■]\n[_ ■ ■ ■]\n[■ ■ ■ _]",
+          "questionText": "What geometric feature is formed by the empty spaces ('_') across this 4x4 matrix?",
+          "options": ["A continuous diagonal line", "A central square hole", "A vertical perimeter border", "An outer border frame"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "points": 1,
+          "explanation": "The coordinates (0,2), (1,1), (2,0) and the shifting positions create an unbroken diagonal."
+        },
+        {
+          "id": "pla_cfu_04",
+          "abilityCode": "CFU",
+          "stimulusType": "complex_contour",
+          "stimulus": "A hexagonal outline with three alternating vertices deleted and replaced by inward pointing curved indents.",
+          "questionText": "What 3D structure is suggested by mentally projecting these boundary contours into depth?",
+          "options": ["A 3-blade propeller hub", "A solid cube", "A flat triangle", "A straight cylinder"],
+          "correctIndex": 0,
+          "difficulty": 4,
+          "points": 1,
+          "explanation": "Alternating indented vertices on a hexagonal symmetry form a classic 3-fold radial propeller blade hub."
+        }
+      ]
+    },
+    {
+      "sectionId": "pla_sec_02",
+      "abilityCode": "CFC",
+      "title": "Visual Classification & Categorization",
+      "instruction": "Analyze the visual properties of the figures and determine which figure belongs to the group or violates the shared rule.",
+      "timeLimitSeconds": 360,
+      "items": [
+        {
+          "id": "pla_cfc_01",
+          "abilityCode": "CFC",
+          "stimulus": "Group A: [Equilateral Triangle, Regular Pentagon, Square, Regular Octagon]",
+          "questionText": "What is the defining geometric classification rule for Group A?",
+          "options": ["All figures are convex regular polygons with equal sides and equal angles", "All figures have exactly 4 right angles", "All figures contain curved arcs", "All figures have odd numbers of vertices"],
+          "correctIndex": 0,
+          "difficulty": 1,
+          "points": 1,
+          "explanation": "Each shape in the group possesses equilateral edges and equiangular vertices (regular polygons)."
+        },
+        {
+          "id": "pla_cfc_02",
+          "abilityCode": "CFC",
+          "stimulus": "Set: [Filled Black Circle, Hollow Circle with 2 dots, Concentric Double Circle, Solid Black Square]",
+          "questionText": "Which figure DOES NOT belong to the category established by the other three?",
+          "options": ["Solid Black Square", "Filled Black Circle", "Hollow Circle with 2 dots", "Concentric Double Circle"],
+          "correctIndex": 0,
+          "difficulty": 2,
+          "points": 1,
+          "explanation": "All other shapes share circular rotational topology; the square introduces 4 sharp vertices and right angles."
+        },
+        {
+          "id": "pla_cfc_03",
+          "abilityCode": "CFC",
+          "stimulus": "Rule: 'Shapes possessing both horizontal and vertical lines of symmetry simultaneously.'",
+          "questionText": "Which of the following belongs in this category?",
+          "options": ["Rectangle (non-square)", "Isosceles Trapezoid", "Scalene Triangle", "Regular Pentagon"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "points": 1,
+          "explanation": "A rectangle has both a vertical and a horizontal axis of reflectional symmetry."
+        },
+        {
+          "id": "pla_cfc_04",
+          "abilityCode": "CFC",
+          "stimulus": "Set X: [Figure with 3 line segments & 1 intersection], [Figure with 4 line segments & 2 intersections], [Figure with 5 line segments & 3 intersections]",
+          "questionText": "Which figure satisfies the sequential classification invariant for Set X?",
+          "options": ["Figure with 6 line segments & 4 intersections", "Figure with 6 line segments & 2 intersections", "Figure with 7 line segments & 1 intersection", "Figure with 8 line segments & 8 intersections"],
+          "correctIndex": 0,
+          "difficulty": 4,
+          "points": 1,
+          "explanation": "The invariant rule is (Line Segments - Intersections = 2). 6 line segments - 4 intersections = 2."
+        }
+      ]
+    },
+    {
+      "sectionId": "pla_sec_03",
+      "abilityCode": "CFR",
+      "title": "Spatial Analogies & Transformations",
+      "instruction": "Examine the spatial transformation rule between Figure 1 and Figure 2. Apply that exact same rule to Figure 3 to find Figure 4.",
+      "timeLimitSeconds": 390,
+      "items": [
+        {
+          "id": "pla_cfr_01",
+          "abilityCode": "CFR",
+          "stimulus": "[Large White Square containing Small Black Circle] is to [Large Black Circle containing Small White Square] AS [Large White Triangle containing Small Black Diamond] is to: ?",
+          "questionText": "What is the corresponding transformed figure?",
+          "options": ["Large Black Diamond containing Small White Triangle", "Large White Triangle containing Small White Diamond", "Large Black Triangle with no inner shape", "Small Black Triangle inside Large White Square"],
+          "correctIndex": 0,
+          "difficulty": 1,
+          "points": 1,
+          "explanation": "The outer and inner shapes swap their roles (outer becomes inner, inner becomes outer) and invert their colors (white becomes black, black becomes white)."
+        },
+        {
+          "id": "pla_cfr_02",
+          "abilityCode": "CFR",
+          "stimulus": "[Arrow pointing North with 1 crossbar] is to [Arrow pointing East with 2 crossbars] AS [Arrow pointing South with 2 crossbars] is to: ?",
+          "questionText": "Apply the rotation and increment transformation:",
+          "options": ["Arrow pointing West with 3 crossbars", "Arrow pointing North with 3 crossbars", "Arrow pointing East with 1 crossbar", "Arrow pointing South with 4 crossbars"],
+          "correctIndex": 0,
+          "difficulty": 2,
+          "points": 1,
+          "explanation": "Rule 1: 90-degree clockwise rotation (South -> West). Rule 2: Increment crossbars by +1 (2 -> 3)."
+        },
+        {
+          "id": "pla_cfr_03",
+          "abilityCode": "CFR",
+          "stimulus": "[Solid Octagon enclosing an upward Arrow] is to [Dotted Octagon enclosing a downward Arrow and 2 stars] AS [Solid Hexagon enclosing an upward Arrow] is to: ?",
+          "questionText": "What is the analogous transformation?",
+          "options": ["Dotted Hexagon enclosing a downward Arrow and 2 stars", "Solid Hexagon enclosing a rightward Arrow", "Dotted Octagon enclosing 4 circles", "Hollow Triangle enclosing 2 stars"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "points": 1,
+          "explanation": "Boundary line shifts from solid to dotted; internal pointer flips 180 degrees; two star tokens are added."
+        },
+        {
+          "id": "pla_cfr_04",
+          "abilityCode": "CFR",
+          "stimulus": "[3x3 Grid with top-left shaded] is to [3x3 Grid with bottom-right shaded and horizontally reflected] AS [3x3 Grid with center-top shaded] is to: ?",
+          "questionText": "Identify the transformed state:",
+          "options": ["3x3 Grid with center-bottom shaded", "3x3 Grid with center-top shaded", "3x3 Grid with center-left shaded", "3x3 Grid completely filled"],
+          "correctIndex": 0,
+          "difficulty": 4,
+          "points": 1,
+          "explanation": "Point reflection through center point (x,y) -> (4-x, 4-y) moves top-center to bottom-center."
+        }
+      ]
+    },
+    {
+      "sectionId": "pla_sec_04",
+      "abilityCode": "MFU",
+      "title": "Visual Working Memory",
+      "instruction": "Study the visual pattern presented, then answer the verification question regarding its exact features.",
+      "timeLimitSeconds": 360,
+      "items": [
+        {
+          "id": "pla_mfu_01",
+          "abilityCode": "MFU",
+          "stimulus": "Memorize this 4-shape sequence: [Red Diamond, Blue Star, Green Circle, Yellow Triangle]",
+          "questionText": "Which shape was located at the 3rd position in the memorized sequence?",
+          "options": ["Green Circle", "Blue Star", "Yellow Triangle", "Red Diamond"],
+          "correctIndex": 0,
+          "difficulty": 1,
+          "points": 1,
+          "explanation": "The 3rd position item is the Green Circle."
+        },
+        {
+          "id": "pla_mfu_02",
+          "abilityCode": "MFU",
+          "stimulus": "Grid Layout: Top-Left: Pentagon, Top-Right: Crescent, Center: Hexagon, Bottom-Left: Cross, Bottom-Right: Oval",
+          "questionText": "Which symbol was located at the Bottom-Left quadrant?",
+          "options": ["Cross", "Pentagon", "Crescent", "Oval"],
+          "correctIndex": 0,
+          "difficulty": 2,
+          "points": 1,
+          "explanation": "The Cross is located at the bottom-left coordinate."
+        },
+        {
+          "id": "pla_mfu_03",
+          "abilityCode": "MFU",
+          "stimulus": "Complex Badge: A gold shield with 3 vertical stripes (Blue, White, Red), a silver eagle at the crest, and 5 gold stars along the bottom rim.",
+          "questionText": "How many gold stars were placed along the bottom rim?",
+          "options": ["5 stars", "3 stars", "7 stars", "4 stars"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "points": 1,
+          "explanation": "The specification explicitly noted 5 gold stars along the bottom rim."
+        },
+        {
+          "id": "pla_mfu_04",
+          "abilityCode": "MFU",
+          "stimulus": "Visual Matrix: Row 1 [▲, ■, ●], Row 2 [◆, ✦, ⬟], Row 3 [★, ✖, ⬢].",
+          "questionText": "Which symbol occupied the exact position Row 2, Column 3?",
+          "options": ["⬟ (Pentagon)", "✦ (Sparkle)", "◆ (Diamond)", "⬢ (Hexagon)"],
+          "correctIndex": 0,
+          "difficulty": 4,
+          "points": 1,
+          "explanation": "Row 2 consists of [◆, ✦, ⬟], placing ⬟ in Column 3."
+        }
+      ]
+    },
+    {
+      "sectionId": "pla_sec_05",
+      "abilityCode": "EFU",
+      "title": "Visual Discrimination & Error Detection",
+      "instruction": "Carefully inspect fine geometric details and identify the exact discrepancy or subtle flaw.",
+      "timeLimitSeconds": 360,
+      "items": [
+        {
+          "id": "pla_efu_01",
+          "abilityCode": "EFU",
+          "stimulus": "Target: Standard uppercase letter 'E' with three equal-length horizontal arms.",
+          "questionText": "Which variation contains a subtle proportional error?",
+          "options": ["Middle horizontal arm is noticeably longer than top and bottom arms", "Top and bottom arms are exactly equal", "Vertical spine is perpendicular to baseline", "All corner junctions form 90-degree right angles"],
+          "correctIndex": 0,
+          "difficulty": 1,
+          "points": 1,
+          "explanation": "In standard typography, the middle arm of 'E' is equal to or slightly shorter than the top/bottom arms, never longer."
+        },
+        {
+          "id": "pla_efu_02",
+          "abilityCode": "EFU",
+          "stimulus": "Pair Comparison: Diagram X vs Diagram Y. Both depict a 12-toothed circular gear.",
+          "questionText": "In Diagram Y, tooth #7 is pitched at 32 degrees while all other teeth are pitched at 30 degrees. This represents what type of defect?",
+          "options": ["Angular pitch asymmetry", "Tooth count reduction", "Concentric offset", "Line thickness modulation"],
+          "correctIndex": 0,
+          "difficulty": 2,
+          "points": 1,
+          "explanation": "A variation from 30° to 32° in tooth spacing is an angular pitch asymmetry error."
+        },
+        {
+          "id": "pla_efu_03",
+          "abilityCode": "EFU",
+          "stimulus": "Circuit schematic: 4 parallel resistors (R1, R2, R3, R4) connected between Node A and Node B.",
+          "questionText": "Where is the schematic break if Node B's terminal line terminates 1 millimeter before intersecting R3's lead?",
+          "options": ["Open circuit fault at R3", "Short circuit across R1", "Overvoltage at Node A", "Ground loop error"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "points": 1,
+          "explanation": "A line terminating prior to contact forms an open circuit disconnection at resistor R3."
+        },
+        {
+          "id": "pla_efu_04",
+          "abilityCode": "EFU",
+          "stimulus": "Tessellation: An alternating interlocking floor pattern of black and white regular octagons and small squares.",
+          "questionText": "If one junction displays three small squares meeting with one octagon, what geometric violation has occurred?",
+          "options": ["Invalid vertex configuration (regular octagon-square tessellations require exactly two octagons and one square per vertex)", "Scale inversion error", "Color inversion only", "No violation; this is valid"],
+          "correctIndex": 0,
+          "difficulty": 4,
+          "points": 1,
+          "explanation": "The semi-regular Archimedean tessellation (4.8.8) requires vertices of two octagons and one square."
+        }
+      ]
+    },
+    {
+      "sectionId": "pla_sec_06",
+      "abilityCode": "EFC",
+      "title": "Visual Outlier Discrimination",
+      "instruction": "Evaluate the set of complex figures and determine which figure violates the shared set rule.",
+      "timeLimitSeconds": 360,
+      "items": [
+        {
+          "id": "pla_efc_01",
+          "abilityCode": "EFC",
+          "stimulus": "Figures: [Shape A: Circle divided into 4 quarters with 1 quarter shaded], [Shape B: Square divided into 4 quarters with 1 quarter shaded], [Shape C: Triangle divided into 4 equal subtriangles with 1 shaded], [Shape D: Hexagon divided into 6 triangles with 3 shaded]",
+          "questionText": "Which figure is the outlier regarding the shaded fraction?",
+          "options": ["Shape D (50% shaded vs 25% for all others)", "Shape A", "Shape B", "Shape C"],
+          "correctIndex": 0,
+          "difficulty": 1,
+          "points": 1,
+          "explanation": "Shapes A, B, and C all represent exactly 1/4 (25%), while Shape D represents 3/6 (50%)."
+        },
+        {
+          "id": "pla_efc_02",
+          "abilityCode": "EFC",
+          "stimulus": "Rule: 'Polygons having an interior angle sum equal to or greater than 540 degrees.'",
+          "questionText": "Which shape DOES NOT belong in this category?",
+          "options": ["Trapezoid (Sum = 360°)", "Regular Pentagon (Sum = 540°)", "Hexagon (Sum = 720°)", "Heptagon (Sum = 900°)"],
+          "correctIndex": 0,
+          "difficulty": 2,
+          "points": 1,
+          "explanation": "A trapezoid has 4 vertices with interior angle sum (4-2)*180 = 360°, which is strictly less than 540°."
+        },
+        {
+          "id": "pla_efc_03",
+          "abilityCode": "EFC",
+          "stimulus": "Set of 4 complex geometric tokens. All tokens have topological genus 1 (exactly 1 through-hole, like a doughnut or coffee cup with handle).",
+          "questionText": "Which item violates this topological class?",
+          "options": ["A solid sphere with zero holes (genus 0)", "A torus ring", "A picture frame", "A washer disc with central aperture"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "points": 1,
+          "explanation": "A solid sphere has zero through-holes (genus 0), violating the genus 1 class."
+        },
+        {
+          "id": "pla_efc_04",
+          "abilityCode": "EFC",
+          "stimulus": "Set Rule: 'Each figure contains exactly 2 lines of symmetry and rotational symmetry of order 2.'",
+          "questionText": "Which figure violates this set requirement?",
+          "options": ["Equilateral Triangle (3 lines of symmetry, rotational order 3)", "Rhombus (non-square)", "Standard Oval / Ellipse", "Letter 'H' (sans-serif uppercase)"],
+          "correctIndex": 0,
+          "difficulty": 4,
+          "points": 1,
+          "explanation": "An equilateral triangle has 3 lines of symmetry, whereas all others have exactly 2."
+        }
+      ]
+    },
+    {
+      "sectionId": "pla_sec_07",
+      "abilityCode": "NFU",
+      "title": "Visual Construction & Spatial Assembly",
+      "instruction": "Mentally combine the given components or geometric segments to determine the resulting composite structure.",
+      "timeLimitSeconds": 390,
+      "items": [
+        {
+          "id": "pla_nfu_01",
+          "abilityCode": "NFU",
+          "stimulus": "Parts: Two identical right-angled isosceles triangles with legs of length 4 cm.",
+          "questionText": "Joining them along their hypotenuses creates which geometric shape?",
+          "options": ["A square of side length 4 cm", "A circle of radius 4 cm", "A regular pentagon", "An equilateral triangle"],
+          "correctIndex": 0,
+          "difficulty": 1,
+          "points": 1,
+          "explanation": "Joining two 45-45-90 triangles along their shared hypotenuse produces a square with side length equal to the legs (4 cm)."
+        },
+        {
+          "id": "pla_nfu_02",
+          "abilityCode": "NFU",
+          "stimulus": "Parts: 6 identical equilateral triangles of side length 3 cm.",
+          "questionText": "Arranging them such that all share a single central vertex without overlapping forms:",
+          "options": ["A regular hexagon of side length 3 cm", "A star with 8 points", "A square of side length 6 cm", "A circle"],
+          "correctIndex": 0,
+          "difficulty": 2,
+          "points": 1,
+          "explanation": "Each triangle has a 60° vertex. 6 * 60° = 360° around the center, forming a complete regular hexagon."
+        },
+        {
+          "id": "pla_nfu_03",
+          "abilityCode": "NFU",
+          "stimulus": "Flat cross-shaped net consisting of 6 connected equal squares (1 center, 1 top, 1 bottom, 1 left, 2 right in sequence).",
+          "questionText": "Folding along all internal boundary lines produces what 3D solid?",
+          "options": ["A closed 6-sided Cube", "An open rectangular prism", "A triangular pyramid", "An octahedron"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "points": 1,
+          "explanation": "A standard 6-square cross net folds into a complete 3D cube."
+        },
+        {
+          "id": "pla_nfu_04",
+          "abilityCode": "NFU",
+          "stimulus": "Parts: A hollow cylindrical pipe cut diagonally at a 45-degree angle.",
+          "questionText": "If the cut surface is unwrapped and laid completely flat on a plane, the contour line becomes:",
+          "options": ["A continuous sinusoidal wave", "A straight horizontal line", "A series of sharp 90-degree steps", "A circle"],
+          "correctIndex": 0,
+          "difficulty": 4,
+          "points": 1,
+          "explanation": "The planar intersection of a circular cylinder at an oblique angle unfolds into a sine wave function y = A*sin(x)."
+        }
+      ]
+    },
+    {
+      "sectionId": "pla_sec_08",
+      "abilityCode": "CSS",
+      "title": "Mathematical Sequences & Pattern Rules",
+      "instruction": "Discover the numerical or alphanumeric rule governing the sequence and determine the missing term.",
+      "timeLimitSeconds": 390,
+      "items": [
+        {
+          "id": "pla_css_01",
+          "abilityCode": "CSS",
+          "stimulus": "Sequence: 3, 7, 11, 15, 19, ?",
+          "questionText": "What is the next number in this sequence?",
+          "options": ["23", "21", "25", "27"],
+          "correctIndex": 0,
+          "difficulty": 1,
+          "points": 1,
+          "explanation": "The sequence follows an arithmetic progression with a common difference of +4. 19 + 4 = 23."
+        },
+        {
+          "id": "pla_css_02",
+          "abilityCode": "CSS",
+          "stimulus": "Sequence: 2, 6, 18, 54, 162, ?",
+          "questionText": "What is the next term in this sequence?",
+          "options": ["486", "324", "450", "512"],
+          "correctIndex": 0,
+          "difficulty": 2,
+          "points": 1,
+          "explanation": "The sequence is a geometric progression with multiplier *3. 162 * 3 = 486."
+        },
+        {
+          "id": "pla_css_03",
+          "abilityCode": "CSS",
+          "stimulus": "Sequence: 1, 1, 2, 3, 5, 8, 13, 21, ?",
+          "questionText": "What is the next term according to the Fibonacci rule?",
+          "options": ["34", "29", "31", "38"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "points": 1,
+          "explanation": "Each term is the sum of the two preceding terms. 13 + 21 = 34."
+        },
+        {
+          "id": "pla_css_04",
+          "abilityCode": "CSS",
+          "stimulus": "Alphanumeric Sequence: A2Z, C4X, E8V, G16T, ?",
+          "questionText": "What is the next composite token?",
+          "options": ["I32R", "H32S", "I24R", "J32Q"],
+          "correctIndex": 0,
+          "difficulty": 4,
+          "points": 1,
+          "explanation": "First letter skips +2 (A, C, E, G -> I). Number doubles (2, 4, 8, 16 -> 32). Last letter steps backward -2 (Z, X, V, T -> R)."
+        }
+      ]
+    },
+    {
+      "sectionId": "pla_sec_09",
+      "abilityCode": "MSU",
+      "title": "Symbolic & Code Recall",
+      "instruction": "Retain the alphanumeric codes in memory and answer the recall prompt accurately.",
+      "timeLimitSeconds": 360,
+      "items": [
+        {
+          "id": "pla_msu_01",
+          "abilityCode": "MSU",
+          "stimulus": "Security Token: [7 - 4 - 9 - 2]",
+          "questionText": "What was the 3rd digit of the security token?",
+          "options": ["9", "7", "4", "2"],
+          "correctIndex": 0,
+          "difficulty": 1,
+          "points": 1,
+          "explanation": "The token was 7-4-9-2. The 3rd digit is 9."
+        },
+        {
+          "id": "pla_msu_02",
+          "abilityCode": "MSU",
+          "stimulus": "Catalog Code: [K - 8 - B - 3 - M - 9]",
+          "questionText": "What letter immediately preceded the number '3'?",
+          "options": ["B", "K", "M", "None"],
+          "correctIndex": 0,
+          "difficulty": 2,
+          "points": 1,
+          "explanation": "In K-8-B-3-M-9, the character directly before '3' is 'B'."
+        },
+        {
+          "id": "pla_msu_03",
+          "abilityCode": "MSU",
+          "stimulus": "Flight Routing Identifier: [TX-904-Alpha]",
+          "questionText": "Which flight number was embedded in the identifier?",
+          "options": ["904", "940", "409", "902"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "points": 1,
+          "explanation": "The numeric element was exactly 904."
+        },
+        {
+          "id": "pla_msu_04",
+          "abilityCode": "MSU",
+          "stimulus": "Multi-variable Register: [X=14, Y=29, Z=42, W=87]",
+          "questionText": "What value was assigned to variable Z?",
+          "options": ["42", "29", "14", "87"],
+          "correctIndex": 0,
+          "difficulty": 4,
+          "points": 1,
+          "explanation": "The register assigned Z = 42."
+        }
+      ]
+    },
+    {
+      "sectionId": "pla_sec_10",
+      "abilityCode": "MSUA",
+      "title": "Auditory & Phonological Recall",
+      "instruction": "Listen to / read the oral sequence description and reproduce the required auditory-verbal information.",
+      "timeLimitSeconds": 360,
+      "items": [
+        {
+          "id": "pla_msua_01",
+          "abilityCode": "MSUA",
+          "stimulus": "Spoken direction: 'Take book 4, place it on shelf 2, and stamp it with green ink.'",
+          "questionText": "What color ink was specified in the spoken instructions?",
+          "options": ["Green", "Blue", "Red", "Black"],
+          "correctIndex": 0,
+          "difficulty": 1,
+          "points": 1,
+          "explanation": "The instruction specified 'stamp it with green ink'."
+        },
+        {
+          "id": "pla_msua_02",
+          "abilityCode": "MSUA",
+          "stimulus": "Auditory digit span: '8 ... 3 ... 9 ... 1 ... 7 ... 4'",
+          "questionText": "What was the final digit spoken in this 6-digit sequence?",
+          "options": ["4", "7", "8", "1"],
+          "correctIndex": 0,
+          "difficulty": 2,
+          "points": 1,
+          "explanation": "The sequence concluded with the digit 4."
+        },
+        {
+          "id": "pla_msua_03",
+          "abilityCode": "MSUA",
+          "stimulus": "Phonological sequence: 'BAP ... TEP ... MUP ... KIP ... ZOP'",
+          "questionText": "Which pseudo-word was spoken in the 3rd position?",
+          "options": ["MUP", "BAP", "TEP", "KIP"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "points": 1,
+          "explanation": "Position 1: BAP, Position 2: TEP, Position 3: MUP."
+        },
+        {
+          "id": "pla_msua_04",
+          "abilityCode": "MSUA",
+          "stimulus": "Reverse digit span: The numbers spoken in order were '5 - 2 - 8 - 4 - 9'.",
+          "questionText": "What is the sequence when recited in EXACT REVERSE order?",
+          "options": ["9 - 4 - 8 - 2 - 5", "5 - 2 - 8 - 4 - 9", "9 - 8 - 4 - 2 - 5", "4 - 9 - 8 - 2 - 5"],
+          "correctIndex": 0,
+          "difficulty": 4,
+          "points": 1,
+          "explanation": "Reversing 5, 2, 8, 4, 9 yields 9, 4, 8, 2, 5."
+        }
+      ]
+    },
+    {
+      "sectionId": "pla_sec_11",
+      "abilityCode": "NST",
+      "title": "Symbolic Transformations & Problem Solving",
+      "instruction": "Solve for the unknown variable or transform equations using mathematical logic.",
+      "timeLimitSeconds": 390,
+      "items": [
+        {
+          "id": "pla_nst_01",
+          "abilityCode": "NST",
+          "stimulus": "Equation: 3x + 7 = 22",
+          "questionText": "What is the value of x?",
+          "options": ["5", "4", "6", "7"],
+          "correctIndex": 0,
+          "difficulty": 1,
+          "points": 1,
+          "explanation": "3x = 22 - 7 = 15 -> x = 15 / 3 = 5."
+        },
+        {
+          "id": "pla_nst_02",
+          "abilityCode": "NST",
+          "stimulus": "System: [A + B = 18] and [A - B = 6]",
+          "questionText": "What is the value of A * B?",
+          "options": ["72", "64", "80", "54"],
+          "correctIndex": 0,
+          "difficulty": 2,
+          "points": 1,
+          "explanation": "Adding equations: 2A = 24 -> A = 12. B = 18 - 12 = 6. Product = 12 * 6 = 72."
+        },
+        {
+          "id": "pla_nst_03",
+          "abilityCode": "NST",
+          "stimulus": "Custom Operator: Define x ⊕ y = (x * y) + (x - y).",
+          "questionText": "What is the evaluation of 6 ⊕ 4?",
+          "options": ["26", "24", "22", "28"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "points": 1,
+          "explanation": "(6 * 4) + (6 - 4) = 24 + 2 = 26."
+        },
+        {
+          "id": "pla_nst_04",
+          "abilityCode": "NST",
+          "stimulus": "Cipher substitution rule: If 'CAT' = 'FDW' (each letter shifted +3 positions in alphabet), what does 'DOG' become?",
+          "questionText": "Encode 'DOG' using the same +3 cipher shift:",
+          "options": ["GRJ", "GQI", "FSJ", "HQK"],
+          "correctIndex": 0,
+          "difficulty": 4,
+          "points": 1,
+          "explanation": "D(+3) = G, O(+3) = R, G(+3) = J -> GRJ."
+        }
+      ]
+    },
+    {
+      "sectionId": "pla_sec_12",
+      "abilityCode": "CMUr",
+      "title": "Reading Comprehension & Vocabulary Breadth",
+      "instruction": "Read the contextual sentence and identify the most accurate definition of the highlighted term.",
+      "timeLimitSeconds": 360,
+      "items": [
+        {
+          "id": "pla_cmur_01",
+          "abilityCode": "CMUr",
+          "stimulus": "Sentence: 'The scientist offered a TENTATIVE explanation until further lab samples could confirm the hypothesis.'",
+          "questionText": "What does 'tentative' mean in this context?",
+          "options": ["Provisional and subject to future revision", "Completely proven and permanent", "Hostile and aggressive", "Confidential and secret"],
+          "correctIndex": 0,
+          "difficulty": 1,
+          "points": 1,
+          "explanation": "'Tentative' denotes an unconfirmed, provisional conclusion awaiting definitive verification."
+        },
+        {
+          "id": "pla_cmur_02",
+          "abilityCode": "CMUr",
+          "stimulus": "Sentence: 'The mayor's decision was PRAGMATIC, focusing on immediate feasibility rather than abstract theoretical purity.'",
+          "questionText": "What is the closest synonym for 'pragmatic'?",
+          "options": ["Practical and realistic", "Impulsive and careless", "Poetic and aesthetic", "Dogmatic and rigid"],
+          "correctIndex": 0,
+          "difficulty": 2,
+          "points": 1,
+          "explanation": "'Pragmatic' means dealing with things sensibly and realistically based on practical considerations."
+        },
+        {
+          "id": "pla_cmur_03",
+          "abilityCode": "CMUr",
+          "stimulus": "Sentence: 'The historical records were meticulously CURATED to preserve fragile parchment manuscripts.'",
+          "questionText": "What does 'curated' describe in this context?",
+          "options": ["Carefully selected, organized, and preserved", "Hastily discarded", "Accidentally destroyed", "Sold at public auction"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "points": 1,
+          "explanation": "To curate in an archival context means to professionally select, organize, and safeguard collections."
+        },
+        {
+          "id": "pla_cmur_04",
+          "abilityCode": "CMUr",
+          "stimulus": "Sentence: 'His arguments possessed an INTRINSIC cogency that required no rhetorical embellishment.'",
+          "questionText": "What does 'intrinsic' mean?",
+          "options": ["Inherent and belonging naturally from within", "Borrowed from external sources", "Temporary and superficial", "Visually decorative"],
+          "correctIndex": 0,
+          "difficulty": 4,
+          "points": 1,
+          "explanation": "'Intrinsic' means essential, inherent, and arising from the fundamental nature of something."
+        }
+      ]
+    },
+    {
+      "sectionId": "pla_sec_13",
+      "abilityCode": "CMR",
+      "title": "Verbal Analogies & Semantic Relations",
+      "instruction": "Identify the conceptual relationship between the first pair of words and choose the word that completes the second pair.",
+      "timeLimitSeconds": 360,
+      "items": [
+        {
+          "id": "pla_cmr_01",
+          "abilityCode": "CMR",
+          "stimulus": "ARCHITECT : BLUEPRINT :: NOVELIST : ?",
+          "questionText": "Complete the analogy based on creator and primary planning artifact:",
+          "options": ["Manuscript", "Paintbrush", "Library", "Publisher"],
+          "correctIndex": 0,
+          "difficulty": 1,
+          "points": 1,
+          "explanation": "An architect designs a blueprint as their primary creation; a novelist writes a manuscript."
+        },
+        {
+          "id": "pla_cmr_02",
+          "abilityCode": "CMR",
+          "stimulus": "THERMOMETER : TEMPERATURE :: BAROMETER : ?",
+          "questionText": "Complete the measurement tool analogy:",
+          "options": ["Atmospheric Pressure", "Wind Velocity", "Precipitation Volume", "Solar Radiation"],
+          "correctIndex": 0,
+          "difficulty": 2,
+          "points": 1,
+          "explanation": "A thermometer measures temperature; a barometer measures atmospheric pressure."
+        },
+        {
+          "id": "pla_cmr_03",
+          "abilityCode": "CMR",
+          "stimulus": "CATALYST : REACTION :: MENTOR : ?",
+          "questionText": "Complete the analogy of facilitation/acceleration:",
+          "options": ["Career Growth / Learning", "Obstruction", "Laboratory Equipment", "Chemical Compound"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "points": 1,
+          "explanation": "A catalyst accelerates a chemical reaction; a mentor guides and accelerates personal/career development."
+        },
+        {
+          "id": "pla_cmr_04",
+          "abilityCode": "CMR",
+          "stimulus": "MALLEABLE : METAL :: DUCTILE : WIRE :: PLIABLE : ?",
+          "questionText": "Identify the matching material property relationship:",
+          "options": ["Clay / Leather", "Brittle Glass", "Cast Iron", "Diamond Gemstone"],
+          "correctIndex": 0,
+          "difficulty": 4,
+          "points": 1,
+          "explanation": "'Pliable' describes materials that bend smoothly without breaking, characteristic of moist clay or soft leather."
+        }
+      ]
+    },
+    {
+      "sectionId": "pla_sec_14",
+      "abilityCode": "CMS",
+      "title": "Paragraph Logic & Inferential Systems",
+      "instruction": "Read the passage carefully and deduce the logical conclusion supported by the text.",
+      "timeLimitSeconds": 390,
+      "items": [
+        {
+          "id": "pla_cms_01",
+          "abilityCode": "CMS",
+          "stimulus": "Passage: 'All members of the botanical expedition carried insulated containers. Anyone carrying an insulated container was assigned to sample cryogenic permafrost flora. Dr. Vance was a member of the botanical expedition.'",
+          "questionText": "What conclusion MUST be true based on the passage?",
+          "options": ["Dr. Vance was assigned to sample cryogenic permafrost flora", "Dr. Vance was the leader of the expedition", "Only botanists can handle cryogenic samples", "Dr. Vance did not collect any flora samples"],
+          "correctIndex": 0,
+          "difficulty": 1,
+          "points": 1,
+          "explanation": "Syllogism: Dr. Vance -> Member -> Insulated container -> Assigned to permafrost flora."
+        },
+        {
+          "id": "pla_cms_02",
+          "abilityCode": "CMS",
+          "stimulus": "Passage: 'During solar eclipses, diurnal birds cease vocalization when ambient light drops below 10 lux. In the 2024 eclipse, ambient light reached 6 lux at 2:14 PM and rose back above 15 lux by 2:22 PM.'",
+          "questionText": "What can be inferred about the diurnal birds' behavior at 2:18 PM?",
+          "options": ["They had ceased vocalization", "They were vocalizing at peak volume", "They migrated south immediately", "They initiated nocturnal hunting flights"],
+          "correctIndex": 0,
+          "difficulty": 2,
+          "points": 1,
+          "explanation": "At 2:18 PM (between 2:14 and 2:22 PM), ambient light was below the 10 lux threshold, so diurnal birds ceased vocalizing."
+        },
+        {
+          "id": "pla_cms_03",
+          "abilityCode": "CMS",
+          "stimulus": "Passage: 'Renewable microgrids equipped with battery storage maintained uninterrupted power throughout the storm. Traditional grid sectors without storage experienced an average 18-hour blackout. Suburb K suffered no blackout.'",
+          "questionText": "Which deduction is most strongly supported by the passage?",
+          "options": ["Suburb K likely utilized a microgrid with battery storage or did not lose generation", "Suburb K had traditional grid connections without battery backup", "Battery storage always guarantees zero cost", "The storm avoided Suburb K entirely"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "points": 1,
+          "explanation": "Since sectors without storage had blackouts and Suburb K had zero downtime, Suburb K was supported by storage/microgrid resilience."
+        },
+        {
+          "id": "pla_cms_04",
+          "abilityCode": "CMS",
+          "stimulus": "Passage: 'A robust ecosystem requires both biodiversity and trophic balance. Introducing an apex predator to Island Alpha increased plant biomass by 40% over 5 years by reducing herbivore overgrazing.'",
+          "questionText": "This scenario represents which ecological system mechanism?",
+          "options": ["Trophic cascade regulation", "Direct herbivore extinction", "Soil nutrient depletion", "Artificial selection"],
+          "correctIndex": 0,
+          "difficulty": 4,
+          "points": 1,
+          "explanation": "Top predators regulating herbivore pressure leading to vegetation recovery is the classic trophic cascade phenomenon."
+        }
+      ]
+    }
+  ]
+}

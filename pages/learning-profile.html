@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learning Ability Profile | NeuroScan AI</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/learning.css">
+</head>
+<body>
+  <div id="nav-ph"></div>
+
+  <main class="learning-page-container">
+    <!-- HERO HEADER -->
+    <header class="learning-hero">
+      <div class="learning-hero-badge">📊 Diagnostic Ability Profile</div>
+      <h1>Learning Ability Profile & Construct Spectrum</h1>
+      <p>
+        Standardized 14-construct cognitive profile derived from diagnostic assessment data. Visualizes relative performance bands from Low to Exceptional with constructive educational significance and targeted development priorities.
+      </p>
+
+      <div class="learning-quick-tabs">
+        <a href="learning-assessment.html" class="learning-tab-btn">📝 Active Assessment</a>
+        <a href="learning-profile.html" class="learning-tab-btn active">📊 Ability Profile</a>
+        <a href="learning-program.html" class="learning-tab-btn">🎯 Training Program</a>
+        <a href="learning-progress.html" class="learning-tab-btn">📈 Progress & Reassessment</a>
+      </div>
+    </header>
+
+    <!-- LEARNER STATUS STRIP -->
+    <div class="report-learner-strip" style="background:#fff;border-radius:12px;">
+      <div class="learner-info-item">
+        <span class="lbl">Learner</span>
+        <strong id="learnerNameDisplay" class="val">Leo Tanaka</strong>
+      </div>
+      <div class="learner-info-item">
+        <span class="lbl">Age & Grade</span>
+        <strong id="learnerAgeGradeDisplay" class="val">10 yrs · Grade 5</strong>
+      </div>
+      <div class="learner-info-item">
+        <span class="lbl">Assessment Battery</span>
+        <strong id="batteryDisplay" class="val">PLA Assessment (14 Constructs)</strong>
+      </div>
+      <div class="learner-info-item">
+        <span class="lbl">Overall Index</span>
+        <strong id="overallIndexDisplay" class="val" style="color:var(--learn-primary)">74% · Average</strong>
+      </div>
+    </div>
+
+    <!-- DOMAIN SUMMARY OVERVIEW CARDS -->
+    <section>
+      <h3 style="margin:0 0 14px;font-size:1.15rem;">Cognitive Domain Summaries</h3>
+      <div class="domain-grid" id="domainSummaryContainer">
+        <!-- Rendered by ProfileEngine -->
+      </div>
+    </section>
+
+    <!-- ABILITY BAR CHART SECTION -->
+    <section style="margin-bottom:36px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h3 style="margin:0;font-size:1.25rem;">Standardized Ability Spectrum</h3>
+          <span style="font-size:.85rem;color:var(--learn-muted);">Click any ability row for constructive educational interpretation & developmental strategies</span>
+        </div>
+
+        <!-- Filter Pills -->
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-outline btn-sm filter-pill active" onclick="window.filterAbilities('ALL')">All Constructs</button>
+          <button class="btn btn-outline btn-sm filter-pill" onclick="window.filterAbilities('FIGURAL')">Figural</button>
+          <button class="btn btn-outline btn-sm filter-pill" onclick="window.filterAbilities('SYMBOLIC')">Symbolic</button>
+          <button class="btn btn-outline btn-sm filter-pill" onclick="window.filterAbilities('SEMANTIC')">Semantic</button>
+        </div>
+      </div>
+
+      <div id="abilityBarsContainer">
+        <!-- Rendered by ProfileEngine -->
+      </div>
+    </section>
+
+    <!-- STRENGTHS & PRIORITIES SECTION -->
+    <section style="margin-bottom:36px;">
+      <h3 style="margin:0 0 14px;font-size:1.25rem;">Targeted Development & Relative Strengths</h3>
+      <div id="prioritiesContainer">
+        <!-- Rendered by ProfileEngine -->
+      </div>
+    </section>
+
+    <!-- ACTION FOOTER BAR -->
+    <div style="display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--learn-border);padding:20px;border-radius:12px;">
+      <div>
+        <h4 style="margin:0 0 4px;">Ready to begin targeted training?</h4>
+        <span style="font-size:.85rem;color:var(--learn-muted);">Generate an adaptive 8-week curriculum targeting identified priority abilities.</span>
+      </div>
+      <div style="display:flex;gap:12px;">
+        <button id="btnOpenReport" class="btn btn-outline btn-sm">📄 View / Print Full Report</button>
+        <button id="btnGenerateProgram" class="btn btn-primary btn-sm">🎯 Open Training Program →</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ABILITY MODAL DIALOG -->
+  <div id="abilityModal" class="modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+    <div class="modal-dialog" style="background:#fff;border-radius:16px;max-width:600px;width:90%;padding:28px;box-shadow:0 10px 25px rgba(0,0,0,0.15);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span id="modalDomainBadge" class="ability-badge-domain figural">FIGURAL</span>
+          <h3 id="modalTitle" style="margin:0;font-size:1.2rem;">CFR · Spatial Analogies</h3>
+        </div>
+        <button onclick="window.closeModal()" style="border:none;background:none;font-size:1.5rem;cursor:pointer;color:#64748b;">×</button>
+      </div>
+
+      <div style="margin-bottom:16px;background:#f8fafc;padding:12px 16px;border-radius:8px;border:1px solid #e2e8f0;">
+        <div style="display:flex;justify-content:space-between;font-size:.9rem;font-weight:700;">
+          <span>Measured Score: <span id="modalScoreVal" style="color:var(--learn-primary)">74%</span></span>
+          <span>Performance Band: <span id="modalBandVal">Average</span></span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:.9rem;line-height:1.5;color:#334155;">
+        <div>
+          <strong style="color:#0f172a;">What is this ability?</strong>
+          <p id="modalDesc" style="margin:4px 0 0;"></p>
+        </div>
+        <div>
+          <strong style="color:#0f172a;">Why it matters in education:</strong>
+          <p id="modalEdu" style="margin:4px 0 0;"></p>
+        </div>
+        <div>
+          <strong style="color:#0f172a;">Development Strategy:</strong>
+          <p id="modalInterp" style="margin:4px 0 0;"></p>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;text-align:right;">
+        <button onclick="window.closeModal()" class="btn btn-primary btn-sm">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-ph"></div>
+
+  <script type="module">
+    import '../js/shared.js';
+    import { ProfileEngine } from '../js/learning/profile-engine.js';
+
+    let currentProfile = null;
+    let profileEngine = null;
+
+    async function loadProfile() {
+      // 1. Check localStorage for fresh completed assessment
+      const stored = localStorage.getItem('neuroscan_latest_learning_profile');
+      if (stored) {
+        try {
+          currentProfile = JSON.parse(stored);
+        } catch(e) {}
+      }
+
+      // 2. Fetch from backend if none
+      if (!currentProfile) {
+        try {
+          const res = await fetch('/api/learning/profile/learner-001');
+          currentProfile = await res.json();
+        } catch (e) {
+          console.warn('Profile fetch error:', e);
+        }
+      }
+
+      if (currentProfile) {
+        renderProfileView(currentProfile);
+      }
+    }
+
+    function renderProfileView(profile) {
+      profileEngine = new ProfileEngine(profile);
+
+      // Render Meta
+      document.getElementById('learnerNameDisplay').innerText = profile.learner?.name || 'Leo Tanaka';
+      document.getElementById('learnerAgeGradeDisplay').innerText = `${profile.learner?.age || 10} yrs · Grade ${profile.learner?.grade || '5'}`;
+      document.getElementById('batteryDisplay').innerText = `${profile.assessmentId || 'PLA-v1.0'} (${profile.assessmentType || 'PLA'})`;
+      document.getElementById('overallIndexDisplay').innerText = `${profile.overallPercentage || 74}% · ${profile.overallBand || 'Average'}`;
+
+      // Render UI components
+      profileEngine.renderDomainCards('domainSummaryContainer');
+      profileEngine.renderAbilityBarChart('abilityBarsContainer', 'ALL');
+      profileEngine.renderPriorityBreakdown('prioritiesContainer');
+    }
+
+    window.filterAbilities = (domain) => {
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      if (profileEngine) {
+        profileEngine.renderAbilityBarChart('abilityBarsContainer', domain);
+      }
+    };
+
+    window.showAbilityModal = (code) => {
+      if (!currentProfile) return;
+      const ability = (currentProfile.abilityScores || []).find(a => a.code === code);
+      if (!ability) return;
+
+      document.getElementById('modalDomainBadge').innerText = ability.domain.toUpperCase();
+      document.getElementById('modalDomainBadge').className = `ability-badge-domain ${ability.domain.toLowerCase()}`;
+      document.getElementById('modalTitle').innerText = `${ability.code} · ${ability.construct || ability.name}`;
+      document.getElementById('modalScoreVal').innerText = `${ability.percentage}%`;
+      document.getElementById('modalBandVal').innerText = ability.performanceBand;
+      document.getElementById('modalDesc').innerText = ability.description || 'Ability construct evaluating fundamental cognitive processing.';
+      document.getElementById('modalEdu').innerText = ability.educationalSignificance || 'Critical for scholastic progress and mental agility.';
+      document.getElementById('modalInterp').innerText = ability.interpretation || 'Systematic targeted practice with progressive difficulty reinforces cognitive automaticity.';
+
+      const modal = document.getElementById('abilityModal');
+      modal.style.display = 'flex';
+    };
+
+    window.closeModal = () => {
+      document.getElementById('abilityModal').style.display = 'none';
+    };
+
+    document.getElementById('btnGenerateProgram').addEventListener('click', () => {
+      window.location.href = 'learning-program.html';
+    });
+
+    document.getElementById('btnOpenReport').addEventListener('click', () => {
+      window.location.href = 'learning-progress.html?view=report';
+    });
+
+    loadProfile();
+  </script>
+</body>
+</html>

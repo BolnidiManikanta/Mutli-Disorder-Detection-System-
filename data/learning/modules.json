@@ -1,0 +1,124 @@
+[
+  {
+    "moduleId": "MOD-CFR-01",
+    "abilityCode": "CFR",
+    "name": "Spatial Analogies Foundation",
+    "level": 1,
+    "description": "Foundational geometric transformation deduction and proportional mapping.",
+    "exercises": [
+      { "exerciseId": "EX-CFR-101", "name": "Basic 2D Rotations", "difficulty": 1, "durationMinutes": 10 },
+      { "exerciseId": "EX-CFR-102", "name": "Color Inversion & Swaps", "difficulty": 1, "durationMinutes": 12 },
+      { "exerciseId": "EX-CFR-103", "name": "Scale & Proportion Shifts", "difficulty": 2, "durationMinutes": 15 },
+      { "exerciseId": "EX-CFR-104", "name": "Compound Dual-Rule Analogies", "difficulty": 2, "durationMinutes": 15 }
+    ]
+  },
+  {
+    "moduleId": "MOD-CFR-02",
+    "abilityCode": "CFR",
+    "name": "Multi-Axis Spatial Reasoning",
+    "level": 2,
+    "description": "3D rotations, nested transformations, and isometric projections.",
+    "exercises": [
+      { "exerciseId": "EX-CFR-201", "name": "Matrix Matrix Coordinate Rotations", "difficulty": 3, "durationMinutes": 15 },
+      { "exerciseId": "EX-CFR-202", "name": "3D Isometric Analogies", "difficulty": 3, "durationMinutes": 18 },
+      { "exerciseId": "EX-CFR-203", "name": "Topological Invariant Deducer", "difficulty": 4, "durationMinutes": 20 }
+    ]
+  },
+  {
+    "moduleId": "MOD-CSS-01",
+    "abilityCode": "CSS",
+    "name": "Numerical Sequences & Pattern Discovery",
+    "level": 1,
+    "description": "Progressions, arithmetic differences, and geometric series extraction.",
+    "exercises": [
+      { "exerciseId": "EX-CSS-101", "name": "Arithmetic Step Discovery", "difficulty": 1, "durationMinutes": 10 },
+      { "exerciseId": "EX-CSS-102", "name": "Geometric Series Multipliers", "difficulty": 2, "durationMinutes": 12 },
+      { "exerciseId": "EX-CSS-103", "name": "Interleaved Dual-Stream Sequences", "difficulty": 2, "durationMinutes": 15 },
+      { "exerciseId": "EX-CSS-104", "name": "Modular Arithmetic Clocks", "difficulty": 3, "durationMinutes": 15 }
+    ]
+  },
+  {
+    "moduleId": "MOD-CSS-02",
+    "abilityCode": "CSS",
+    "name": "Alphanumeric Code Systems",
+    "level": 2,
+    "description": "Multi-tier alphanumeric code generation and cipher rules.",
+    "exercises": [
+      { "exerciseId": "EX-CSS-201", "name": "Letter-Shift Ciphers", "difficulty": 3, "durationMinutes": 15 },
+      { "exerciseId": "EX-CSS-202", "name": "Algorithmic State Machines", "difficulty": 4, "durationMinutes": 18 },
+      { "exerciseId": "EX-CSS-203", "name": "Polynomial Sequence Deduction", "difficulty": 5, "durationMinutes": 20 }
+    ]
+  },
+  {
+    "moduleId": "MOD-CFU-01",
+    "abilityCode": "CFU",
+    "name": "Visual Closure Mastery",
+    "level": 1,
+    "description": "Rapid silhouette completion and visual boundary synthesis.",
+    "exercises": [
+      { "exerciseId": "EX-CFU-101", "name": "Fragmented Icon Reconstruction", "difficulty": 1, "durationMinutes": 10 },
+      { "exerciseId": "EX-CFU-102", "name": "Obscured Word & Contour Decode", "difficulty": 2, "durationMinutes": 12 },
+      { "exerciseId": "EX-CFU-103", "name": "Rapid Radial Boundary Closure", "difficulty": 3, "durationMinutes": 15 }
+    ]
+  },
+  {
+    "moduleId": "MOD-MFU-01",
+    "abilityCode": "MFU",
+    "name": "Visual Working Memory Buffer",
+    "level": 1,
+    "description": "Multi-item visual recall and spatial matrix retention.",
+    "exercises": [
+      { "exerciseId": "EX-MFU-101", "name": "4-Item Spatial Grid Recall", "difficulty": 1, "durationMinutes": 10 },
+      { "exerciseId": "EX-MFU-102", "name": "6-Item Rapid Exposure Memory", "difficulty": 2, "durationMinutes": 12 },
+      { "exerciseId": "EX-MFU-103", "name": "Delayed Interference Matrix Memory", "difficulty": 3, "durationMinutes": 15 }
+    ]
+  },
+  {
+    "moduleId": "MOD-EFC-01",
+    "abilityCode": "EFC",
+    "name": "Visual Outlier Discrimination",
+    "level": 1,
+    "description": "Class boundary verification and rule-breaking detection.",
+    "exercises": [
+      { "exerciseId": "EX-EFC-101", "name": "Symmetry Outlier Audit", "difficulty": 1, "durationMinutes": 10 },
+      { "exerciseId": "EX-EFC-102", "name": "Area Fraction Discrimination", "difficulty": 2, "durationMinutes": 12 },
+      { "exerciseId": "EX-EFC-103", "name": "Multi-Attribute Set Validation", "difficulty": 3, "durationMinutes": 15 }
+    ]
+  },
+  {
+    "moduleId": "MOD-CMR-01",
+    "abilityCode": "CMR",
+    "name": "Verbal Analogies & Relational Taxonomy",
+    "level": 1,
+    "description": "Taxonomy hierarchies, functional relationships, and causal analogies.",
+    "exercises": [
+      { "exerciseId": "EX-CMR-101", "name": "Part-to-Whole Relationships", "difficulty": 1, "durationMinutes": 10 },
+      { "exerciseId": "EX-CMR-102", "name": "Tool & Function Analogies", "difficulty": 2, "durationMinutes": 12 },
+      { "exerciseId": "EX-CMR-103", "name": "Abstract Causal Bridge Analogies", "difficulty": 3, "durationMinutes": 15 }
+    ]
+  },
+  {
+    "moduleId": "MOD-NST-01",
+    "abilityCode": "NST",
+    "name": "Symbolic Problem Solving",
+    "level": 1,
+    "description": "Equation transformations, balancing, and variable substitution.",
+    "exercises": [
+      { "exerciseId": "EX-NST-101", "name": "Linear Unknown Balancing", "difficulty": 1, "durationMinutes": 10 },
+      { "exerciseId": "EX-NST-102", "name": "Simultaneous Equation Substitution", "difficulty": 2, "durationMinutes": 15 },
+      { "exerciseId": "EX-NST-103", "name": "Symbolic Cipher Transforms", "difficulty": 3, "durationMinutes": 15 }
+    ]
+  },
+  {
+    "moduleId": "MOD-CMS-01",
+    "abilityCode": "CMS",
+    "name": "Inferential Reading & Logic Systems",
+    "level": 1,
+    "description": "Paragraph-level deduction, syllogism extraction, and premise validation.",
+    "exercises": [
+      { "exerciseId": "EX-CMS-101", "name": "Direct Premise Deduction", "difficulty": 1, "durationMinutes": 12 },
+      { "exerciseId": "EX-CMS-102", "name": "Conditional Logic & Hidden Axioms", "difficulty": 2, "durationMinutes": 15 },
+      { "exerciseId": "EX-CMS-103", "name": "Scientific Synthesis & Inference", "difficulty": 3, "durationMinutes": 18 }
+    ]
+  }
+]

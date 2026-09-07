@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>AI Doctor Chat — NeuroScan</title>
+  <title>AI Doctor Chat — NeuroScan AI</title>
   <link rel="stylesheet" href="../css/main.css"/>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
@@ -153,6 +153,7 @@
   </style>
 </head>
 <body>
+<div id="nav-ph"></div>
 <script type="module" src="../js/shared.js"></script>
 
 <div class="chat-wrapper">
@@ -319,19 +320,17 @@ window.sendMessage = async function() {
       ? '\nIMPORTANT: Respond in Hindi (हिंदी) language.'
       : '';
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/doctor-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: SYSTEM_PROMPT + langInstruction,
         messages: conversationHistory.slice(-20), // Keep last 20 messages for context
+        language: currentLang
       }),
     });
 
     const data = await response.json();
-    const reply = data.content?.[0]?.text || 'I apologize, I encountered an error. Please try again.';
+    const reply = data.reply || 'I apologize, I encountered an error. Please try again.';
 
     removeTypingIndicator();
     const assistantMsg = { role: 'assistant', content: reply };
