@@ -283,3 +283,7 @@ const s = document.createElement('style');
 s.textContent = `@keyframes slideIn{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:none}}`;
 document.head.appendChild(s);
 
+// Global AI Assistance Bot
+import('./ai-bot.js').catch(err => console.warn('AI Bot module failed to load:', err));
+
+

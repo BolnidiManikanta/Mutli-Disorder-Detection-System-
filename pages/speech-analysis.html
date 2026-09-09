@@ -144,6 +144,18 @@
         <div class="timer-display" id="timerDisplay">00:00</div>
       </div>
 
+      <!-- Real-Time Speech Recognition Transcript Box -->
+      <div id="liveTranscriptBox" style="margin:0 20px 14px;padding:12px 14px;background:#f8fafc;border:1px solid var(--border);border-radius:6px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:.78rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px">
+            🎙️ Speech Transcription:
+            <span id="sttStatus" style="font-size:.7rem;padding:2px 6px;border-radius:4px;background:#e9ecef;color:#495057">Ready</span>
+          </span>
+          <span style="font-size:.7rem;color:var(--muted)">Editable before analysis</span>
+        </div>
+        <textarea id="liveTranscriptInput" rows="2" placeholder="Speech transcription will appear here in real time as you speak, or you can type here..." style="width:100%;font-size:.84rem;border:1px solid #ced4da;border-radius:4px;padding:6px 8px;box-sizing:border-box;font-family:inherit;resize:vertical"></textarea>
+      </div>
+
       <div style="padding:0 20px 16px">
         <div id="recordingsList" class="recordings-list"></div>
         <div id="noRecordings" style="text-align:center;color:var(--muted);font-size:.82rem;padding:16px 0">No recordings yet. Press Record to start.</div>
@@ -339,6 +351,9 @@ function updateMilestones() {
 }
 updateMilestones();
 
+let speechRec = null;
+let capturedSpeech = '';
+
 // ── RECORDING ──────────────────────────────────────────────
 async function startRecording() {
   try {
@@ -361,6 +376,37 @@ async function startRecording() {
     };
     mediaRecorder.start(250);
 
+    // Initialize Web Speech Recognition if available
+    capturedSpeech = '';
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRec) {
+      try {
+        speechRec = new SpeechRec();
+        speechRec.continuous = true;
+        speechRec.interimResults = true;
+        speechRec.lang = 'en-US';
+        const sttStatus = document.getElementById('sttStatus');
+        if (sttStatus) { sttStatus.textContent = 'Recording…'; sttStatus.style.background = '#d1e7dd'; sttStatus.style.color = '#0f5132'; }
+        
+        speechRec.onresult = (e) => {
+          let interim = '';
+          for (let i = e.resultIndex; i < e.results.length; ++i) {
+            if (e.results[i].isFinal) {
+              capturedSpeech += e.results[i][0].transcript + ' ';
+            } else {
+              interim += e.results[i][0].transcript;
+            }
+          }
+          const full = (capturedSpeech + ' ' + interim).trim();
+          const input = document.getElementById('liveTranscriptInput');
+          if (input && full) input.value = full;
+        };
+        speechRec.start();
+      } catch (recErr) {
+        console.warn('SpeechRec start warning:', recErr);
+      }
+    }
+
     drawWaveform();
     startTimer();
     document.getElementById('btnRecord').style.display = 'none';
@@ -375,6 +421,12 @@ async function startRecording() {
 function stopRecording() {
   if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
   if (audioCtx) audioCtx.close();
+  if (speechRec) {
+    try { speechRec.stop(); } catch(e) {}
+    speechRec = null;
+    const sttStatus = document.getElementById('sttStatus');
+    if (sttStatus) { sttStatus.textContent = 'Completed'; sttStatus.style.background = '#e9ecef'; sttStatus.style.color = '#495057'; }
+  }
   cancelAnimationFrame(waveAnimFrame);
   clearInterval(recordingTimer);
   document.getElementById('btnRecord').style.display = 'inline-block';
@@ -457,106 +509,63 @@ window.deleteRecording = function(i) {
   if (!recordings.length) document.getElementById('btnAnalyze').disabled = true;
 };
 
-// ── AI ANALYSIS ────────────────────────────────────────────
+// ── AI SPEECH ANALYSIS ────────────────────────────────────────────
 async function analyzeLatest() {
   if (!recordings.length) return;
   const btn = document.getElementById('btnAnalyze');
   btn.disabled = true;
   btn.textContent = '⏳ Analyzing…';
 
-  document.getElementById('analysisContent').innerHTML = `<div class="analyzing-state"><div class="analyzing-spin"></div><div style="font-size:.85rem;color:var(--muted)">Sending to AI for speech analysis…</div></div>`;
+  document.getElementById('analysisContent').innerHTML = `<div class="analyzing-state"><div class="analyzing-spin"></div><div style="font-size:.85rem;color:var(--muted)">Conducting clinical speech & acoustic analysis…</div></div>`;
 
-  // Claude API does not accept audio files directly.
-  // We use Web Speech API for transcription where available,
-  // then send the transcript + metadata to Claude for clinical analysis.
   const latest = recordings[recordings.length - 1];
   const prompt = document.getElementById('promptText').textContent;
+  const transcriptInput = document.getElementById('liveTranscriptInput')?.value?.trim() || '';
 
-  // Try Web Speech API transcription first
-  let transcript = '';
-  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    try {
-      transcript = await transcribeWithWebSpeech(latest.blob);
-    } catch(e) { transcript = ''; }
+  // Convert audio blob to base64
+  let audioBase64 = '';
+  try {
+    audioBase64 = await new Promise((res, rej) => {
+      const reader = new FileReader();
+      reader.onloadend = () => res(reader.result);
+      reader.onerror = rej;
+      reader.readAsDataURL(latest.blob);
+    });
+  } catch (err) {
+    console.warn('Audio base64 conversion fallback:', err);
   }
 
-  await analyzeWithTextFallback(latest.duration, prompt, transcript);
-
-  btn.disabled = false;
-  btn.textContent = '🧠 Analyze';
-}
-
-async function transcribeWithWebSpeech(blob) {
-  return new Promise((_resolve, reject) => {
-    reject(new Error('Blob transcription not supported — skipping'));
-  });
-}
-
-async function analyzeWithTextFallback(durationOverride, promptOverride, transcriptHint) {
-  const latest = recordings[recordings.length - 1];
-  const duration = durationOverride ?? latest?.duration ?? 0;
-  const prompt = promptOverride ?? document.getElementById('promptText').textContent;
-  const transcriptNote = transcriptHint
-    ? `The user's transcript is: "${transcriptHint}". Use this as the basis for your analysis.`
-    : `No transcript available. Generate a realistic example transcript for a ${duration}-second response.`;
-
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/speech-analysis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: `You are a speech-language pathologist AI. Analyze a ${duration}-second speech sample recorded in response to: "${prompt}". ${transcriptNote}
-
-Return ONLY valid JSON (no markdown, no preamble):
-{
-  "transcript": "Example transcript appropriate for the prompt and duration",
-  "metrics": {
-    "fluency": 72,
-    "articulation": 65,
-    "vocabulary_complexity": 58,
-    "sentence_length": 61,
-    "speech_rate": "normal",
-    "pause_frequency": "high",
-    "prosody": "flat",
-    "repetitiveness": 45
-  },
-  "signals": [
-    {"type": "Frequent mid-sentence pauses noted", "severity": "watch"},
-    {"type": "Reduced prosodic variation", "severity": "watch"},
-    {"type": "Vocabulary appropriate for age", "severity": "normal"}
-  ],
-  "clinical_interpretation": "The speech sample shows adequate articulation with some notable features including elevated pause frequency and reduced prosodic variation, which may warrant further evaluation in the context of neurodevelopmental assessment.",
-  "disorder_indicators": {
-    "speech_delay": 28,
-    "asd": 35,
-    "dyslexia": 15,
-    "adhd": 22
-  }
-}`
-        }]
+        transcript: transcriptInput,
+        prompt: prompt,
+        duration: latest.duration,
+        audioBase64: audioBase64,
+        mimeType: latest.blob.type || 'audio/webm'
       })
     });
 
     if (response.ok) {
-      const data = await response.json();
-      const text = data.content?.[0]?.text || '{}';
-      const analysis = JSON.parse(text.replace(/```json|```/g, '').trim());
+      const analysis = await response.json();
       currentAnalysis = analysis;
       renderAnalysis(analysis);
+      btn.disabled = false;
+      btn.textContent = '🧠 Analyze';
       return;
     }
   } catch (err) {
-    console.warn('Speech AI API call fallback engaged:', err);
+    console.warn('Speech backend API call fallback engaged:', err);
   }
 
   // Robust local clinical fallback analysis
-  const fallbackAnalysis = generateSpeechFallback(duration, prompt, transcriptHint);
+  const fallbackAnalysis = generateSpeechFallback(latest.duration, prompt, transcriptInput);
   currentAnalysis = fallbackAnalysis;
   renderAnalysis(fallbackAnalysis);
+  btn.disabled = false;
+  btn.textContent = '🧠 Analyze';
 }
 
 function generateSpeechFallback(duration, prompt, transcriptHint) {

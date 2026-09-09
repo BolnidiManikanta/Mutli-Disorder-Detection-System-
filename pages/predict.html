@@ -428,9 +428,12 @@ function updatePredictionUI(result, answered, isFromRealML) {
 
   // Model breakdown
   if (result.models) {
-    document.getElementById('rfScoreVal').textContent = `${result.models.random_forest.score_pct}%`;
-    document.getElementById('xgbScoreVal').textContent = `${result.models.gradient_boosting.score_pct}%`;
-    document.getElementById('lrScoreVal').textContent = `${result.models.logistic_regression.score_pct}%`;
+    const rf = result.models.random_forest;
+    const gb = result.models.gradient_boosting;
+    const lr = result.models.logistic_regression;
+    document.getElementById('rfScoreVal').textContent = `${rf?.score_pct ?? rf?.score ?? 0}%`;
+    document.getElementById('xgbScoreVal').textContent = `${gb?.score_pct ?? gb?.score ?? 0}%`;
+    document.getElementById('lrScoreVal').textContent = `${lr?.score_pct ?? lr?.score ?? 0}%`;
   } else if (result.lr_score !== undefined) {
     document.getElementById('rfScoreVal').textContent = `${Math.round(result.rf_score * 100)}%`;
     document.getElementById('xgbScoreVal').textContent = `${Math.round(result.xgb_score * 100)}%`;

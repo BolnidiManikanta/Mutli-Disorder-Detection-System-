@@ -145,6 +145,64 @@
     .info-card-title { font-weight: 700; font-size: .82rem; margin-bottom: 6px; color: var(--primary); }
     .info-card-body { font-size: .8rem; line-height: 1.6; }
 
+    /* Interactive Voice & Controls */
+    .chat-controls-row { display: flex; align-items: center; gap: 8px; }
+    .voice-mic-btn {
+      width: 44px; height: 44px; border-radius: 12px; border: 1.5px solid var(--border);
+      background: #fff; color: var(--muted); cursor: pointer; font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center; transition: all .2s;
+    }
+    .voice-mic-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .voice-mic-btn.listening {
+      background: #fee2e2; border-color: #ef4444; color: #dc2626;
+      animation: micPulse 1.2s infinite alternate;
+    }
+    @keyframes micPulse { 0%{box-shadow: 0 0 0 0 rgba(239,68,68,0.4)} 100%{box-shadow: 0 0 0 10px rgba(239,68,68,0)} }
+
+    .msg-actions {
+      display: flex; gap: 8px; margin-top: 6px; align-items: center; flex-wrap: wrap;
+    }
+    .msg-action-btn {
+      font-size: .72rem; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border);
+      background: #fff; color: var(--muted); cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+      transition: all .2s;
+    }
+    .msg-action-btn:hover { color: var(--primary); border-color: var(--primary-l); }
+    .msg-action-btn.speaking { background: var(--green-bg); color: var(--primary); border-color: var(--primary); }
+
+    /* Context notification banner */
+    .patient-context-banner {
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border: 1px solid #a5d6a7;
+      padding: 10px 18px; border-radius: 10px; margin: 12px 24px 0;
+      display: flex; align-items: center; justify-content: space-between; font-size: .82rem;
+    }
+    .patient-context-banner button {
+      padding: 4px 10px; border-radius: 6px; border: 1px solid var(--primary);
+      background: var(--primary); color: #fff; font-size: .75rem; font-weight: 700; cursor: pointer;
+    }
+
+    /* Interactive Symptom Builder Drawer */
+    .symptom-builder {
+      background: #fff; border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 16px; margin: 12px 24px 0; box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+    }
+    .builder-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+    .builder-chip {
+      padding: 5px 12px; border-radius: 50px; font-size: .76rem; border: 1.5px solid var(--border);
+      background: var(--bg); cursor: pointer; transition: all .2s; color: var(--text);
+    }
+    .builder-chip.active {
+      background: var(--green-bg); border-color: var(--primary); color: var(--primary); font-weight: 700;
+    }
+
+    /* Follow-up suggestion pills */
+    .followup-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .followup-chip {
+      padding: 4px 10px; border-radius: 50px; font-size: .74rem; background: var(--bg);
+      border: 1px solid var(--border); color: var(--primary); cursor: pointer; transition: all .2s;
+    }
+    .followup-chip:hover { background: var(--green-bg); border-color: var(--primary); }
+
     /* Disclaimer banner */
     .disclaimer-banner {
       background: #fff8e1; border-bottom: 1px solid #f0d060; padding: 8px 24px;
@@ -211,11 +269,58 @@
       <div class="chat-topbar-avatar">👨‍⚕️</div>
       <div class="chat-topbar-info">
         <h3>Dr. NeuroScan AI</h3>
-        <p>Pediatric Neurodevelopment Specialist · AI-Powered</p>
+        <p>Pediatric Neurodevelopment Specialist · Powered by Google Gemini</p>
       </div>
       <div class="chat-topbar-actions">
+        <button class="topbar-btn" id="toggleCaseBuilderBtn" onclick="toggleCaseBuilder()">📋 Case Builder</button>
         <button class="topbar-btn" onclick="window.location.href='assess.html'">🧠 Take Assessment</button>
-        <button class="topbar-btn" onclick="exportChat()">📥 Export Chat</button>
+        <button class="topbar-btn" onclick="exportChat()">📥 Export</button>
+      </div>
+    </div>
+
+    <!-- Collapsible Interactive Symptom & Milestone Builder -->
+    <div id="caseBuilderPanel" class="symptom-builder" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <strong style="font-size:.85rem">🩺 Interactive Clinical Case Builder</strong>
+        <span style="font-size:.75rem;color:var(--muted);cursor:pointer" onclick="toggleCaseBuilder()">✕ Close</span>
+      </div>
+      <div style="font-size:.78rem;color:var(--muted);margin-bottom:8px">Select child's developmental age and observed characteristics to generate an immediate targeted clinical consultation:</div>
+      
+      <div style="margin-bottom:10px">
+        <span style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase">Age Group:</span>
+        <div class="builder-chips" id="ageChips">
+          <button type="button" class="builder-chip active" data-age="Toddler (1-3 yrs)" onclick="selectAge(this)">Toddler (1–3 yrs)</button>
+          <button type="button" class="builder-chip" data-age="Child (4-7 yrs)" onclick="selectAge(this)">Child (4–7 yrs)</button>
+          <button type="button" class="builder-chip" data-age="Adolescent (8-12 yrs)" onclick="selectAge(this)">Adolescent (8–12 yrs)</button>
+          <button type="button" class="builder-chip" data-age="Teen / Adult (13+ yrs)" onclick="selectAge(this)">Teen / Adult (13+ yrs)</button>
+        </div>
+      </div>
+
+      <div>
+        <span style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase">Observed Behaviors & Traits (select all that apply):</span>
+        <div class="builder-chips" id="symptomChips">
+          <button type="button" class="builder-chip" onclick="toggleChip(this)">👁️ Limited eye contact</button>
+          <button type="button" class="builder-chip" onclick="toggleChip(this)">🗣️ Speech delay / Few words</button>
+          <button type="button" class="builder-chip" onclick="toggleChip(this)">🔄 Repetitive hand flapping / rocking</button>
+          <button type="button" class="builder-chip" onclick="toggleChip(this)">🎧 Sensory sound / texture distress</button>
+          <button type="button" class="builder-chip" onclick="toggleChip(this)">⚡ Hyperactivity / Can't sit still</button>
+          <button type="button" class="builder-chip" onclick="toggleChip(this)">🧩 Meltdowns during routine changes</button>
+          <button type="button" class="builder-chip" onclick="toggleChip(this)">📖 Reading or phonetic reversal</button>
+          <button type="button" class="builder-chip" onclick="toggleChip(this)">🤝 Difficulty with peer play</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
+        <button class="topbar-btn" style="background:var(--primary);color:#fff;border-color:var(--primary)" onclick="submitCaseBuilder()">⚡ Consult Dr. NeuroScan with this Case</button>
+      </div>
+    </div>
+
+    <!-- Active Assessment Context Bar if available -->
+    <div id="patientContextBanner" class="patient-context-banner" style="display:none">
+      <span id="patientContextText">💡 Recent screening found: <strong>ASD Risk 72%</strong>. Would you like to include this in the consultation?</span>
+      <div style="display:flex;gap:6px">
+        <button onclick="applyAssessmentContext()">Attach to Chat</button>
+        <button style="background:transparent;color:var(--muted);border-color:transparent" onclick="dismissContext()">✕</button>
       </div>
     </div>
 
@@ -225,11 +330,12 @@
 
     <div class="chat-input-area">
       <div class="chat-input-row">
-        <textarea class="chat-textarea" id="chatInput" rows="1" placeholder="Ask about autism, ADHD, therapy options, or your child's development…"
+        <button class="voice-mic-btn" id="voiceMicBtn" title="Voice Input (Speech-to-Text)" onclick="toggleVoiceInput()">🎙️</button>
+        <textarea class="chat-textarea" id="chatInput" rows="1" placeholder="Ask Dr. NeuroScan about autism, ADHD, speech milestones, or therapy options…"
           onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-        <button class="chat-send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+        <button class="chat-send-btn" id="sendBtn" title="Send message" onclick="sendMessage()">➤</button>
       </div>
-      <div class="input-hint">Press Enter to send · Shift+Enter for new line · Powered by Claude claude-sonnet-4-20250514</div>
+      <div class="input-hint">Press Enter to send · Shift+Enter for new line · Powered by Google Gemini 3.8 Flash</div>
     </div>
   </div>
 </div>
@@ -240,70 +346,103 @@ import { saveChatMessage, getChatHistory, onAuthChange, auth } from '../js/mongo
 let conversationHistory = [];
 let currentLang = 'en';
 let isTyping = false;
+let activePatientContext = null;
+let speechRecognition = null;
+let isRecordingVoice = false;
+let currentUtterance = null;
+
 window.setLang = setLang;
 window.sendSuggested = sendSuggested;
 window.clearChat = clearChat;
 window.exportChat = exportChat;
+window.toggleCaseBuilder = toggleCaseBuilder;
+window.selectAge = selectAge;
+window.toggleChip = toggleChip;
+window.submitCaseBuilder = submitCaseBuilder;
+window.toggleVoiceInput = toggleVoiceInput;
+window.speakMessage = speakMessage;
+window.copyMessageText = copyMessageText;
+window.applyAssessmentContext = applyAssessmentContext;
+window.dismissContext = dismissContext;
 
-const SYSTEM_PROMPT = `You are Dr. NeuroScan AI, an empathetic and highly knowledgeable pediatric neurodevelopment specialist AI assistant. You specialize in:
-- Autism Spectrum Disorder (ASD) — diagnosis, symptoms, early signs, therapies
-- ADHD — attention, hyperactivity, impulsivity, management
-- Dyslexia and learning disabilities — reading, writing, phonological processing
-- Social Anxiety Disorder — social fears, avoidance, CBT approaches
-- Speech and Language Delay — developmental milestones, SLP therapy
-- Intellectual Disability — cognitive development, IEP, adaptive skills
-- Sensory Processing Disorder (SPD) — sensory integration, OT therapy
-
-Your communication style:
-- Warm, empathetic, and non-judgmental — especially with worried parents
-- Clear and accessible language (avoid excessive jargon)
-- Evidence-based: cite recognized therapies and research
-- Always acknowledge emotions before providing information
-- Structure responses with bullet points when listing symptoms or options
-- Always end responses involving clinical concern with a reminder to consult professionals
-- You can respond in English, Tamil (தமிழ்), or Hindi (हिंदी) based on the user's language
-
-Format your responses naturally. Use bold for key terms. Use bullet points for lists.
-
-IMPORTANT: Always include at the end of clinical responses: "⚠️ This is educational information only — please consult a qualified healthcare professional for diagnosis."`;
+// Check for recent assessment data in storage
+try {
+  const lastScore = localStorage.getItem('neuroscan_last_result') || sessionStorage.getItem('neuroscan_last_result');
+  if (lastScore) {
+    const parsed = JSON.parse(lastScore);
+    const scoreVal = parsed.aqScore ?? parsed.score ?? (parsed.probability ? Math.round(parsed.probability * 100) + '%' : null);
+    if (scoreVal) {
+      activePatientContext = {
+        age: parsed.age || 'Child',
+        gender: parsed.gender || 'Not specified',
+        scores: parsed,
+        primaryConcern: parsed.riskLevel ? `Risk level: ${parsed.riskLevel}` : 'Neurodevelopmental screening'
+      };
+      const banner = document.getElementById('patientContextBanner');
+      const bannerText = document.getElementById('patientContextText');
+      if (banner && bannerText) {
+        bannerText.innerHTML = `💡 Recent assessment detected: <strong>${parsed.assessment_type || 'AQ-10'} (${parsed.riskLevel || 'Evaluated'}, ${scoreVal})</strong>. Include in Dr. NeuroScan context?`;
+        banner.style.display = 'flex';
+      }
+    }
+  }
+} catch(e) {}
 
 // Load history on auth
 onAuthChange(async user => {
   if (user) {
     try {
       const history = await getChatHistory(user.uid, 30);
-      conversationHistory = history.map(h => ({ role: h.role, content: h.text }));
+      if (history && history.length > 0) {
+        conversationHistory = history.map(h => ({ role: h.role, content: h.text }));
+        renderAllMessages();
+        return;
+      }
     } catch(e) {}
   }
   showWelcome();
 });
 
+function renderAllMessages() {
+  const container = document.getElementById('chatMessages');
+  container.innerHTML = '';
+  conversationHistory.forEach((msg, idx) => {
+    appendMessage(msg, false, idx);
+  });
+}
+
 function showWelcome() {
   const welcomeMsg = {
     role: 'assistant',
-    content: `Hello! I'm **Dr. NeuroScan AI**, your AI pediatric neurodevelopment specialist. 🧠
+    content: `Hello! I'm **Dr. NeuroScan AI**, your pediatric neurodevelopment specialist assistant. 🧠
 
-I'm here to help you understand neurodevelopmental conditions like autism (ASD), ADHD, dyslexia, speech delays, and more.
+I provide clinical evidence-based guidance on:
+• **Autism Spectrum Disorder (ASD)**: Early signs, DSM-5 criteria, sensory integration, and communication
+• **ADHD**: Inattention, hyperactivity, executive function, and classroom accommodations (IEP/504)
+• **Speech & Language Delays**: Developmental age milestones, expressive language, and SLP therapy
+• **Sensory Processing Differences (SPD)**: Sensory diets, hypersensitivity, and calming strategies
+• **Learning Differences**: Dyslexia, dyscalculia, and structured literacy
 
-**How I can help you today:**
-- Answer questions about symptoms, behaviors, and development milestones
-- Explain diagnosis processes and what to expect
-- Guide you through therapy options and interventions
-- Help you understand your NeuroScan assessment results
-- Provide support and guidance for parents, educators, and clinicians
-
-Feel free to ask me anything — no question is too big or small. What's on your mind?`,
+*You can speak using the 🎙️ mic button, type your question below, or use the **📋 Case Builder** above for a structured evaluation.*`,
+    followups: [
+      "Early signs of Autism in toddlers",
+      "Differences between ADHD and Autism",
+      "When to consult a Speech Therapist?",
+      "How to request an IEP or school evaluation?"
+    ]
   };
   appendMessage(welcomeMsg, true);
 }
 
-window.sendMessage = async function() {
+window.sendMessage = async function(overrideText = null) {
   const input = document.getElementById('chatInput');
-  const text = input.value.trim();
+  const text = (overrideText !== null ? overrideText : input.value).trim();
   if (!text || isTyping) return;
 
-  input.value = '';
-  input.style.height = 'auto';
+  if (overrideText === null) {
+    input.value = '';
+    input.style.height = 'auto';
+  }
   document.getElementById('sendBtn').disabled = true;
 
   const userMsg = { role: 'user', content: text };
@@ -314,30 +453,29 @@ window.sendMessage = async function() {
   isTyping = true;
 
   try {
-    const langInstruction = currentLang === 'ta' 
-      ? '\nIMPORTANT: Respond in Tamil (தமிழ்) language.'
-      : currentLang === 'hi' 
-      ? '\nIMPORTANT: Respond in Hindi (हिंदी) language.'
-      : '';
-
     const response = await fetch('/api/doctor-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        messages: conversationHistory.slice(-20), // Keep last 20 messages for context
-        language: currentLang
+        messages: conversationHistory.slice(-15),
+        language: currentLang,
+        patientContext: activePatientContext
       }),
     });
 
     const data = await response.json();
-    const reply = data.reply || 'I apologize, I encountered an error. Please try again.';
+    const reply = data.reply || 'I am here to assist with developmental inquiries. What specific concerns are you noticing?';
 
     removeTypingIndicator();
-    const assistantMsg = { role: 'assistant', content: reply };
+    const assistantMsg = { 
+      role: 'assistant', 
+      content: reply,
+      followups: generateSmartFollowups(text, reply)
+    };
     appendMessage(assistantMsg);
     conversationHistory.push(assistantMsg);
 
-    // Save to Firebase
+    // Save to database
     try {
       const user = auth.currentUser;
       if (user) {
@@ -350,7 +488,8 @@ window.sendMessage = async function() {
     removeTypingIndicator();
     appendMessage({
       role: 'assistant',
-      content: 'I\'m having trouble connecting right now. Please check your internet connection and try again. If the issue persists, please try refreshing the page.',
+      content: 'I\'m currently re-routing your request. NeuroScan AI offers multi-disorder guidance for ASD, ADHD, Speech Delays, and Dyslexia. Please try submitting your inquiry again.',
+      followups: ["What are standard speech milestones?", "What is an AQ-10 screening?"]
     });
   }
 
@@ -359,18 +498,58 @@ window.sendMessage = async function() {
   document.getElementById('chatInput').focus();
 };
 
-function appendMessage(msg, isWelcome = false) {
+function generateSmartFollowups(userText, botReply) {
+  const t = (userText + ' ' + botReply).toLowerCase();
+  if (t.includes('speech') || t.includes('word') || t.includes('talk')) {
+    return ["What home exercises help speech delay?", "Speech delay vs autism markers", "How to find a certified SLP?"];
+  }
+  if (t.includes('adhd') || t.includes('hyper') || t.includes('focus')) {
+    return ["Best classroom accommodations for ADHD", "Executive function routine tips", "Behavioral therapy vs medication"];
+  }
+  if (t.includes('sensory') || t.includes('texture') || t.includes('sound')) {
+    return ["Creating a calming sensory diet", "How to manage sensory meltdowns", "Occupational therapy sensory equipment"];
+  }
+  return ["What are next clinical steps?", "Explain early intervention therapy", "How does the AQ-10 screening work?"];
+}
+
+function appendMessage(msg, isWelcome = false, index = null) {
   const container = document.getElementById('chatMessages');
   const div = document.createElement('div');
   div.className = `msg ${msg.role}`;
 
   const time = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
   const avatarEmoji = msg.role === 'assistant' ? '👨‍⚕️' : '👤';
+  const msgId = 'msg-' + (index !== null ? index : Date.now() + '-' + Math.floor(Math.random()*1000));
+
+  let actionButtons = '';
+  if (msg.role === 'assistant') {
+    actionButtons = `
+      <div class="msg-actions">
+        <button class="msg-action-btn" title="Read aloud" onclick="speakMessage('${msgId}')">
+          <span id="${msgId}-icon">🔊</span> Read
+        </button>
+        <button class="msg-action-btn" title="Copy text" onclick="copyMessageText('${msgId}')">
+          📋 Copy
+        </button>
+      </div>
+    `;
+  }
+
+  let followupsHtml = '';
+  if (msg.followups && msg.followups.length > 0) {
+    followupsHtml = `
+      <div class="followup-chips">
+        ${msg.followups.map(f => `<div class="followup-chip" onclick="sendSuggested(this)">${f}</div>`).join('')}
+      </div>
+    `;
+  }
 
   div.innerHTML = `
     <div class="msg-avatar">${avatarEmoji}</div>
-    <div>
-      <div class="msg-bubble">${formatMessage(msg.content)}</div>
+    <div style="max-width:100%">
+      <div class="msg-bubble" id="${msgId}">${formatMessage(msg.content)}</div>
+      ${actionButtons}
+      ${followupsHtml}
       <div class="msg-time">${time}</div>
     </div>
   `;
@@ -380,6 +559,7 @@ function appendMessage(msg, isWelcome = false) {
 }
 
 function formatMessage(text) {
+  if (!text) return '';
   return text
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
@@ -413,17 +593,23 @@ function setLang(lang, btn) {
   currentLang = lang;
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  const langNames = { en: 'English', ta: 'Tamil (தமிழ்)', hi: 'Hindi (हिंदी)' };
+  appendMessage({
+    role: 'assistant',
+    content: `Language switched to **${langNames[lang] || lang}**. Feel free to continue asking your questions!`
+  });
 }
 
 function sendSuggested(el) {
-  document.getElementById('chatInput').value = el.textContent;
-  window.sendMessage();
+  const q = el.textContent.trim();
+  window.sendMessage(q);
 }
 
 function clearChat() {
   if (!confirm('Clear the entire conversation?')) return;
   conversationHistory = [];
   document.getElementById('chatMessages').innerHTML = '';
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
   showWelcome();
 }
 
@@ -431,11 +617,166 @@ function exportChat() {
   const msgs = conversationHistory.map(m =>
     `[${m.role.toUpperCase()}]\n${m.content}\n`
   ).join('\n---\n');
-  const blob = new Blob([`NeuroScan AI Chat Export\n${'='.repeat(40)}\n\n${msgs}`], { type: 'text/plain' });
+  const blob = new Blob([`NeuroScan AI Clinical Consultation Export\n${'='.repeat(44)}\nDate: ${new Date().toLocaleString()}\n\n${msgs}`], { type: 'text/plain' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `NeuroScan_Chat_${new Date().toISOString().split('T')[0]}.txt`;
+  a.download = `NeuroScan_Doctor_Consult_${new Date().toISOString().split('T')[0]}.txt`;
   a.click();
+}
+
+// ── INTERACTIVE VOICE RECOGNITION (SPEECH-TO-TEXT) ────────────
+function toggleVoiceInput() {
+  const micBtn = document.getElementById('voiceMicBtn');
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRec) {
+    alert('Voice speech recognition is not supported in this browser. Please use Google Chrome or Edge.');
+    return;
+  }
+
+  if (isRecordingVoice) {
+    if (speechRecognition) speechRecognition.stop();
+    isRecordingVoice = false;
+    micBtn.classList.remove('listening');
+    return;
+  }
+
+  try {
+    speechRecognition = new SpeechRec();
+    speechRecognition.continuous = false;
+    speechRecognition.interimResults = true;
+    speechRecognition.lang = currentLang === 'ta' ? 'ta-IN' : currentLang === 'hi' ? 'hi-IN' : 'en-US';
+
+    speechRecognition.onstart = () => {
+      isRecordingVoice = true;
+      micBtn.classList.add('listening');
+      document.getElementById('chatInput').placeholder = 'Listening to your voice… speak now…';
+    };
+
+    speechRecognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map(r => r[0].transcript)
+        .join('');
+      document.getElementById('chatInput').value = transcript;
+      window.autoResize(document.getElementById('chatInput'));
+    };
+
+    speechRecognition.onerror = (e) => {
+      console.warn('Speech recognition error:', e.error);
+      micBtn.classList.remove('listening');
+      isRecordingVoice = false;
+      document.getElementById('chatInput').placeholder = "Ask Dr. NeuroScan about autism, ADHD, speech milestones…";
+    };
+
+    speechRecognition.onend = () => {
+      micBtn.classList.remove('listening');
+      isRecordingVoice = false;
+      document.getElementById('chatInput').placeholder = "Ask Dr. NeuroScan about autism, ADHD, speech milestones…";
+      const val = document.getElementById('chatInput').value.trim();
+      if (val.length > 5) {
+        // Automatically send voice query or allow user to edit
+      }
+    };
+
+    speechRecognition.start();
+  } catch (err) {
+    console.error('Voice recognition initiation error:', err);
+  }
+}
+
+// ── TEXT-TO-SPEECH (READ ALOUD) ───────────────────────────────
+function speakMessage(msgId) {
+  if (!('speechSynthesis' in window)) {
+    alert('Text-to-speech audio is not supported in your browser.');
+    return;
+  }
+
+  const el = document.getElementById(msgId);
+  const icon = document.getElementById(`${msgId}-icon`);
+  if (!el) return;
+
+  if (window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    if (icon) icon.textContent = '🔊';
+    return;
+  }
+
+  const rawText = el.innerText.replace(/⚠️.*$/s, '').trim();
+  const utterance = new SpeechSynthesisUtterance(rawText);
+  utterance.rate = 1.0;
+  utterance.pitch = 1.0;
+
+  if (currentLang === 'ta') utterance.lang = 'ta-IN';
+  else if (currentLang === 'hi') utterance.lang = 'hi-IN';
+  else utterance.lang = 'en-US';
+
+  utterance.onstart = () => {
+    if (icon) icon.textContent = '⏹️';
+  };
+  utterance.onend = () => {
+    if (icon) icon.textContent = '🔊';
+  };
+  utterance.onerror = () => {
+    if (icon) icon.textContent = '🔊';
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function copyMessageText(msgId) {
+  const el = document.getElementById(msgId);
+  if (!el) return;
+  navigator.clipboard.writeText(el.innerText).then(() => {
+    const btn = event.currentTarget;
+    const oldText = btn.innerHTML;
+    btn.innerHTML = '✓ Copied';
+    setTimeout(() => { btn.innerHTML = oldText; }, 1800);
+  });
+}
+
+// ── CASE BUILDER LOGIC ────────────────────────────────────────
+function toggleCaseBuilder() {
+  const panel = document.getElementById('caseBuilderPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function selectAge(btn) {
+  document.querySelectorAll('#ageChips .builder-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleChip(btn) {
+  btn.classList.toggle('active');
+}
+
+function submitCaseBuilder() {
+  const activeAge = document.querySelector('#ageChips .builder-chip.active')?.dataset.age || 'Child (4-7 yrs)';
+  const selectedSymptoms = Array.from(document.querySelectorAll('#symptomChips .builder-chip.active'))
+    .map(b => b.textContent.trim());
+
+  if (selectedSymptoms.length === 0) {
+    alert('Please select at least 1 or 2 observed traits to construct the clinical inquiry.');
+    return;
+  }
+
+  const prompt = `I am seeking developmental clinical consultation for a ${activeAge}. We have observed the following behaviors:\n- ${selectedSymptoms.join('\n- ')}\n\nCould you provide a detailed evaluation of what neurodevelopmental conditions (such as ASD, ADHD, or Speech Delays) might be relevant, what standardized screening tools to request, and what evidence-based steps we should take?`;
+
+  toggleCaseBuilder();
+  window.sendMessage(prompt);
+}
+
+function applyAssessmentContext() {
+  if (activePatientContext) {
+    const banner = document.getElementById('patientContextBanner');
+    if (banner) banner.style.display = 'none';
+    const contextPrompt = `Hello Dr. NeuroScan, could you review my child's recent assessment profile (${activePatientContext.primaryConcern}) and explain what therapies and accommodations are recommended based on these scores?`;
+    window.sendMessage(contextPrompt);
+  }
+}
+
+function dismissContext() {
+  const banner = document.getElementById('patientContextBanner');
+  if (banner) banner.style.display = 'none';
 }
 
 window.handleKey = function(e) {

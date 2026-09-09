@@ -78,30 +78,57 @@ ALL_QUESTION_KEYS = [
     'q_abstract_reasoning', 'q_developmental_milestones'
 ]
 
-def generate_heuristic_cohort(num_samples=800, random_state=42):
+def generate_heuristic_cohort(num_samples=1200, random_state=42):
     """
     Generates a simulated developmental cohort based on clinical feature covariances
-    for software architecture prototyping.
+    and DSM-5 symptom clusters for comprehensive multi-disorder classification.
     """
     rng = np.random.RandomState(random_state)
     X_samples = []
     y_dict = {d: [] for d in DISORDER_DEFS}
 
-    for _ in range(num_samples):
-        # Latent traits
-        f_social = rng.beta(2, 5)
-        f_executive = rng.beta(2, 5)
-        f_language = rng.beta(1.5, 5)
-        f_sensory = rng.beta(2, 5)
+    for i in range(num_samples):
+        # Determine archetype for this sample to ensure balanced multi-class representation
+        archetype = rng.choice([
+            'typical', 'asd', 'adhd', 'dyslexia', 'social_anxiety',
+            'speech_delay', 'intellectual_disability', 'spd', 'comorbid'
+        ], p=[0.24, 0.12, 0.12, 0.10, 0.10, 0.09, 0.06, 0.08, 0.09])
 
-        if rng.rand() < 0.25:
-            f_social = min(1.0, f_social + rng.uniform(0.3, 0.7))
-        if rng.rand() < 0.25:
-            f_executive = min(1.0, f_executive + rng.uniform(0.3, 0.7))
-        if rng.rand() < 0.20:
-            f_language = min(1.0, f_language + rng.uniform(0.3, 0.7))
-        if rng.rand() < 0.22:
-            f_sensory = min(1.0, f_sensory + rng.uniform(0.3, 0.7))
+        # Base latent levels (typical is low across all)
+        f_social = rng.beta(1.2, 5.0)
+        f_executive = rng.beta(1.2, 5.0)
+        f_language = rng.beta(1.2, 5.0)
+        f_sensory = rng.beta(1.2, 5.0)
+
+        if archetype == 'asd':
+            f_social = rng.uniform(0.65, 0.98)
+            f_sensory = rng.uniform(0.55, 0.95)
+            if rng.rand() < 0.4: f_executive = rng.uniform(0.45, 0.85)
+        elif archetype == 'adhd':
+            f_executive = rng.uniform(0.68, 0.98)
+            if rng.rand() < 0.35: f_sensory = rng.uniform(0.4, 0.7)
+        elif archetype == 'dyslexia':
+            f_language = rng.uniform(0.65, 0.98)
+            if rng.rand() < 0.3: f_executive = rng.uniform(0.4, 0.75)
+        elif archetype == 'social_anxiety':
+            f_social = rng.uniform(0.58, 0.92)
+        elif archetype == 'speech_delay':
+            f_language = rng.uniform(0.65, 0.95)
+        elif archetype == 'intellectual_disability':
+            f_social = rng.uniform(0.6, 0.9)
+            f_executive = rng.uniform(0.6, 0.9)
+            f_language = rng.uniform(0.6, 0.9)
+        elif archetype == 'spd':
+            f_sensory = rng.uniform(0.68, 0.98)
+        elif archetype == 'comorbid':
+            # E.g. ASD + ADHD or Dyslexia + Speech Delay
+            if rng.rand() < 0.5:
+                f_social = rng.uniform(0.65, 0.95)
+                f_executive = rng.uniform(0.65, 0.95)
+                f_sensory = rng.uniform(0.5, 0.85)
+            else:
+                f_language = rng.uniform(0.65, 0.95)
+                f_executive = rng.uniform(0.55, 0.85)
 
         row = []
         for q in ALL_QUESTION_KEYS:
@@ -116,26 +143,26 @@ def generate_heuristic_cohort(num_samples=800, random_state=42):
             else:
                 p = (f_social + f_executive + f_language) / 3.0
 
-            p_noisy = np.clip(p + rng.normal(0, 0.12), 0.0, 1.0)
-            score = int(round(p_noisy * 3))
+            p_noisy = np.clip(p + rng.normal(0, 0.08), 0.0, 1.0)
+            score = float(round(p_noisy * 3.0, 1))
             row.append(score)
 
-        age = rng.randint(3, 50)
+        age = rng.randint(2, 12) if archetype == 'speech_delay' else rng.randint(3, 50)
         gender = rng.choice([0, 1])
         jaundice = 1 if rng.rand() < 0.18 else 0
-        family = 1 if rng.rand() < 0.22 else 0
+        family = 1 if (archetype != 'typical' and rng.rand() < 0.35) else 0
 
         features = row + [age, gender, jaundice, family]
         X_samples.append(features)
 
-        # Ground truth diagnostic labels based on heuristic rules
-        y_dict['asd'].append(1 if (f_social > 0.55 and f_sensory > 0.40) or (f_social > 0.70) else 0)
-        y_dict['adhd'].append(1 if f_executive > 0.58 else 0)
-        y_dict['dyslexia'].append(1 if (f_language > 0.60 and f_executive > 0.35) else 0)
-        y_dict['social_anxiety'].append(1 if (f_social > 0.50 and f_sensory > 0.30 and rng.rand() > 0.3) else 0)
-        y_dict['speech_delay'].append(1 if f_language > 0.55 and age <= 10 else 0)
-        y_dict['intellectual_disability'].append(1 if (f_social > 0.65 and f_executive > 0.65 and f_language > 0.65) else 0)
-        y_dict['spd'].append(1 if f_sensory > 0.55 else 0)
+        # Ground truth diagnostic labels based on clinical thresholds
+        y_dict['asd'].append(1 if (f_social >= 0.60 and f_sensory >= 0.45) or (f_social >= 0.75) else 0)
+        y_dict['adhd'].append(1 if f_executive >= 0.60 else 0)
+        y_dict['dyslexia'].append(1 if (f_language >= 0.60 and archetype in ('dyslexia', 'comorbid')) else 0)
+        y_dict['social_anxiety'].append(1 if (f_social >= 0.55 and archetype in ('social_anxiety', 'asd')) else 0)
+        y_dict['speech_delay'].append(1 if (f_language >= 0.58 and archetype in ('speech_delay', 'comorbid')) else 0)
+        y_dict['intellectual_disability'].append(1 if (archetype == 'intellectual_disability' or (f_social >= 0.65 and f_executive >= 0.65 and f_language >= 0.65)) else 0)
+        y_dict['spd'].append(1 if f_sensory >= 0.60 else 0)
 
     X = np.array(X_samples, dtype=np.float32)
     return X, y_dict
@@ -159,7 +186,7 @@ def train_multi_disorder_models():
     artifacts_dir = os.path.join(os.path.dirname(__file__), '../artifacts')
     os.makedirs(artifacts_dir, exist_ok=True)
 
-    X, y_dict = generate_heuristic_cohort(num_samples=800, random_state=42)
+    X, y_dict = generate_heuristic_cohort(num_samples=1200, random_state=42)
     print(f"Generated heuristic prototype cohort: {X.shape[0]} profiles with {X.shape[1]} features.")
 
     trained_suite = {}

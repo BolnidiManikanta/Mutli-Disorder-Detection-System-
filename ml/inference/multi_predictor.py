@@ -167,6 +167,146 @@ def load_multi_artifacts():
 
     return _CACHED_MULTI_MODELS, _CACHED_MULTI_SCALER, _CACHED_MULTI_METRICS
 
+def map_questionnaire_answers(answers_dict):
+    """
+    Translates questionnaire answers from assess.html / predict.html / APIs
+    into standard 0.0-3.0 symptom severity scores for all 22 ALL_QUESTION_KEYS.
+    Accurately maps both option indices (0-4) from adaptive questionnaires and
+    direct continuous symptom ratings (0.0 to 3.0).
+    """
+    mapped = {k: 0.0 for k in ALL_QUESTION_KEYS}
+    if not isinstance(answers_dict, dict):
+        return mapped
+
+    def set_val(k, v):
+        if k in mapped:
+            mapped[k] = max(mapped[k], min(3.0, float(v)))
+
+    # Check if inputs already provide direct canonical severity scores (floats > 0 or specific keys)
+    direct_keys = set(answers_dict.keys()) & set(ALL_QUESTION_KEYS)
+    has_direct_canonical = len(direct_keys) >= 3
+
+    for k, v in answers_dict.items():
+        if v is None:
+            continue
+        try:
+            val_num = float(v)
+        except (ValueError, TypeError):
+            continue
+
+        # If already directly specifying canonical question severity (0.0 to 3.0 scale)
+        if has_direct_canonical and k in mapped:
+            set_val(k, val_num)
+            continue
+
+        # ADAPTIVE_QUESTIONS mapping (handling choice indices 0-4)
+        if k == 'q_eye_contact':
+            # 0: Avoids completely -> 3.0, 4: Always comfortable -> 0.0
+            set_val('q_eye_contact', (4.0 - min(4.0, val_num)) / 4.0 * 3.0)
+        elif k == 'q_social_interaction' or k == 'q_social_reciprocity':
+            # 0: Completely withdrawn -> 3.0, 4: Very social -> 0.0
+            s = (4.0 - min(4.0, val_num)) / 4.0 * 3.0 if val_num <= 4.0 and not has_direct_canonical else val_num
+            set_val('q_social_reciprocity', s)
+            set_val('q_peer_interaction', s)
+        elif k == 'q_attention_span' or k == 'q_sustained_attention':
+            # 0: <2 mins -> 3.0, 4: 30+ mins -> 0.0
+            s = (4.0 - min(4.0, val_num)) / 4.0 * 3.0 if val_num <= 4.0 and not has_direct_canonical else val_num
+            set_val('q_sustained_attention', s)
+        elif k == 'q_repetitive_behavior' or k == 'q_repetitive':
+            # 0: Never -> 0.0, 4: Always -> 3.0
+            s = min(4.0, val_num) / 4.0 * 3.0 if val_num <= 4.0 and not has_direct_canonical else val_num
+            set_val('q_repetitive', s)
+        elif k == 'q_sensory_response':
+            if val_num == 0:
+                set_val('q_sensory_hyper', 3.0)
+            elif val_num == 1:
+                set_val('q_sensory_hyper', 2.2)
+            elif val_num == 3:
+                set_val('q_sensory_hypo', 2.2)
+            elif val_num == 4:
+                set_val('q_sensory_hyper', 2.0)
+                set_val('q_sensory_hypo', 2.6)
+            else:
+                set_val('q_sensory_hyper', 0.2)
+        elif k == 'q_language_development':
+            s = (4.0 - min(4.0, val_num)) / 4.0 * 3.0
+            set_val('q_speech_onset', s)
+            set_val('q_vocabulary', s)
+            set_val('q_articulation', s)
+        elif k == 'q_reading':
+            set_val('q_reading_fluency', (4.0 - min(4.0, val_num)) / 4.0 * 3.0)
+        elif k == 'q_hyperactivity':
+            s = 3.0 if val_num == 0 else 2.4 if val_num == 1 else 1.4 if val_num == 2 else 0.2 if val_num == 3 else 0.0
+            set_val('q_hyperactivity', s)
+        elif k == 'q_emotional_regulation':
+            set_val('q_impulsivity', (4.0 - min(4.0, val_num)) / 4.0 * 3.0)
+        elif k == 'q_routine':
+            set_val('q_routine_rigidity', (4.0 - min(4.0, val_num)) / 4.0 * 3.0)
+        elif k == 'q_special_interests':
+            set_val('q_special_interests', min(4.0, val_num) / 4.0 * 3.0)
+        elif k == 'q_anxiety_social' or k == 'q_social_fear':
+            s = (4.0 - min(4.0, val_num)) / 4.0 * 3.0 if val_num <= 4.0 and not has_direct_canonical else val_num
+            set_val('q_social_fear', s)
+        elif k == 'q_play_imaginative':
+            s = (4.0 - min(4.0, val_num)) / 4.0 * 3.0
+            set_val('q_social_reciprocity', s)
+            set_val('q_abstract_reasoning', s * 0.7)
+        elif k == 'q_pointing':
+            s = (4.0 - min(4.0, val_num)) / 4.0 * 3.0
+            set_val('q_social_reciprocity', s)
+            set_val('q_developmental_milestones', s)
+        elif k == 'q_babbling':
+            s = 3.0 if val_num == 0 else 0.0
+            set_val('q_speech_onset', s)
+            set_val('q_developmental_milestones', s)
+        elif k == 'q_response_name':
+            s = (4.0 - min(4.0, val_num)) / 4.0 * 3.0
+            set_val('q_social_reciprocity', s)
+            set_val('q_developmental_milestones', s)
+        elif k == 'q_joint_attention':
+            s = (4.0 - min(4.0, val_num)) / 4.0 * 3.0
+            set_val('q_social_reciprocity', s)
+            set_val('q_developmental_milestones', s)
+        elif k == 'q_friendships':
+            s = (4.0 - min(4.0, val_num)) / 4.0 * 3.0
+            set_val('q_peer_interaction', s)
+        elif k == 'q_academic':
+            s = (4.0 - min(4.0, val_num)) / 4.0 * 3.0
+            set_val('q_organization', s)
+            set_val('q_abstract_reasoning', s)
+        elif k == 'q_letters_reversal':
+            s = min(4.0, val_num) / 4.0 * 3.0
+            set_val('q_phonological', s)
+            set_val('q_spelling', s)
+        elif k == 'q_social_media':
+            s = (4.0 - min(4.0, val_num)) / 4.0 * 2.8
+            set_val('q_social_fear', s)
+        elif k == 'q_independence':
+            s = (4.0 - min(4.0, val_num)) / 4.0 * 3.0
+            set_val('q_adaptive_functioning', s)
+        elif k in mapped:
+            set_val(k, val_num)
+
+    # Impute missing questions within closely aligned functional clusters
+    clusters = {
+        'executive': ['q_sustained_attention', 'q_impulsivity', 'q_hyperactivity', 'q_organization'],
+        'asd_social': ['q_social_reciprocity', 'q_eye_contact', 'q_peer_interaction'],
+        'speech': ['q_speech_onset', 'q_vocabulary', 'q_articulation'],
+        'reading': ['q_reading_fluency', 'q_phonological', 'q_spelling'],
+        'sensory': ['q_sensory_hyper', 'q_repetitive', 'q_routine_rigidity'],
+        'adaptive': ['q_adaptive_functioning', 'q_abstract_reasoning', 'q_developmental_milestones']
+    }
+    for cluster_name, keys in clusters.items():
+        active = [mapped[k] for k in keys if mapped[k] > 0]
+        if active:
+            avg_score = sum(active) / len(active)
+            for k in keys:
+                if mapped[k] == 0.0:
+                    # Impute unobserved items in the same cluster proportionally
+                    mapped[k] = round(avg_score * 0.75, 2)
+
+    return mapped
+
 def predict_multi_disorder(answers_dict, demographics_dict=None):
     """
     Evaluates 7 conditions for a patient profile.
@@ -180,17 +320,9 @@ def predict_multi_disorder(answers_dict, demographics_dict=None):
     jaundice = 1 if demographics_dict.get('jaundice') in (True, 1, 'yes', 'true') else 0
     family = 1 if demographics_dict.get('family_history', demographics_dict.get('family', 0)) in (True, 1, 'yes', 'true') else 0
 
-    # Build input feature vector
-    q_vector = []
-    for q in ALL_QUESTION_KEYS:
-        # Check if question answer provided in answers_dict (mapped by id or key)
-        val = answers_dict.get(q, 0)
-        # If passed as string or object, convert safely
-        try:
-            val_num = float(val)
-        except:
-            val_num = 0.0
-        q_vector.append(val_num)
+    # Translate inputs into canonical question keys with proper clinical scaling
+    mapped_answers = map_questionnaire_answers(answers_dict)
+    q_vector = [mapped_answers.get(q, 0.0) for q in ALL_QUESTION_KEYS]
 
     feature_vector = np.array(q_vector + [age, gender, jaundice, family], dtype=np.float32).reshape(1, -1)
     feature_scaled = scaler.transform(feature_vector) if scaler is not None else feature_vector
@@ -209,8 +341,27 @@ def predict_multi_disorder(answers_dict, demographics_dict=None):
         prob_rf = float(rf_m.predict_proba(feature_vector)[0, 1])
         prob_gb = float(gb_m.predict_proba(feature_vector)[0, 1])
 
-        # Calibrated ensemble
-        ens_prob = float(0.40 * prob_rf + 0.40 * prob_gb + 0.20 * prob_lr)
+        # Machine learning ensemble
+        ml_prob = float(0.40 * prob_rf + 0.40 * prob_gb + 0.20 * prob_lr)
+
+        # Core clinical domain alignment (DSM-5 / ICD-11 symptom criteria)
+        core_keys = defs.get('core_questions', [])
+        core_vals = [mapped_answers.get(ck, 0.0) for ck in core_keys if ck in mapped_answers]
+        core_mean = (sum(core_vals) / len(core_vals)) if core_vals else 0.0
+        core_ratio = core_mean / 3.0  # 0.0 (no symptoms) to 1.0 (severe symptoms)
+
+        if core_ratio >= 0.65:
+            # Clinical threshold reached for this disorder's symptom cluster
+            clinical_base = 0.60 + 0.35 * ((core_ratio - 0.65) / 0.35)
+            ens_prob = max(ml_prob, float(0.50 * ml_prob + 0.50 * clinical_base))
+        elif core_ratio <= 0.22:
+            # Minimal to no core symptoms
+            ens_prob = min(ml_prob, float(0.45 * ml_prob + 0.55 * (core_ratio * 0.4)))
+        else:
+            # Intermediate / moderate symptom range
+            ens_prob = float(0.55 * ml_prob + 0.45 * (0.25 + 0.40 * ((core_ratio - 0.22) / 0.43)))
+
+        ens_prob = float(np.clip(ens_prob, 0.005, 0.985))
 
         # Risk level
         if ens_prob >= 0.70:
@@ -285,22 +436,37 @@ def predict_multi_disorder(answers_dict, demographics_dict=None):
 
     # Doctor Narrative
     primary_meta = DISORDER_DEFS[primary_id]
-    doc_narrative = (
-        f"Clinical Evaluation Summary for {demographics_dict.get('name', 'Patient')}:\n\n"
-        f"Based on the multi-disciplinary screening questionnaire and demographic profile, "
-        f"the ensemble ML diagnostic model indicates a **{results[primary_id]['riskLevel']} Risk** "
-        f"({results[primary_id]['probability_pct']}%) profile consistent with **{primary_meta['name']} ({primary_meta['icd']})**.\n\n"
-        f"Key Contributing Observations:\n"
-    )
-    for f in shap_factors[:4]:
-        doc_narrative += f"• **{f['feature']}**: {f['impact']} (SHAP weight: {f['shap_value']:+.2f})\n"
+    patient_name = demographics_dict.get('name', 'Individual')
+    top_prob = results[primary_id]['probability']
 
-    if co_occurring:
-        doc_narrative += f"\nPotential Co-occurring Patterns Detected:\n"
-        for c in co_occurring:
-            doc_narrative += f"• Elevated risk indicators noted for **{c['name']}** ({int(c['probability']*100)}% likelihood).\n"
+    if top_prob < 0.25:
+        doc_narrative = (
+            f"Clinical Evaluation Summary for {patient_name}:\n\n"
+            f"Based on the multi-disciplinary screening questionnaire and developmental profile, "
+            f"all 7 assessed domains fall within **Typical Development (Minimal Risk)** limits "
+            f"(highest domain: {primary_meta['name']} at {results[primary_id]['probability_pct']}%).\n\n"
+            f"Key Observations:\n"
+            f"• Social reciprocity, communicative eye contact, and emotional regulation align with standard developmental milestones.\n"
+            f"• No significant behavioral flags for ASD, ADHD, Dyslexia, or other evaluated conditions were identified.\n\n"
+            f"Recommended Action: Standard routine pediatric developmental monitoring and age-appropriate learning enrichment."
+        )
+    else:
+        doc_narrative = (
+            f"Clinical Evaluation Summary for {patient_name}:\n\n"
+            f"Based on the multi-disciplinary screening questionnaire and demographic profile, "
+            f"the ensemble ML diagnostic model indicates a **{results[primary_id]['riskLevel']} Risk** "
+            f"({results[primary_id]['probability_pct']}%) profile consistent with **{primary_meta['name']} ({primary_meta['icd']})**.\n\n"
+            f"Key Contributing Observations:\n"
+        )
+        for f in shap_factors[:4]:
+            doc_narrative += f"• **{f['feature']}**: {f['impact']} (SHAP weight: {f['shap_value']:+.2f})\n"
 
-    doc_narrative += "\nRecommended Action: Comprehensive in-person evaluation by a qualified specialist."
+        if co_occurring:
+            doc_narrative += f"\nPotential Co-occurring Patterns Detected:\n"
+            for c in co_occurring:
+                doc_narrative += f"• Elevated risk indicators noted for **{c['name']}** ({int(c['probability']*100)}% likelihood).\n"
+
+        doc_narrative += "\nRecommended Action: Comprehensive in-person evaluation by a qualified specialist."
 
     return {
         'status': 'RESEARCH_PROTOTYPE',
