@@ -6,16 +6,57 @@
   <link rel="stylesheet" href="../css/main.css"/>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
+    html, body {
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .navbar {
+      flex-shrink: 0;
+    }
     .chat-wrapper {
+      flex: 1;
       height: calc(100vh - var(--nav-h));
+      min-height: 0;
       display: grid; grid-template-columns: 300px 1fr;
+      overflow: hidden;
     }
     @media(max-width:768px){.chat-wrapper{grid-template-columns:1fr}.chat-sidebar{display:none}}
+
+    /* Hide any global footer on this full-height clinical workspace */
+    footer.footer, .footer, #footer-ph {
+      display: none !important;
+      height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    /* Position the AI Assistant launcher neatly above the input row */
+    .ns-bot-launcher {
+      bottom: 84px !important;
+      right: 24px !important;
+      z-index: 9999 !important;
+    }
+    .ns-bot-window {
+      bottom: 84px !important;
+      z-index: 10000 !important;
+    }
 
     /* Sidebar */
     .chat-sidebar {
       background: linear-gradient(160deg, #0a1628 0%, #1a2d4a 100%);
       color: #fff; display: flex; flex-direction: column; overflow: hidden;
+      height: 100%; min-height: 0;
     }
     .chat-sidebar-header { padding: 24px 20px 16px; border-bottom: 1px solid rgba(255,255,255,.1); }
     .doctor-avatar {
@@ -53,10 +94,10 @@
     .capability-icon { font-size: .9rem; flex-shrink: 0; }
 
     /* Chat area */
-    .chat-main { display: flex; flex-direction: column; background: #f8f9fb; }
+    .chat-main { display: flex; flex-direction: column; background: #f8f9fb; height: 100%; min-height: 0; overflow: hidden; }
     .chat-topbar {
       padding: 14px 24px; background: #fff; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 14px;
+      display: flex; align-items: center; gap: 14px; flex-shrink: 0;
     }
     .chat-topbar-avatar {
       width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #2d6a4f, #52b788);
@@ -64,7 +105,7 @@
     }
     .chat-topbar-info h3 { font-size: .9rem; font-weight: 800; margin: 0 0 1px; }
     .chat-topbar-info p { font-size: .72rem; color: var(--muted); margin: 0; }
-    .chat-topbar-actions { margin-left: auto; display: flex; gap: 8px; }
+    .chat-topbar-actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
     .topbar-btn {
       padding: 7px 14px; border-radius: var(--r-sm); border: 1.5px solid var(--border);
       background: #fff; font-size: .75rem; font-weight: 700; cursor: pointer; color: var(--text);
@@ -73,7 +114,7 @@
     .topbar-btn:hover { border-color: var(--primary); color: var(--primary); }
 
     /* Messages */
-    .chat-messages { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; min-height: 0; }
     
     .msg { display: flex; gap: 10px; max-width: 80%; }
     .msg.user { align-self: flex-end; flex-direction: row-reverse; }
@@ -210,9 +251,10 @@
     }
   </style>
 </head>
-<body>
+<body data-no-footer="true">
 <div id="nav-ph"></div>
 <script type="module" src="../js/shared.js"></script>
+<script defer src="../js/ai-bot.js"></script>
 
 <div class="chat-wrapper">
   <!-- SIDEBAR -->
@@ -272,6 +314,7 @@
         <p>Pediatric Neurodevelopment Specialist · Powered by Google Gemini</p>
       </div>
       <div class="chat-topbar-actions">
+        <button class="topbar-btn" id="openAiAssistantBtn" onclick="window.nsToggleBot ? window.nsToggleBot(true) : document.getElementById('nsBotLauncher')?.click()" style="display:inline-flex;align-items:center;gap:6px;background:rgba(45,106,79,.08);color:var(--primary);border-color:var(--primary)" title="Open AI Assistant Copilot">🤖 AI Assistant</button>
         <button class="topbar-btn" id="toggleCaseBuilderBtn" onclick="toggleCaseBuilder()">📋 Case Builder</button>
         <button class="topbar-btn" onclick="window.location.href='assess.html'">🧠 Take Assessment</button>
         <button class="topbar-btn" onclick="exportChat()">📥 Export</button>
@@ -388,6 +431,9 @@ try {
   }
 } catch(e) {}
 
+// Initialize welcome message immediately so the interface is never blank
+showWelcome();
+
 // Load history on auth
 onAuthChange(async user => {
   if (user) {
@@ -400,7 +446,6 @@ onAuthChange(async user => {
       }
     } catch(e) {}
   }
-  showWelcome();
 });
 
 function renderAllMessages() {
@@ -453,15 +498,19 @@ window.sendMessage = async function(overrideText = null) {
   isTyping = true;
 
   try {
+    const controller = new AbortController();
+    const clientTimer = setTimeout(() => controller.abort(), 25000);
+
     const response = await fetch('/api/doctor-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
       body: JSON.stringify({
-        messages: conversationHistory.slice(-15),
+        messages: conversationHistory.slice(-6),
         language: currentLang,
         patientContext: activePatientContext
       }),
-    });
+    }).finally(() => clearTimeout(clientTimer));
 
     const data = await response.json();
     const reply = data.reply || 'I am here to assist with developmental inquiries. What specific concerns are you noticing?';
@@ -528,7 +577,7 @@ function appendMessage(msg, isWelcome = false, index = null) {
         <button class="msg-action-btn" title="Read aloud" onclick="speakMessage('${msgId}')">
           <span id="${msgId}-icon">🔊</span> Read
         </button>
-        <button class="msg-action-btn" title="Copy text" onclick="copyMessageText('${msgId}')">
+        <button class="msg-action-btn" title="Copy text" onclick="copyMessageText('${msgId}', this)">
           📋 Copy
         </button>
       </div>
@@ -560,15 +609,40 @@ function appendMessage(msg, isWelcome = false, index = null) {
 
 function formatMessage(text) {
   if (!text) return '';
-  return text
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/^• (.+)$/gm, '<li>$1</li>')
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br>')
-    .replace(/^(.+)$/, '<p>$1</p>');
+  let safe = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  safe = safe.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+  const lines = safe.split('\n');
+  let inList = false;
+  const out = [];
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (line.startsWith('• ') || line.startsWith('- ') || line.startsWith('* ')) {
+      if (!inList) {
+        out.push('<ul style="margin:6px 0;padding-left:20px">');
+        inList = true;
+      }
+      out.push(`<li>${line.replace(/^[•\-\*]\s*/, '')}</li>`);
+    } else {
+      if (inList) {
+        out.push('</ul>');
+        inList = false;
+      }
+      if (line === '') {
+        out.push('<div style="height:6px"></div>');
+      } else {
+        out.push(`<p style="margin:4px 0">${line}</p>`);
+      }
+    }
+  }
+  if (inList) out.push('</ul>');
+  return out.join('');
 }
 
 function showTypingIndicator() {
@@ -723,15 +797,17 @@ function speakMessage(msgId) {
   window.speechSynthesis.speak(utterance);
 }
 
-function copyMessageText(msgId) {
+function copyMessageText(msgId, btnElement = null) {
   const el = document.getElementById(msgId);
   if (!el) return;
   navigator.clipboard.writeText(el.innerText).then(() => {
-    const btn = event.currentTarget;
-    const oldText = btn.innerHTML;
-    btn.innerHTML = '✓ Copied';
-    setTimeout(() => { btn.innerHTML = oldText; }, 1800);
-  });
+    const btn = btnElement || (typeof event !== 'undefined' ? event.currentTarget : null);
+    if (btn) {
+      const oldText = btn.innerHTML;
+      btn.innerHTML = '✓ Copied';
+      setTimeout(() => { btn.innerHTML = oldText; }, 1800);
+    }
+  }).catch(() => {});
 }
 
 // ── CASE BUILDER LOGIC ────────────────────────────────────────
@@ -787,6 +863,15 @@ window.autoResize = function(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 };
+
+// Defensive removal of any footer element in doctor-chat
+function removeAnyFooters() {
+  document.querySelectorAll('footer, .footer, #footer-ph').forEach(f => f.remove());
+}
+removeAnyFooters();
+document.addEventListener('DOMContentLoaded', removeAnyFooters);
+setTimeout(removeAnyFooters, 100);
+setTimeout(removeAnyFooters, 500);
 </script>
 </body>
 </html>

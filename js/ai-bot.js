@@ -5,15 +5,24 @@
 // ================================================================
 
 (function initAIAssistantBot() {
-  if (document.getElementById('neuroscan-ai-bot-root')) return;
+  function mountBot() {
+    if (document.getElementById('neuroscan-ai-bot-root')) return;
+    if (!document.body) {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', mountBot);
+      } else {
+        setTimeout(mountBot, 30);
+      }
+      return;
+    }
 
-  const isRoot = !window.location.pathname.includes('/pages/');
-  const root = isRoot ? '' : '../';
+    const isRoot = !window.location.pathname.includes('/pages/');
+    const root = isRoot ? '' : '../';
 
-  // 1. Inject Styles
-  const style = document.createElement('style');
-  style.id = 'neuroscan-bot-styles';
-  style.textContent = `
+    // 1. Inject Styles
+    const style = document.createElement('style');
+    style.id = 'neuroscan-bot-styles';
+    style.textContent = `
     /* Floating Launcher Button */
     .ns-bot-launcher {
       position: fixed;
@@ -720,11 +729,20 @@
   renderBotMessages();
 
   // Launcher toggle
-  launcher.addEventListener('click', () => {
-    windowEl.classList.toggle('open');
-    if (windowEl.classList.contains('open')) {
-      setTimeout(() => inputEl.focus(), 150);
+  window.nsToggleBot = function(forceState) {
+    if (!windowEl) return;
+    if (typeof forceState === 'boolean') {
+      windowEl.classList.toggle('open', forceState);
+    } else {
+      windowEl.classList.toggle('open');
     }
+    if (windowEl.classList.contains('open')) {
+      setTimeout(() => inputEl && inputEl.focus(), 150);
+    }
+  };
+
+  launcher.addEventListener('click', () => {
+    window.nsToggleBot();
   });
 
   closeBtn.addEventListener('click', () => {
@@ -764,11 +782,15 @@
     isBotTyping = true;
 
     try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 25000);
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: botHistory.slice(-10) }),
-      });
+        signal: controller.signal,
+        body: JSON.stringify({ messages: botHistory.slice(-5) }),
+      }).finally(() => clearTimeout(timer));
 
       const data = await res.json();
       removeBotTyping();
@@ -834,15 +856,40 @@
 
   function formatBotMarkdown(t) {
     if (!t) return '';
-    return t
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      .replace(/^• (.+)$/gm, '<li>$1</li>')
-      .replace(/^- (.+)$/gm, '<li>$1</li>')
-      .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
-      .replace(/\n\n/g, '</p><p>')
-      .replace(/\n/g, '<br>')
-      .replace(/^(.+)$/, '<p>$1</p>');
+    let safe = t
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    safe = safe.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+    const lines = safe.split('\n');
+    let inList = false;
+    const out = [];
+
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+      if (line.startsWith('• ') || line.startsWith('- ') || line.startsWith('* ')) {
+        if (!inList) {
+          out.push('<ul style="margin:4px 0;padding-left:18px">');
+          inList = true;
+        }
+        out.push(`<li>${line.replace(/^[•\-\*]\s*/, '')}</li>`);
+      } else {
+        if (inList) {
+          out.push('</ul>');
+          inList = false;
+        }
+        if (line === '') {
+          out.push('<div style="height:6px"></div>');
+        } else {
+          out.push(`<p style="margin:3px 0">${line}</p>`);
+        }
+      }
+    }
+    if (inList) out.push('</ul>');
+    return out.join('');
   }
 
   function showBotTyping() {
@@ -983,5 +1030,7 @@
       desc.textContent = 'Significant indicators identified across gaze, speech, or repetitive patterns. We recommend a full clinical screening and pediatric consultation.';
     }
   }
+}
 
+  mountBot();
 })();

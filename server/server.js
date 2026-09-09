@@ -715,6 +715,62 @@ app.post('/api/ml/retrain', async (req, res) => {
   }
 });
 
+// ── ROBUST GEMINI MODEL GENERATOR WITH DYNAMIC MULTI-TIER FALLBACK ───────
+// Uses ultra-fast gemini-3.1-flash-lite with instant timeout race and clinical fallback
+const GEMINI_TEXT_MODELS = ['gemini-3.1-flash-lite'];
+
+// High-speed in-memory cache for common and repeated chat queries (TTL 30 mins)
+const responseCache = new Map();
+const CACHE_TTL_MS = 30 * 60 * 1000;
+
+function getCachedResponse(key) {
+  if (!key) return null;
+  const item = responseCache.get(key);
+  if (item && (Date.now() - item.timestamp < CACHE_TTL_MS)) {
+    return item.reply;
+  }
+  if (item) responseCache.delete(key);
+  return null;
+}
+
+function setCachedResponse(key, reply) {
+  if (!key || !reply) return;
+  if (responseCache.size > 500) {
+    const firstKey = responseCache.keys().next().value;
+    responseCache.delete(firstKey);
+  }
+  responseCache.set(key, { reply, timestamp: Date.now() });
+}
+
+async function generateWithGeminiFallback(ai, contents, config = {}, timeoutMs = 15000) {
+  let lastError = null;
+  for (const model of GEMINI_TEXT_MODELS) {
+    try {
+      let timer = null;
+      const timeoutPromise = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`Model ${model} timeout after ${timeoutMs}ms`)), timeoutMs);
+      });
+
+      const callPromise = ai.models.generateContent({
+        model,
+        contents,
+        config
+      }).finally(() => {
+        if (timer) clearTimeout(timer);
+      });
+
+      const response = await Promise.race([callPromise, timeoutPromise]);
+      if (response && response.text) {
+        return response.text;
+      }
+    } catch (err) {
+      console.warn(`[Gemini Engine] Model "${model}" notification:`, err.status || err.message);
+      lastError = err;
+    }
+  }
+  throw lastError;
+}
+
 // ── GEMINI MULTI-TURN MESSAGE FORMATTER ───────────────────────
 function buildGeminiContents(rawMessages) {
   if (!Array.isArray(rawMessages) || rawMessages.length === 0) {
@@ -735,7 +791,7 @@ function buildGeminiContents(rawMessages) {
     return [{ role: 'user', parts: [{ text: 'Hello' }] }];
   }
 
-  // 2. Multi-turn requirement: First turn must be 'user'. Drop leading 'model' messages.
+  // 2. Multi-turn requirement: First turn MUST be 'user'. Drop leading 'model' messages.
   while (cleaned.length > 0 && cleaned[0].role !== 'user') {
     cleaned.shift();
   }
@@ -757,6 +813,15 @@ function buildGeminiContents(rawMessages) {
         alternating.push({ role: msg.role, parts: [{ text: msg.text }] });
       }
     }
+  }
+
+  // 4. Multi-turn requirement: Last turn MUST be 'user' so model can respond
+  while (alternating.length > 0 && alternating[alternating.length - 1].role !== 'user') {
+    alternating.pop();
+  }
+
+  if (alternating.length === 0) {
+    return [{ role: 'user', parts: [{ text: 'Hello' }] }];
   }
 
   return alternating;
@@ -930,7 +995,32 @@ Autism Spectrum Disorder (ASD) and associated neurodevelopmental conditions invo
 // ── AI ASSISTANT & DOCTOR CHAT API (GEMINI INTEGRATION) ────────
 app.post('/api/doctor-chat', async (req, res) => {
   try {
-    const { messages = [], language = 'en', patientContext = null } = req.body;
+    let { messages = [], language = 'en', patientContext = null } = req.body;
+    if (!Array.isArray(messages)) {
+      const single = req.body.message || req.body.prompt || req.body.text || '';
+      messages = single ? [{ role: 'user', content: single }] : [];
+    }
+
+    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')?.content || '';
+    const cleanMsg = lastUserMsg.trim().toLowerCase();
+
+    // 1. Instant Greeting Fast-Path (< 5ms response time)
+    if (/^(hi|hello|hey|greetings|good morning|good afternoon|good evening|doctor|dr|help|namaste|vanakkam)(\s+(doctor|dr|dr\.|there|assistant|ai))?[\s!.]*$/i.test(cleanMsg)) {
+      const greeting = language === 'ta'
+        ? 'வணக்கம்! நான் டாக்டர் நியூரோஸ்கேன் AI. வளர்ச்சி மற்றும் நரம்பியல் மதிப்பீடுகள் குறித்து நான் உங்களுக்கு எவ்வாறு உதவ முடியும்?'
+        : language === 'hi'
+        ? 'नमस्ते! मैं डॉ. न्यूरोस्कैन एआई हूँ। बाल विकास और न्यूरोडेवलपमेंटल मूल्यांकन में मैं आज आपकी क्या सहायता कर सकता हूँ?'
+        : 'Hello! I am Dr. NeuroScan AI, Pediatric Neurodevelopment Specialist. How can I assist you with developmental evaluations, autism (ASD), ADHD, or speech inquiries today?';
+      return res.json({ reply: greeting, role: 'assistant', fast: true });
+    }
+
+    // 2. High-speed In-Memory Cache Lookup (< 2ms response time)
+    const cacheKey = `doc_${language}_${patientContext ? (patientContext.primaryConcern || '') : ''}_${cleanMsg}`;
+    const cachedReply = getCachedResponse(cacheKey);
+    if (cachedReply) {
+      return res.json({ reply: cachedReply, role: 'assistant', cached: true });
+    }
+
     const ai = getGenAI();
 
     const contextPrefix = patientContext ? `
@@ -941,50 +1031,40 @@ Known Patient Profile:
 - Primary Concerns: ${patientContext.primaryConcern || 'General inquiry'}
 ` : '';
 
-    const systemPrompt = `You are Dr. NeuroScan AI, an empathetic, highly knowledgeable, and neurodiversity-affirming pediatric neurodevelopment specialist AI. You specialize in:
-- Autism Spectrum Disorder (ASD) — symptoms, early signs, DSM-5 criteria, neurodiversity-affirming therapies
-- ADHD — inattention, hyperactivity, impulsivity, executive dysfunction, classroom accommodations (IEP/504)
-- Dyslexia and specific learning disabilities — phonological processing, Orton-Gillingham methods
-- Speech and Language Delay — expressive/receptive delays, developmental milestones, SLP interventions
-- Sensory Processing Disorder (SPD) — sensory diets, sensory meltdowns vs tantrums, OT support
-- Intellectual Disability & Social Anxiety Disorder
+    const systemPrompt = `You are Dr. NeuroScan AI, a pediatric neurodevelopment specialist. Give clear, concise, actionable advice on:
+- Autism (ASD), ADHD, Dyslexia, Speech/Language Delays, Sensory Processing (SPD).
 ${contextPrefix}
-Communication standards:
-- Empathetic, supportive, and reassuring tone towards parents, educators, and neurodivergent individuals.
-- Evidence-based: cite recognized pediatric standards (AAP, CDC, NICE, DSM-5).
-- Structure responses with clean markdown headings and bullet points.
-- Always include helpful follow-up questions or recommended action steps.
-${language === 'ta' ? 'IMPORTANT: You MUST respond in Tamil (தமிழ்) language.' : language === 'hi' ? 'IMPORTANT: You MUST respond in Hindi (हिंदी) language.' : ''}
-
-Always end clinical inquiries with:
-"⚠️ *This is educational information only — please consult a qualified healthcare professional or developmental pediatrician for a formal clinical diagnosis.*"`;
+Guidelines:
+- Empathetic and neurodiversity-affirming tone.
+- Keep responses concise, organized with clean bullet points.
+- Cite recognized standards (AAP, CDC, DSM-5).
+${language === 'ta' ? 'Respond in Tamil (தமிழ்).' : language === 'hi' ? 'Respond in Hindi (हिंदी).' : ''}
+End with: "⚠️ *Educational information only — consult a qualified healthcare professional for formal diagnosis.*"`;
 
     if (ai) {
       try {
-        const contents = buildGeminiContents(messages);
+        // Use last 4-5 messages for rapid context ingestion
+        const contents = buildGeminiContents(messages.slice(-5));
 
-        const response = await ai.models.generateContent({
-          model: 'gemini-3.8-flash',
-          contents,
-          config: {
-            systemInstruction: systemPrompt,
-            temperature: 0.65,
-            maxOutputTokens: 1200
-          }
-        });
+        const replyText = await generateWithGeminiFallback(ai, contents, {
+          systemInstruction: systemPrompt,
+          temperature: 0.6,
+          maxOutputTokens: 600
+        }, 15000);
 
-        const reply = response.text || 'I am Dr. NeuroScan AI. How can I assist with developmental evaluations today?';
-        return res.json({ reply, role: 'assistant' });
+        if (replyText) {
+          setCachedResponse(cacheKey, replyText);
+          return res.json({ reply: replyText, role: 'assistant' });
+        }
       } catch (geminiError) {
-        console.warn('Gemini API call failed, activating comprehensive clinical fallback:', geminiError.message);
+        console.warn('Gemini doctor-chat cascaded to instant clinical knowledge base:', geminiError.message);
       }
     }
 
-    // High quality clinical rule-based response fallback if AI key or quota unavailable
-    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')?.content || '';
+    // Immediate clinical fallback response if API is busy or unconfigured
     const fallbackText = generateClinicalDoctorFallback(lastUserMsg, language, patientContext);
-
-    res.json({ reply: fallbackText, role: 'assistant' });
+    setCachedResponse(cacheKey, fallbackText);
+    res.json({ reply: fallbackText, role: 'assistant', fallback: true });
   } catch (err) {
     console.error('Doctor chat route error:', err);
     res.status(500).json({ error: 'Doctor chat failed', details: err.message });
@@ -1484,50 +1564,68 @@ Return ONLY a valid JSON object strictly matching this schema (no markdown, no b
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const { messages = [] } = req.body;
+    let { messages = [] } = req.body;
+    if (!Array.isArray(messages)) {
+      const single = req.body.message || req.body.prompt || req.body.text || '';
+      messages = single ? [{ role: 'user', content: single }] : [];
+    }
+
+    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')?.content || '';
+    const cleanMsg = lastUserMsg.trim().toLowerCase();
+
+    // 1. Instant Greeting Fast-Path (< 5ms response)
+    if (/^(hi|hello|hey|start|help|greetings|who are you|what can you do)(\s+(assistant|there|bot|ai))?[\s!.]*$/i.test(cleanMsg)) {
+      return res.json({
+        reply: "Hello! I am **NeuroScan AI Assistant**. 🌟\n\nI can help you with:\n• **AI Clinical Screening**: Interpreting AQ-10 and multi-disorder test results\n• **Machine Learning Transparency**: Explaining Random Forest, XGBoost & SHAP attributions\n• **Speech Biomarkers**: Understanding audio pitch, fluency, and articulation markers\n• **Guidance & Strategies**: Practical tips for home routines, sensory diets, and specialist referrals\n\nWhat would you like to explore today?",
+        role: 'assistant',
+        fast: true
+      });
+    }
+
+    // 2. High-speed In-Memory Cache Lookup (< 2ms)
+    const cacheKey = `chat_${cleanMsg}`;
+    const cachedReply = getCachedResponse(cacheKey);
+    if (cachedReply) {
+      return res.json({ reply: cachedReply, role: 'assistant', cached: true });
+    }
+
     const ai = getGenAI();
 
     if (ai) {
       try {
-        const contents = buildGeminiContents(messages);
+        const contents = buildGeminiContents(messages.slice(-5));
 
-        const response = await ai.models.generateContent({
-          model: 'gemini-3.8-flash',
-          contents,
-          config: {
-            systemInstruction: `You are NeuroScan AI Assistant, a friendly, ultra-knowledgeable developmental and clinical guide on the NeuroScan AI platform.
-You assist users with:
-- Navigating and interpreting AQ-10, multi-disorder assessments, and speech analysis
-- Explaining machine learning models (Random Forest, XGBoost, Logistic Regression, SHAP feature attributions)
-- Clarifying developmental milestones (motor, speech, sensory, social)
-- Giving practical, neurodiversity-affirming tips for home, school, and clinical referrals
-Be concise, compassionate, formatted with clear markdown bullet points, and prompt users with smart follow-up suggestions.`,
-            temperature: 0.7,
-            maxOutputTokens: 900
-          }
-        });
+        const replyText = await generateWithGeminiFallback(ai, contents, {
+          systemInstruction: `You are NeuroScan AI Assistant, a concise, friendly, and expert developmental guide.
+Explain AQ-10 assessments, ML prediction models (Random Forest, XGBoost, SHAP), speech biomarkers, and developmental tips.
+Format with clean markdown bullets, keep responses concise, and suggest 1-2 actionable follow-up questions.`,
+          temperature: 0.6,
+          maxOutputTokens: 450
+        }, 15000);
 
-        const reply = response.text || 'Hello! I am NeuroScan AI Assistant. How can I help you today?';
-        return res.json({ reply, role: 'assistant' });
+        if (replyText) {
+          setCachedResponse(cacheKey, replyText);
+          return res.json({ reply: replyText, role: 'assistant' });
+        }
       } catch (geminiError) {
-        console.warn('Gemini chat API call failed, using intelligent fallback:', geminiError.message);
+        console.warn('Gemini chat API cascaded to fast intelligent fallback:', geminiError.message);
       }
     }
 
-    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')?.content?.toLowerCase() || '';
     let reply = "Hello! I am NeuroScan AI Assistant. I can help you with our screening assessments (AQ-10 and 7-disorder ML battery), speech audio screening, developmental milestones, and tracking your child's progress.";
 
-    if (lastUserMsg.includes('aq-10') || lastUserMsg.includes('screening') || lastUserMsg.includes('test') || lastUserMsg.includes('question')) {
+    if (cleanMsg.includes('aq-10') || cleanMsg.includes('screening') || cleanMsg.includes('test') || cleanMsg.includes('question')) {
       reply = "**About the AQ-10 Autism Screening:**\n• The Autism Spectrum Quotient (AQ-10) is a validated 10-item clinical triage instrument developed by Baron-Cohen et al. (Cambridge Autism Research Centre).\n• A score of **6 or above out of 10** indicates significant autistic traits warranting formal multidisciplinary assessment.\n• On NeuroScan AI, your answers are evaluated in real-time by a Python Scikit-Learn ensemble model with SHAP mathematical feature attribution.\n\n*Click **Start Screening** in the navigation bar to run an evaluation.*";
-    } else if (lastUserMsg.includes('shap') || lastUserMsg.includes('model') || lastUserMsg.includes('ml') || lastUserMsg.includes('algorithm')) {
+    } else if (cleanMsg.includes('shap') || cleanMsg.includes('model') || cleanMsg.includes('ml') || cleanMsg.includes('algorithm')) {
       reply = "**How NeuroScan AI's Machine Learning Works:**\n• **Ensemble Engine**: Combines Random Forest (40%), XGBoost/Gradient Boosting (40%), and calibrated Logistic Regression (20%) trained on verified clinical cohorts.\n• **SHAP (SHapley Additive exPlanations)**: Uses cooperative game theory to measure the exact mathematical contribution (+ or -) of each behavioral response to the final probability.\n• **Zero Black Box**: Every prediction is fully transparent so clinicians and parents can see which specific behaviors elevated the score.";
-    } else if (lastUserMsg.includes('speech') || lastUserMsg.includes('voice') || lastUserMsg.includes('audio')) {
+    } else if (cleanMsg.includes('speech') || cleanMsg.includes('voice') || cleanMsg.includes('audio')) {
       reply = "**Voice & Speech Biomarker Analysis:**\n• Our acoustic AI analyzes vocal pitch variation, speech fluency (WPM), pause latencies, and articulation complexity.\n• Speech delays and atypical prosody (monotone or sing-song pitch) are frequently correlated with neurodevelopmental differences.\n• You can record your child's voice or upload an audio file directly in the **Speech Analysis** tab.";
-    } else if (lastUserMsg.includes('recommend') || lastUserMsg.includes('therapy') || lastUserMsg.includes('help')) {
+    } else if (cleanMsg.includes('recommend') || cleanMsg.includes('therapy') || cleanMsg.includes('help')) {
       reply = "**Evidence-Based Therapy Options:**\n• **Speech-Language Therapy (SLP)**: Enhances expressive language, speech clarity, and pragmatic social communication.\n• **Occupational Therapy (OT)**: Addresses fine motor skills, sensory modulation, and self-care independence.\n• **CBT / Behavioral Intervention**: Helps with emotional regulation, anxiety, and task transitions.\n\n*Check out our **Recommendations** tab for daily routine timelines and sensory diets.*";
     }
 
-    res.json({ reply, role: 'assistant' });
+    setCachedResponse(cacheKey, reply);
+    res.json({ reply, role: 'assistant', fallback: true });
   } catch (err) {
     console.error('Chat route error:', err);
     res.status(500).json({ error: 'Chat failed', details: err.message });

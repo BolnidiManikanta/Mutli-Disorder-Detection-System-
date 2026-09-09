@@ -35,17 +35,20 @@
     .save-indicator{font-size:.72rem;color:var(--muted);text-align:center;margin-bottom:8px}
     .save-indicator.saved{color:var(--primary)}
     @media(max-width:900px){.chat-page{padding:16px 16px 70px}}
+    footer.footer, .footer { display: none !important; }
   </style>
 </head>
-<body>
+<body data-no-footer="true">
 <div id="nav-ph"></div>
+<script type="module" src="../js/shared.js"></script>
+<script defer src="../js/ai-bot.js"></script>
 
 <div class="chat-page">
   <div class="chat-hdr">
     <div class="chat-avatar">🧠</div>
     <div class="chat-hdr-info">
       <h2>ASD AI Assistant</h2>
-      <p>Powered by Claude · Answers ASD & AQ-10 questions · History saved to Firebase</p>
+      <p>Powered by Google Gemini · Answers ASD & AQ-10 questions · History saved securely</p>
     </div>
     <div style="margin-left:auto;display:flex;gap:8px">
       <button onclick="clearHistory()" class="btn btn-ghost btn-sm">🗑 Clear</button>
@@ -91,8 +94,6 @@
     <button class="chat-send" id="sendBtn" onclick="sendMessage()">➤</button>
   </div>
 </div>
-
-<div id="footer-ph"></div>
 
 <script type="module">
 import { onAuthChange, saveChatMessage, getChatHistory } from '../js/mongodb.js';

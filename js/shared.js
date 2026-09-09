@@ -53,6 +53,7 @@ window.APP = { user: null, userDoc: null };
       </li>
       <li><a class="nav-link" href="${root}pages/tracker.html">📈 Progress</a></li>
       <li><a class="nav-link" href="${root}pages/doctor-chat.html">👨‍⚕️ AI Doctor</a></li>
+      <li><a class="nav-link" href="${root}pages/chat.html">🤖 AI Assistant</a></li>
       <li><a class="nav-link" href="${root}pages/media-analysis.html">📤 Upload &amp; Detect</a></li>
       <li><a class="nav-link" href="${root}pages/dashboard.html">📊 Dashboard</a></li>
     </ul>
@@ -80,6 +81,7 @@ window.APP = { user: null, userDoc: null };
     <a href="${root}pages/assess.html">🧠 AI Clinical Screening</a>
     <a href="${root}pages/media-analysis.html">📤 Upload &amp; Detect</a>
     <a href="${root}pages/doctor-chat.html">👨‍⚕️ AI Doctor Chat</a>
+    <a href="${root}pages/chat.html">🤖 AI Assistant (ASD &amp; Copilot)</a>
     <a href="${root}pages/speech-analysis.html">🎙️ Speech AI Analysis</a>
     <a href="${root}pages/emotion-detect.html">👁️ Emotion Detection</a>
 
@@ -158,9 +160,16 @@ window.APP = { user: null, userDoc: null };
     document.body.insertAdjacentHTML('afterbegin', NAV);
   }
 
+  const isChatPage = (
+    window.location.pathname.includes('doctor-chat') ||
+    window.location.pathname.includes('chat.html') ||
+    (document.body && document.body.dataset.noFooter === 'true') ||
+    Boolean(document.querySelector('.chat-wrapper'))
+  );
+
   if (footerEl) {
     footerEl.innerHTML = FOOTER;
-  } else if (!document.querySelector('.footer')) {
+  } else if (!isChatPage && !document.querySelector('.footer')) {
     document.body.insertAdjacentHTML('beforeend', FOOTER);
   }
 })();
@@ -284,6 +293,17 @@ s.textContent = `@keyframes slideIn{from{opacity:0;transform:translateX(100%)}to
 document.head.appendChild(s);
 
 // Global AI Assistance Bot
-import('./ai-bot.js').catch(err => console.warn('AI Bot module failed to load:', err));
+(function loadAIAssistantBot() {
+  if (document.getElementById('neuroscan-ai-bot-root')) return;
+  const isRoot = !window.location.pathname.includes('/pages/');
+  const botSrc = isRoot ? 'js/ai-bot.js' : '../js/ai-bot.js';
+  const script = document.createElement('script');
+  script.src = botSrc;
+  script.defer = true;
+  script.onerror = () => {
+    import('./ai-bot.js').catch(err => console.warn('AI Bot module failed to load:', err));
+  };
+  document.head.appendChild(script);
+})();
 
 
