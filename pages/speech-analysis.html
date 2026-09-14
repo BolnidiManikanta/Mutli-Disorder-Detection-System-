@@ -139,9 +139,23 @@
       </div>
       <div class="rec-controls">
         <button class="btn-rec btn-rec-start" id="btnRecord" onclick="startRecording()">⏺ Record</button>
+        <button class="btn-rec" id="btnPause" onclick="pauseRecording()" style="display:none;background:#e9c46a;color:#1a1a1a">⏸ Pause</button>
+        <button class="btn-rec" id="btnResume" onclick="resumeRecording()" style="display:none;background:#2a9d8f;color:#fff">▶ Resume</button>
         <button class="btn-rec btn-rec-stop" id="btnStop" onclick="stopRecording()" style="display:none">⏹ Stop</button>
         <button class="btn-rec btn-rec-analyze" id="btnAnalyze" onclick="analyzeLatest()" disabled>🧠 Analyze</button>
         <div class="timer-display" id="timerDisplay">00:00</div>
+      </div>
+
+      <!-- File Upload Alternative (WAV, MP3, M4A, WebM) -->
+      <div style="margin:0 20px 14px;padding:12px 14px;background:var(--bg);border:1px dashed var(--border);border-radius:var(--r-sm)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+          <div style="font-size:.82rem;font-weight:700">📁 Or Upload Audio File</div>
+          <div style="font-size:.72rem;color:var(--muted)">Supports WAV, MP3, M4A, WebM (Max 25MB)</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+          <input type="file" id="audioFileInput" accept="audio/*,.wav,.mp3,.m4a,.webm" style="font-size:.78rem" onchange="handleAudioUpload(event)"/>
+          <span id="uploadStatusBadge" style="font-size:.72rem;font-weight:700;color:var(--muted)"></span>
+        </div>
       </div>
 
       <!-- Real-Time Speech Recognition Transcript Box -->
@@ -153,34 +167,44 @@
           </span>
           <span style="font-size:.7rem;color:var(--muted)">Editable before analysis</span>
         </div>
-        <textarea id="liveTranscriptInput" rows="2" placeholder="Speech transcription will appear here in real time as you speak, or you can type here..." style="width:100%;font-size:.84rem;border:1px solid #ced4da;border-radius:4px;padding:6px 8px;box-sizing:border-box;font-family:inherit;resize:vertical"></textarea>
+        <textarea id="liveTranscriptInput" rows="2" placeholder="Speech transcription will appear here in real time as you speak, or you can type/edit here..." style="width:100%;font-size:.84rem;border:1px solid #ced4da;border-radius:4px;padding:6px 8px;box-sizing:border-box;font-family:inherit;resize:vertical"></textarea>
       </div>
 
       <div style="padding:0 20px 16px">
         <div id="recordingsList" class="recordings-list"></div>
-        <div id="noRecordings" style="text-align:center;color:var(--muted);font-size:.82rem;padding:16px 0">No recordings yet. Press Record to start.</div>
+        <div id="noRecordings" style="text-align:center;color:var(--muted);font-size:.82rem;padding:16px 0">No audio sample loaded. Press Record or upload an audio file above.</div>
       </div>
     </div>
 
-    <!-- Analysis Results -->
+    <!-- Speech Analysis Results -->
     <div class="analysis-panel" id="analysisPanel">
       <div class="ap-section">
-        <div class="ap-title">📊 Speech Analysis Results</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="ap-title" style="margin-bottom:0">📊 Comprehensive Speech &amp; Acoustic Analysis</div>
+          <button id="btnSaveToSession" onclick="saveSpeechToSession()" class="btn btn-sm btn-primary" style="display:none;padding:5px 12px;font-size:.75rem">💾 Save to Assessment Session</button>
+        </div>
         <div id="analysisContent">
-          <div style="text-align:center;color:var(--muted);font-size:.83rem;padding:24px">Record and click "Analyze" to see AI speech analysis</div>
+          <div style="text-align:center;color:var(--muted);font-size:.83rem;padding:24px">Record or upload an audio sample and click "Analyze" to run the acoustic and linguistic feature extraction pipeline.</div>
         </div>
       </div>
 
+      <!-- Interactive Speech & Pause Timeline -->
+      <div class="ap-section" id="timelineSection" style="display:none">
+        <div class="ap-title">⏱️ Speech &amp; Silence Timeline (Click pauses to inspect duration)</div>
+        <div id="speechTimelineContainer" style="margin-top:10px;padding:12px;background:var(--bg);border-radius:var(--r-sm);border:1px solid var(--border)"></div>
+        <div id="pauseDetailBox" style="margin-top:8px;font-size:.76rem;color:var(--muted);font-style:italic">Select a pause block above to view exact duration and context.</div>
+      </div>
+
       <div class="ap-section">
-        <div class="ap-title">📝 Transcript</div>
+        <div class="ap-title">📝 Highlighted Transcript &amp; Disfluency Annotations</div>
         <div class="transcript-box" id="transcriptBox">
-          <span class="transcript-placeholder">Transcript will appear here after analysis…</span>
+          <span class="transcript-placeholder">Transcript with highlighted pauses, filled pauses, and repetitions will appear here…</span>
         </div>
       </div>
 
       <div class="ap-section">
-        <div class="ap-title">🧠 AI Clinical Interpretation</div>
-        <div id="clinicalInterpretation" style="font-size:.85rem;line-height:1.75;color:var(--muted)">Clinical interpretation will appear after analysis.</div>
+        <div class="ap-title">🧠 Decision-Support Analysis &amp; Observed Patterns</div>
+        <div id="clinicalInterpretation" style="font-size:.85rem;line-height:1.75;color:var(--muted)">Model-associated pattern interpretations will appear after feature extraction.</div>
       </div>
     </div>
   </div>
@@ -231,6 +255,9 @@
 </div>
 
 <script type="module">
+import { SpeechAnalysisEngine } from '../js/speech-analysis-engine.js';
+import { AssessmentSessionManager } from '../js/assessment-session.js';
+
 let mediaRecorder = null;
 let audioChunks = [];
 let recordingTimer = null;
@@ -240,6 +267,7 @@ let analyzerNode = null;
 let audioCtx = null;
 let waveAnimFrame = null;
 let currentAnalysis = null;
+let isPaused = false;
 
 const PROMPTS = {
   general: [
@@ -319,8 +347,12 @@ window.updateMilestones = updateMilestones;
 window.nextPrompt = nextPrompt;
 window.changeCategory = changeCategory;
 window.startRecording = startRecording;
+window.pauseRecording = pauseRecording;
+window.resumeRecording = resumeRecording;
 window.stopRecording = stopRecording;
 window.analyzeLatest = analyzeLatest;
+window.handleAudioUpload = handleAudioUpload;
+window.saveSpeechToSession = saveSpeechToSession;
 
 let promptIdx = 0;
 let currentCategory = 'general';
@@ -332,29 +364,41 @@ function nextPrompt() {
   document.getElementById('promptText').textContent = list[promptIdx];
 }
 
+function safeSetHTML(id, html) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html;
+}
+
+function safeSetText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
 function changeCategory() {
-  currentCategory = document.getElementById('promptCategory').value;
+  const catEl = document.getElementById('promptCategory');
+  currentCategory = catEl ? catEl.value : 'conversation';
   promptIdx = 0;
-  document.getElementById('promptText').textContent = PROMPTS[currentCategory][0];
+  safeSetText('promptText', (PROMPTS[currentCategory] || [])[0] || '');
 }
 
 function updateMilestones() {
-  const age = document.getElementById('ageGroup').value;
+  const ageEl = document.getElementById('ageGroup');
+  const age = ageEl ? ageEl.value : '3-4';
   const items = MILESTONES[age] || [];
-  document.getElementById('milestoneList').innerHTML = items.map(m =>
+  safeSetHTML('milestoneList', items.map(m =>
     `<div class="milestone-item">
       <span class="ms-icon">${m.critical ? '🔴' : '🟡'}</span>
       <span class="ms-text">${m.text}</span>
       <span class="ms-status ${m.critical ? 'score-alert' : 'score-warn'}">${m.critical ? 'Key' : 'Watch'}</span>
     </div>`
-  ).join('');
+  ).join(''));
 }
 updateMilestones();
 
 let speechRec = null;
 let capturedSpeech = '';
 
-// ── RECORDING ──────────────────────────────────────────────
+// ── RECORDING CONTROLS ──────────────────────────────────────
 async function startRecording() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
@@ -366,6 +410,7 @@ async function startRecording() {
 
     mediaRecorder = new MediaRecorder(stream);
     audioChunks = [];
+    isPaused = false;
     mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
     mediaRecorder.onstop = () => {
       const blob = new Blob(audioChunks, { type:'audio/webm' });
@@ -376,7 +421,7 @@ async function startRecording() {
     };
     mediaRecorder.start(250);
 
-    // Initialize Web Speech Recognition if available
+    // Speech Recognition
     capturedSpeech = '';
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRec) {
@@ -386,7 +431,7 @@ async function startRecording() {
         speechRec.interimResults = true;
         speechRec.lang = 'en-US';
         const sttStatus = document.getElementById('sttStatus');
-        if (sttStatus) { sttStatus.textContent = 'Recording…'; sttStatus.style.background = '#d1e7dd'; sttStatus.style.color = '#0f5132'; }
+        if (sttStatus) { sttStatus.textContent = 'Listening…'; sttStatus.style.background = '#d1e7dd'; sttStatus.style.color = '#0f5132'; }
         
         speechRec.onresult = (e) => {
           let interim = '';
@@ -410,11 +455,37 @@ async function startRecording() {
     drawWaveform();
     startTimer();
     document.getElementById('btnRecord').style.display = 'none';
+    document.getElementById('btnPause').style.display = 'inline-block';
+    document.getElementById('btnResume').style.display = 'none';
     document.getElementById('btnStop').style.display = 'inline-block';
     document.getElementById('recIndicator').style.display = 'flex';
     document.getElementById('noRecordings').style.display = 'none';
   } catch(e) {
-    alert('Microphone access denied. Please allow microphone access and try again.');
+    alert('Microphone access denied or unavailable. You can also upload an audio file directly using the file input above.');
+  }
+}
+
+function pauseRecording() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.pause();
+    isPaused = true;
+    clearInterval(recordingTimer);
+    document.getElementById('btnPause').style.display = 'none';
+    document.getElementById('btnResume').style.display = 'inline-block';
+    document.getElementById('recIndicator').textContent = '⏸ PAUSED';
+  }
+}
+
+function resumeRecording() {
+  if (mediaRecorder && mediaRecorder.state === 'paused') {
+    mediaRecorder.resume();
+    isPaused = false;
+    startTimer();
+    const btnResume = document.getElementById('btnResume');
+    if (btnResume) btnResume.style.display = 'none';
+    const btnPause = document.getElementById('btnPause');
+    if (btnPause) btnPause.style.display = 'inline-block';
+    safeSetHTML('recIndicator', '<div class="rec-dot"></div>REC');
   }
 }
 
@@ -430,17 +501,38 @@ function stopRecording() {
   cancelAnimationFrame(waveAnimFrame);
   clearInterval(recordingTimer);
   document.getElementById('btnRecord').style.display = 'inline-block';
+  document.getElementById('btnPause').style.display = 'none';
+  document.getElementById('btnResume').style.display = 'none';
   document.getElementById('btnStop').style.display = 'none';
   document.getElementById('recIndicator').style.display = 'none';
+  
   // Clear waveform
   const canvas = document.getElementById('waveCanvas');
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#0a0a12'; ctx.fillRect(0,0,canvas.width,canvas.height);
 }
 
+// ── AUDIO FILE UPLOAD ───────────────────────────────────────
+async function handleAudioUpload(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const badge = document.getElementById('uploadStatusBadge');
+  badge.textContent = `Loading ${file.name}...`;
+
+  const url = URL.createObjectURL(file);
+  const audio = new Audio(url);
+  audio.onloadedmetadata = () => {
+    const dur = Math.round(audio.duration) || 15;
+    recordings.push({ blob: file, url, duration: dur, id: Date.now(), name: file.name });
+    renderRecordings();
+    document.getElementById('btnAnalyze').disabled = false;
+    document.getElementById('noRecordings').style.display = 'none';
+    badge.textContent = `✓ Loaded (${dur}s · ${(file.size / 1024).toFixed(0)} KB)`;
+  };
+}
+
 function startTimer() {
-  recordingSeconds = 0;
-  document.getElementById('timerDisplay').textContent = '00:00';
   recordingTimer = setInterval(() => {
     recordingSeconds++;
     const m = String(Math.floor(recordingSeconds/60)).padStart(2,'0');
@@ -480,21 +572,20 @@ function drawWaveform() {
 }
 
 function renderRecordings() {
-  const list = document.getElementById('recordingsList');
-  list.innerHTML = recordings.map((r, i) =>
+  safeSetHTML('recordingsList', recordings.map((r, i) =>
     `<div class="recording-item">
       <div class="ri-num">${i+1}</div>
       <div class="ri-info">
-        <div class="ri-name">Recording ${i+1}</div>
+        <div class="ri-name">${r.name || 'Sample ' + (i+1)}</div>
         <div class="ri-duration">${r.duration}s · ${(r.blob.size/1024).toFixed(1)} KB</div>
       </div>
-      <audio src="${r.url}" controls style="height:28px;max-width:160px"></audio>
+      <audio src="${r.url}" controls style="height:28px;max-width:180px"></audio>
       <div class="ri-actions">
-        <button class="ri-btn" onclick="downloadRecording(${i})">⬇</button>
-        <button class="ri-btn" style="color:#c44b1b" onclick="deleteRecording(${i})">✕</button>
+        <button class="ri-btn" onclick="downloadRecording(${i})" title="Download">⬇</button>
+        <button class="ri-btn" style="color:#c44b1b" onclick="deleteRecording(${i})" title="Delete">✕</button>
       </div>
     </div>`
-  ).join('');
+  ).join(''));
 }
 
 window.downloadRecording = function(i) {
@@ -503,179 +594,245 @@ window.downloadRecording = function(i) {
   a.download = `speech_sample_${i+1}.webm`;
   a.click();
 };
+
 window.deleteRecording = function(i) {
   recordings.splice(i,1);
   renderRecordings();
-  if (!recordings.length) document.getElementById('btnAnalyze').disabled = true;
+  if (!recordings.length) {
+    const btnAnalyze = document.getElementById('btnAnalyze');
+    if (btnAnalyze) btnAnalyze.disabled = true;
+    const noRec = document.getElementById('noRecordings');
+    if (noRec) noRec.style.display = 'block';
+  }
 };
 
-// ── AI SPEECH ANALYSIS ────────────────────────────────────────────
+// ── ANALYSIS EXECUTION ─────────────────────────────────────
 async function analyzeLatest() {
   if (!recordings.length) return;
   const btn = document.getElementById('btnAnalyze');
-  btn.disabled = true;
-  btn.textContent = '⏳ Analyzing…';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ Analyzing…';
+  }
 
-  document.getElementById('analysisContent').innerHTML = `<div class="analyzing-state"><div class="analyzing-spin"></div><div style="font-size:.85rem;color:var(--muted)">Conducting clinical speech & acoustic analysis…</div></div>`;
+  safeSetHTML('analysisContent', `
+    <div class="analyzing-state">
+      <div class="analyzing-spin"></div>
+      <div style="font-size:.88rem;font-weight:700;margin-bottom:4px">Running Real Speech &amp; Acoustic Analysis Engine</div>
+      <div style="font-size:.78rem;color:var(--muted)">Extracting temporal silence windows, fluency markers, vocabulary diversity, and prosodic metrics…</div>
+    </div>`);
 
   const latest = recordings[recordings.length - 1];
-  const prompt = document.getElementById('promptText').textContent;
   const transcriptInput = document.getElementById('liveTranscriptInput')?.value?.trim() || '';
 
-  // Convert audio blob to base64
-  let audioBase64 = '';
+  // Run comprehensive real analysis
   try {
-    audioBase64 = await new Promise((res, rej) => {
-      const reader = new FileReader();
-      reader.onloadend = () => res(reader.result);
-      reader.onerror = rej;
-      reader.readAsDataURL(latest.blob);
-    });
+    const analysis = await SpeechAnalysisEngine.analyzeSpeech(latest.blob, transcriptInput, latest.duration);
+    currentAnalysis = analysis;
+    renderAnalysis(analysis);
+    document.getElementById('btnSaveToSession').style.display = 'inline-block';
   } catch (err) {
-    console.warn('Audio base64 conversion fallback:', err);
+    console.error('Speech analysis error:', err);
+    alert('Error running speech analysis: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🧠 Re-Analyze';
   }
-
-  try {
-    const response = await fetch('/api/speech-analysis', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        transcript: transcriptInput,
-        prompt: prompt,
-        duration: latest.duration,
-        audioBase64: audioBase64,
-        mimeType: latest.blob.type || 'audio/webm'
-      })
-    });
-
-    if (response.ok) {
-      const analysis = await response.json();
-      currentAnalysis = analysis;
-      renderAnalysis(analysis);
-      btn.disabled = false;
-      btn.textContent = '🧠 Analyze';
-      return;
-    }
-  } catch (err) {
-    console.warn('Speech backend API call fallback engaged:', err);
-  }
-
-  // Robust local clinical fallback analysis
-  const fallbackAnalysis = generateSpeechFallback(latest.duration, prompt, transcriptInput);
-  currentAnalysis = fallbackAnalysis;
-  renderAnalysis(fallbackAnalysis);
-  btn.disabled = false;
-  btn.textContent = '🧠 Analyze';
 }
 
-function generateSpeechFallback(duration, prompt, transcriptHint) {
-  const sampleDuration = Math.max(3, duration || 12);
-  const transcript = transcriptHint || `I was looking at the pictures and the colors were bright. Then there were several shapes and I tried to follow the story about the animals in the park.`;
-  
-  const fluencyScore = Math.min(88, Math.max(45, 65 + Math.floor(Math.random() * 15)));
-  const articulationScore = Math.min(85, Math.max(50, 68 + Math.floor(Math.random() * 12)));
-  const vocabScore = Math.min(82, Math.max(48, 60 + Math.floor(Math.random() * 16)));
-
-  return {
-    transcript: transcript,
-    metrics: {
-      fluency: fluencyScore,
-      articulation: articulationScore,
-      vocabulary_complexity: vocabScore,
-      sentence_length: Math.min(80, Math.max(40, 58 + Math.floor(sampleDuration * 1.5))),
-      speech_rate: sampleDuration > 20 ? 'fast' : sampleDuration < 8 ? 'slow' : 'normal',
-      pause_frequency: sampleDuration > 15 ? 'moderate' : 'high',
-      prosody: 'flat',
-      repetitiveness: 38
-    },
-    signals: [
-      { type: "Slightly elevated mid-utterance latency", severity: "watch" },
-      { type: "Atypical prosodic rhythm / flat pitch modulation", severity: "watch" },
-      { type: "Receptive vocabulary within expected age range", severity: "normal" },
-      { type: "Consistent phonemic articulation without severe distortion", severity: "normal" }
-    ],
-    clinical_interpretation: `The ${sampleDuration}-second speech response demonstrates functional lexical selection with notable prosodic modulation dampening and increased inter-phrase pausing, consistent with patterns observed in neurodevelopmental screening cohorts.`,
-    disorder_indicators: {
-      speech_delay: 24,
-      asd: 38,
-      dyslexia: 14,
-      adhd: 20
-    }
-  };
-}
-
+// ── RENDER ANALYSIS RESULTS ────────────────────────────────
 function renderAnalysis(a) {
-  const metrics = a.metrics || {};
-  const rateColor = { slow:'#457b9d', normal:'#2d6a4f', fast:'#e76f51' };
-  const badgeForNum = n => n >= 70 ? 'score-good' : n >= 45 ? 'score-warn' : 'score-alert';
+  const badgeForScore = s => s >= 75 ? 'score-good' : s >= 50 ? 'score-warn' : 'score-alert';
 
-  const metricsHtml = `
-    <div class="metric-row">
-      <span class="metric-label">Fluency</span>
-      <div class="metric-bar-wrap"><div class="metric-bar" style="width:${metrics.fluency||0}%;background:#2d6a4f"></div></div>
-      <span class="metric-value" style="color:#2d6a4f">${metrics.fluency||0}</span>
-      <span class="score-badge ${badgeForNum(metrics.fluency||0)}" style="margin-left:6px">${metrics.fluency>=70?'Good':metrics.fluency>=45?'Mild':'Low'}</span>
-    </div>
-    <div class="metric-row">
-      <span class="metric-label">Articulation</span>
-      <div class="metric-bar-wrap"><div class="metric-bar" style="width:${metrics.articulation||0}%;background:#457b9d"></div></div>
-      <span class="metric-value" style="color:#457b9d">${metrics.articulation||0}</span>
-    </div>
-    <div class="metric-row">
-      <span class="metric-label">Vocabulary</span>
-      <div class="metric-bar-wrap"><div class="metric-bar" style="width:${metrics.vocabulary_complexity||0}%;background:#9b5de5"></div></div>
-      <span class="metric-value" style="color:#9b5de5">${metrics.vocabulary_complexity||0}</span>
-    </div>
-    <div class="metric-row">
-      <span class="metric-label">Sentence length</span>
-      <div class="metric-bar-wrap"><div class="metric-bar" style="width:${metrics.sentence_length||0}%;background:#f4a261"></div></div>
-      <span class="metric-value" style="color:#f4a261">${metrics.sentence_length||0}</span>
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
-      <span class="score-badge ${metrics.speech_rate==='normal'?'score-good':'score-warn'}">Rate: ${metrics.speech_rate||'—'}</span>
-      <span class="score-badge ${metrics.pause_frequency==='normal'?'score-good':'score-warn'}">Pauses: ${metrics.pause_frequency||'—'}</span>
-      <span class="score-badge ${metrics.prosody==='normal'||metrics.prosody==='varied'?'score-good':'score-warn'}">Prosody: ${metrics.prosody||'—'}</span>
+  const html = `
+    <!-- Top KPI Grid -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:10px;margin-bottom:18px">
+      <div style="background:var(--bg);padding:10px 14px;border-radius:var(--r-sm);border-left:3px solid #2d6a4f">
+        <div style="font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase">Speech Duration</div>
+        <div style="font-size:1.3rem;font-weight:800;color:#2d6a4f">${a.duration}s</div>
+        <div style="font-size:.7rem;color:var(--muted)">Speaking: ${a.speakingDuration}s</div>
+      </div>
+      <div style="background:var(--bg);padding:10px 14px;border-radius:var(--r-sm);border-left:3px solid #457b9d">
+        <div style="font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase">Speaking Rate</div>
+        <div style="font-size:1.3rem;font-weight:800;color:#457b9d">${a.wpm} <span style="font-size:.75rem">WPM</span></div>
+        <div style="font-size:.7rem;color:var(--muted)">${a.syllablesPerSecond} syll/sec</div>
+      </div>
+      <div style="background:var(--bg);padding:10px 14px;border-radius:var(--r-sm);border-left:3px solid #e76f51">
+        <div style="font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase">Pause Frequency</div>
+        <div style="font-size:1.3rem;font-weight:800;color:#e76f51">${a.pauseFrequency}<span style="font-size:.75rem">/min</span></div>
+        <div style="font-size:.7rem;color:var(--muted)">${a.pauseCount} total pauses</div>
+      </div>
+      <div style="background:var(--bg);padding:10px 14px;border-radius:var(--r-sm);border-left:3px solid #9b5de5">
+        <div style="font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase">Mean Pause</div>
+        <div style="font-size:1.3rem;font-weight:800;color:#9b5de5">${a.meanPauseDuration}s</div>
+        <div style="font-size:.7rem;color:var(--muted)">Max: ${a.maxPauseDuration}s</div>
+      </div>
+      <div style="background:var(--bg);padding:10px 14px;border-radius:var(--r-sm);border-left:3px solid #2a9d8f">
+        <div style="font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase">Fluency Score</div>
+        <div style="font-size:1.3rem;font-weight:800;color:#2a9d8f">${a.fluencyScore}<span style="font-size:.75rem">/100</span></div>
+        <div style="font-size:.7rem;color:var(--muted)">Quality: ${a.qualityScore}%</div>
+      </div>
     </div>
 
-    ${a.signals?.length ? `
-    <div style="margin-top:14px">
-      <div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Detected Signals</div>
-      ${a.signals.map(s => `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg);border-radius:5px;margin-bottom:5px;font-size:.8rem">
-        <span>${s.severity==='normal'?'✅':s.severity==='alert'?'🔴':'🟡'}</span>
-        <span>${s.type}</span>
-        <span class="score-badge score-${s.severity==='normal'?'good':s.severity==='alert'?'alert':'warn'}" style="margin-left:auto">${s.severity}</span>
-      </div>`).join('')}
-    </div>` : ''}
+    <!-- Feature Groups Tables -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+      <!-- Fluency & Linguistic -->
+      <div style="background:var(--bg);padding:12px 14px;border-radius:var(--r-sm);border:1px solid var(--border)">
+        <div style="font-size:.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Linguistic &amp; Fluency Features</div>
+        <div style="font-size:.78rem;display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+          <span>Vocabulary Diversity (TTR)</span><strong>${Math.round(a.vocabularyDiversity * 100)}%</strong>
+        </div>
+        <div style="font-size:.78rem;display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+          <span>Filled Pauses (um, uh, er)</span><strong>${a.filledPausesCount}</strong>
+        </div>
+        <div style="font-size:.78rem;display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+          <span>Repetitions / Echolalia markers</span><strong>${a.repetitionCount}</strong>
+        </div>
+        <div style="font-size:.78rem;display:flex;justify-content:space-between;padding:4px 0">
+          <span>Avg Sentence Length</span><strong>${a.avgSentenceLength} words</strong>
+        </div>
+      </div>
 
-    ${a.disorder_indicators ? `
-    <div style="margin-top:14px">
-      <div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Disorder Indicators (from speech)</div>
-      ${Object.entries(a.disorder_indicators).map(([k,v]) => `
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:.8rem">
-          <span style="width:90px;text-transform:capitalize">${k.replace('_',' ')}</span>
-          <div style="flex:1;height:5px;background:var(--bg);border-radius:50px;overflow:hidden"><div style="width:${v}%;height:100%;background:${v>55?'#e76f51':v>30?'#e9c46a':'#2d6a4f'};border-radius:50px"></div></div>
-          <span style="width:30px;text-align:right;font-weight:700;color:${v>55?'#c44b1b':v>30?'#7a5c00':'#2d6a4f'}">${v}%</span>
-        </div>`).join('')}
-    </div>` : ''}
+      <!-- Acoustic Features -->
+      <div style="background:var(--bg);padding:12px 14px;border-radius:var(--r-sm);border:1px solid var(--border)">
+        <div style="font-size:.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Acoustic &amp; Prosodic Features</div>
+        <div style="font-size:.78rem;display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+          <span>Fundamental Frequency (F0)</span><strong>${a.pitchF0} Hz</strong>
+        </div>
+        <div style="font-size:.78rem;display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+          <span>Pitch Variability</span><strong>${a.pitchVar} semitones</strong>
+        </div>
+        <div style="font-size:.78rem;display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+          <span>RMS Energy Intensity</span><strong>${a.energyRMS}</strong>
+        </div>
+        <div style="font-size:.78rem;display:flex;justify-content:space-between;padding:4px 0">
+          <span>Voice Activity Ratio (VAD)</span><strong>${Math.round(a.voiceActivityRatio * 100)}%</strong>
+        </div>
+      </div>
+    </div>
   `;
 
-  document.getElementById('analysisContent').innerHTML = metricsHtml;
-  document.getElementById('transcriptBox').innerHTML = a.transcript || '<em style="color:var(--muted)">Transcript unavailable</em>';
-  document.getElementById('clinicalInterpretation').textContent = a.clinical_interpretation || 'No interpretation available.';
-  document.getElementById('clinicalInterpretation').style.color = 'var(--text)';
+  safeSetHTML('analysisContent', html);
 
-  drawRadar(metrics);
-  updateSpeechMetricsList(metrics);
+  // Render Interactive Timeline
+  renderSpeechTimeline(a);
+
+  // Render Highlighted Transcript
+  renderHighlightedTranscript(a);
+
+  // Decision-support non-diagnostic narrative
+  safeSetHTML('clinicalInterpretation', `
+    <div style="background:#f8fafc;padding:12px 14px;border-radius:var(--r-sm);border-left:3px solid #2d6a4f">
+      <strong>Model-Associated Pattern Analysis:</strong><br>
+      The audio recording reflects an observed speech cadence of <strong>${a.wpm} words per minute</strong> with <strong>${a.pauseFrequency} pauses/min</strong> (mean pause: ${a.meanPauseDuration}s).
+      ${a.pauseFrequency > 8 ? 'Pausing rate is slightly elevated compared to neurotypical baseline cadences.' : 'Pausing patterns reflect continuous, regulated verbal flow.'}
+      Vocabulary diversity is at <strong>${Math.round(a.vocabularyDiversity * 100)}%</strong> with ${a.filledPausesCount} filled pauses and ${a.repetitionCount} word repetitions.
+      <div style="margin-top:8px;font-size:.74rem;color:var(--muted)">
+        <em>Note: This analysis reflects acoustic feature extraction for multimodal decision-support. It does not constitute a clinical medical diagnosis.</em>
+      </div>
+    </div>
+  `);
+
+  drawRadar({
+    fluency: a.fluencyScore,
+    articulation: Math.min(100, Math.round(a.voiceActivityRatio * 100)),
+    vocabulary_complexity: Math.round(a.vocabularyDiversity * 100),
+    sentence_length: Math.min(100, a.avgSentenceLength * 10)
+  });
+}
+
+function renderSpeechTimeline(a) {
+  const container = document.getElementById('speechTimelineContainer');
+  const section = document.getElementById('timelineSection');
+  if (section) section.style.display = 'block';
+
+  let html = `<div style="display:flex;height:34px;border-radius:6px;overflow:hidden;border:1px solid var(--border);width:100%;box-shadow:inset 0 1px 3px rgba(0,0,0,.05)">`;
+
+  const totalDur = Math.max(1, a.duration);
+  a.timeline.forEach(seg => {
+    const widthPct = Math.max(2, (seg.duration / totalDur) * 100);
+    if (seg.type === 'speech') {
+      html += `
+        <div style="width:${widthPct}%;background:#2d6a4f;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.66rem;font-weight:700;overflow:hidden" title="Speech Segment: ${seg.duration}s">
+          ${seg.duration >= 1 ? 'Speech' : ''}
+        </div>`;
+    } else {
+      html += `
+        <div onclick="selectPause('${seg.id}', ${seg.duration}, '${seg.start}s - ${seg.end}s')" 
+             style="width:${widthPct}%;background:#f4a261;height:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.62rem;font-weight:800;transition:all .2s" 
+             title="Pause: ${seg.duration}s (${seg.context})">
+          ⏸
+        </div>`;
+    }
+  });
+
+  html += `</div>`;
+  html += `
+    <div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--muted);margin-top:6px">
+      <span>0:00</span>
+      <span>Total: ${a.duration}s (Speech: ${a.speakingDuration}s | Pauses: ${a.silenceDuration}s)</span>
+      <span>${Math.floor(a.duration / 60)}:${String(Math.round(a.duration % 60)).padStart(2, '0')}</span>
+    </div>`;
+
+  safeSetHTML('speechTimelineContainer', html);
+}
+
+window.selectPause = function(id, duration, timeRange) {
+  const box = document.getElementById('pauseDetailBox');
+  if (box) {
+    box.innerHTML = `<strong>Selected Pause (${id}):</strong> Duration: <strong>${duration}s</strong> at timeline <code>${timeRange}</code>. Atypical long pauses (>1.0s) can reflect linguistic retrieval delays or executive planning pauses.`;
+    box.style.color = '#713f12';
+    box.style.fontStyle = 'normal';
+  }
+};
+
+function renderHighlightedTranscript(a) {
+  const box = document.getElementById('transcriptBox');
+  if (!box) return;
+  let words = a.transcript.split(/\s+/);
+
+  const filledWords = ['um', 'uh', 'er', 'ah', 'like'];
+  const formattedWords = words.map(w => {
+    const clean = w.toLowerCase().replace(/[^a-z]/g, '');
+    if (filledWords.includes(clean)) {
+      return `<span style="background:#fee2e2;color:#991b1b;padding:1px 4px;border-radius:3px;font-weight:700" title="Filled Pause">${w}</span>`;
+    }
+    return w;
+  });
+
+  box.innerHTML = formattedWords.join(' ');
+}
+
+// ── SAVE TO ACTIVE ASSESSMENT SESSION ───────────────────────
+function saveSpeechToSession() {
+  if (!currentAnalysis) return;
+  const session = AssessmentSessionManager.getActiveSession();
+  AssessmentSessionManager.recordModalityData(session.sessionId, 'speech', currentAnalysis);
+
+  const btn = document.getElementById('btnSaveToSession');
+  btn.textContent = '✓ Saved to Session!';
+  btn.style.background = '#15803d';
+  setTimeout(() => {
+    btn.textContent = '💾 Save to Assessment Session';
+    btn.style.background = '';
+  }, 3000);
+
+  if (window.toast) {
+    window.toast('Speech features recorded to Assessment Session (' + session.sessionId + ')', 'success');
+  } else {
+    alert('Speech features saved to Assessment Session!');
+  }
 }
 
 function drawRadar(metrics) {
   const canvas = document.getElementById('radarCanvas');
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const cx = canvas.width/2, cy = canvas.height/2, r = 70;
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
   const dims = ['fluency','articulation','vocabulary_complexity','sentence_length'];
-  const labels = ['Fluency','Articulation','Vocabulary','Sentence'];
+  const labels = ['Fluency','Voice Act.','Vocabulary','Syntax'];
   const vals = dims.map(d => (metrics[d]||0)/100);
   const colors = ['#2d6a4f','#457b9d','#9b5de5','#f4a261'];
   const n = dims.length;
@@ -701,7 +858,7 @@ function drawRadar(metrics) {
   });
 
   // Data polygon
-  ctx.beginPath(); ctx.fillStyle='rgba(45,106,79,.15)'; ctx.strokeStyle='#2d6a4f'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.fillStyle='rgba(45,106,79,.18)'; ctx.strokeStyle='#2d6a4f'; ctx.lineWidth=2;
   vals.forEach((v,i) => {
     const angle=(i/n)*2*Math.PI-Math.PI/2;
     const x=cx+Math.cos(angle)*r*v, y=cy+Math.sin(angle)*r*v;
@@ -727,13 +884,13 @@ function updateSpeechMetricsList(metrics) {
     { label:'Vocabulary', val:metrics.vocabulary_complexity||0 },
     { label:'Sentence length', val:metrics.sentence_length||0 },
   ];
-  document.getElementById('speechMetricsList').innerHTML = items.map(m =>
+  safeSetHTML('speechMetricsList', items.map(m =>
     `<div style="display:flex;align-items:center;gap:6px;font-size:.78rem;margin-bottom:5px">
       <span style="width:80px;color:var(--muted)">${m.label}</span>
       <div style="flex:1;height:4px;background:var(--bg);border-radius:50px"><div style="width:${m.val}%;height:100%;background:#2d6a4f;border-radius:50px"></div></div>
       <span style="width:24px;text-align:right;font-weight:700">${m.val}</span>
     </div>`
-  ).join('');
+  ).join(''));
 }
 
 async function blobToBase64(blob) {

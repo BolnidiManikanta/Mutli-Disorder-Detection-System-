@@ -442,6 +442,10 @@
       <button class="btn-report" id="reportBtn" onclick="generateReport()">
         📄 Download Full PDF Report
       </button>
+
+      <a href="multimodal-dashboard.html" class="btn btn-primary btn-full" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;text-decoration:none;background:#2d6a4f;border-radius:var(--r-sm);padding:12px;font-weight:700">
+        🧬 View in Multimodal AI Hub &rarr;
+      </a>
     </div>
   </div>
 </div>
@@ -449,6 +453,7 @@
 <script type="module">
 import { DISORDERS, ADAPTIVE_QUESTIONS, ensemblePredict, computeSHAP, generateDoctorExplanation, generateRecommendations, TRANSLATIONS, CO_OCCURRENCE } from '../js/ai-engine.js';
 import { saveAssessment, onAuthChange, auth } from '../js/mongodb.js';
+import { AssessmentSessionManager } from '../js/assessment-session.js';
 
 // ── STATE ──────────────────────────────────────────────────────
 let answers = {};
@@ -638,6 +643,25 @@ async function runAnalysis() {
   renderExplanation(docExplanation);
   renderRecommendations(currentRecs);
   document.getElementById('reportBtn').disabled = false;
+
+  // Auto-save to AssessmentSessionManager (Multimodal Fusion Hub)
+  try {
+    const session = AssessmentSessionManager.getActiveSession();
+    session.participant = {
+      ...session.participant,
+      name: demographics.name,
+      age: demographics.age,
+      gender: demographics.gender
+    };
+    AssessmentSessionManager.recordModalityData(session.sessionId, 'questionnaire', {
+      answers,
+      demographics,
+      primaryDisorder: primaryId,
+      results: currentResults
+    });
+  } catch (err) {
+    console.warn('Multimodal session sync error:', err);
+  }
 
   // Auto-save to Firebase if logged in
   try {

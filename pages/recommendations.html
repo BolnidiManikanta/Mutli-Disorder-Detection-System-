@@ -313,7 +313,12 @@ const THERAPIES = [
 const evidenceLabels = { high:'🟢 High Evidence', moderate:'🟡 Moderate Evidence', emerging:'🔵 Emerging Research' };
 const evidenceClass = { high:'evidence-high', moderate:'evidence-moderate', emerging:'evidence-emerging' };
 
-document.getElementById('therapyGrid').innerHTML = THERAPIES.map(t => `
+function safeSetHTML(id, html) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html;
+}
+
+safeSetHTML('therapyGrid', THERAPIES.map(t => `
   <div class="therapy-card">
     <div class="therapy-icon">${t.icon}</div>
     <div class="therapy-name">${t.name}</div>
@@ -329,7 +334,7 @@ document.getElementById('therapyGrid').innerHTML = THERAPIES.map(t => `
       <span class="therapy-evidence ${evidenceClass[t.evidence]}">${evidenceLabels[t.evidence]}</span>
     </div>
   </div>
-`).join('');
+`).join(''));
 
 // ── DAILY PLAN ────────────────────────────────────────────────
 const DAILY_PLAN = [
@@ -349,7 +354,7 @@ const DAILY_PLAN = [
   { time:'8:00 PM', icon:'🌙', activity:'Sleep', detail:'Target 9-11 hours for children. Dark, cool, quiet room. White noise if helpful. Remove all screens from bedroom.' },
 ];
 
-document.getElementById('dailyPlanTimeline').innerHTML = DAILY_PLAN.map(p => `
+safeSetHTML('dailyPlanTimeline', DAILY_PLAN.map(p => `
   <div class="plan-item">
     <div class="plan-dot">${p.icon}</div>
     <div class="plan-card">
@@ -358,7 +363,7 @@ document.getElementById('dailyPlanTimeline').innerHTML = DAILY_PLAN.map(p => `
       <div class="plan-detail">${p.detail}</div>
     </div>
   </div>
-`).join('');
+`).join(''));
 
 // ── DIET ──────────────────────────────────────────────────────
 const DIET_ITEMS = [
@@ -376,14 +381,14 @@ const DIET_ITEMS = [
   { icon:'🌿', food:'Iron-Rich Foods', why:'Iron deficiency is common in children with ADHD and ASD. Include lean meat, leafy greens, and fortified cereals. Monitor ferritin levels.', tag:'🔬 Micronutrient' },
 ];
 
-document.getElementById('dietGrid').innerHTML = DIET_ITEMS.map(d => `
+safeSetHTML('dietGrid', DIET_ITEMS.map(d => `
   <div class="diet-card">
     <div class="diet-icon">${d.icon}</div>
     <div class="diet-food">${d.food}</div>
     <div class="diet-why">${d.why}</div>
     <span class="diet-tag">${d.tag}</span>
   </div>
-`).join('');
+`).join(''));
 
 // ── EXERCISES ─────────────────────────────────────────────────
 const EXERCISES = [
@@ -399,7 +404,7 @@ const EXERCISES = [
   { icon:'🌊', name:'Hydrotherapy', desc:'Water-based therapy using the unique properties of water (warmth, buoyancy, resistance) to improve sensory processing and motor function.', duration:'30-45 min', freq:'1-2×/week', benefits:['Sensory processing','Muscle tone','Relaxation'] },
 ];
 
-document.getElementById('exerciseGrid').innerHTML = EXERCISES.map(e => `
+safeSetHTML('exerciseGrid', EXERCISES.map(e => `
   <div class="exercise-card">
     <div class="exercise-icon">${e.icon}</div>
     <div class="exercise-name">${e.name}</div>
@@ -412,7 +417,7 @@ document.getElementById('exerciseGrid').innerHTML = EXERCISES.map(e => `
       ${e.benefits.map(b=>`<span style="padding:2px 8px;border-radius:50px;font-size:.65rem;font-weight:700;background:var(--green-bg);color:var(--primary);border:1px solid var(--primary-l)">${b}</span>`).join('')}
     </div>
   </div>
-`).join('');
+`).join(''));
 
 // ── SPECIALISTS ───────────────────────────────────────────────
 const SPECIALISTS = [
@@ -430,14 +435,14 @@ const SPECIALISTS = [
   { icon:'🍽️', title:'Pediatric Dietitian', role:'Provides targeted nutritional guidance for neurodevelopmental conditions including selective eating, GFCF diets, and micronutrient assessment.', badge:'Nutrition' },
 ];
 
-document.getElementById('specialistGrid').innerHTML = SPECIALISTS.map(s => `
+safeSetHTML('specialistGrid', SPECIALISTS.map(s => `
   <div class="specialist-card">
     <div class="specialist-avatar">${s.icon}</div>
     <div class="specialist-title">${s.title}</div>
     <div class="specialist-role">${s.role}</div>
     <span class="specialist-badge">${s.badge}</span>
   </div>
-`).join('');
+`).join(''));
 
 // ── RESOURCES ─────────────────────────────────────────────────
 const RESOURCES = [
@@ -460,7 +465,7 @@ const RESOURCES = [
   ]},
 ];
 
-document.getElementById('resourcesList').innerHTML = RESOURCES.map(r => `
+safeSetHTML('resourcesList', RESOURCES.map(r => `
   <div style="margin-bottom:24px">
     <div style="font-size:1rem;font-weight:800;margin-bottom:12px">${r.category}</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
@@ -470,7 +475,7 @@ document.getElementById('resourcesList').innerHTML = RESOURCES.map(r => `
       </a>`).join('')}
     </div>
   </div>
-`).join('');
+`).join(''));
 </script>
 </body>
 </html>

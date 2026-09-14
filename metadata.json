@@ -1,6 +1,6 @@
 {
   "name": "NeuroScan AI",
-  "description": "Advanced neurodevelopmental assessment and multi-disorder detection system with AI screenings, primary & advanced learning abilities (PLA/ALA) evaluation, personalized training programs, and longitudinal progress tracking.",
+  "description": "Advanced neurodevelopmental assessment and multi-disorder detection system featuring multimodal AI fusion (clinical questionnaires, speech biomarkers, drawing & CDT kinematics, cognitive reaction battery), calibrated uncertainty intervals, explainable AI, and longitudinal tracking.",
   "requestFramePermissions": [
     "camera",
     "microphone"

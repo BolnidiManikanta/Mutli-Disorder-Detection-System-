@@ -106,29 +106,46 @@ let currentUser = null;
 const user = await requireAuth();
 currentUser = user;
 
+function safeSetHTML(id, html) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html;
+}
+
+function safeSetText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
 // Populate profile
 const userDoc = await getUserDoc(user.uid).catch(() => null);
-document.getElementById('profileName').textContent  = user.displayName || 'User';
-document.getElementById('profileEmail').textContent = user.email;
-document.getElementById('profileAvatar').src = user.photoURL ||
-  `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName||'U')}&background=2d6a4f&color=fff&size=88`;
+safeSetText('profileName', user.displayName || 'User');
+safeSetText('profileEmail', user.email);
+const avatarEl = document.getElementById('profileAvatar');
+if (avatarEl) {
+  avatarEl.src = user.photoURL ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName||'U')}&background=2d6a4f&color=fff&size=88`;
+}
 
 // Sign out
-document.getElementById('signOutBtn').onclick = async () => {
-  await firebaseSignOut();
-  window.location.href = '../index.html';
-};
+const signOutBtn = document.getElementById('signOutBtn');
+if (signOutBtn) {
+  signOutBtn.onclick = async () => {
+    await firebaseSignOut();
+    window.location.href = '../index.html';
+  };
+}
 
 // Real-time assessments listener
 watchAssessments(user.uid, (assessments) => {
-  document.getElementById('totalAssessments').textContent = assessments.length;
-  document.getElementById('highRiskCount').textContent    = assessments.filter(a => a.risk_level === 'High').length;
-  document.getElementById('histCount').textContent        = `${assessments.length} records`;
+  safeSetText('totalAssessments', assessments.length);
+  safeSetText('highRiskCount', assessments.filter(a => a.risk_level === 'High').length);
+  safeSetText('histCount', `${assessments.length} records`);
   renderHistory(assessments);
 });
 
 function renderHistory(assessments) {
   const container = document.getElementById('historyList');
+  if (!container) return;
   if (assessments.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
@@ -182,12 +199,12 @@ window.showDetail = async (id) => {
   const a = await getAssessmentById(id);
   if (!a) return;
   const date = a.createdAt?.toDate?.()?.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}) || '';
-  document.getElementById('detailTitle').textContent = `AQ-10 Report — ${a.risk_level} Risk`;
-  document.getElementById('detailDate').textContent  = date;
+  safeSetText('detailTitle', `AQ-10 Report — ${a.risk_level} Risk`);
+  safeSetText('detailDate', date);
 
   const QUESTIONS = {A1:'Notices small sounds',A2:'Focuses on whole picture',A3:'Multitasking easily',A4:'Resumes tasks quickly',A5:'Reads between lines',A6:'Tells when someone bored',A7:'Hard to work out character intentions',A8:'Collects information categories',A9:'Reads faces to understand feelings',A10:'Difficult to work out intentions'};
 
-  document.getElementById('detailContent').innerHTML = `
+  safeSetHTML('detailContent', `
     <div style="background:linear-gradient(135deg,var(--primary),var(--primary-l));border-radius:var(--r-sm);padding:20px;color:#fff;display:flex;gap:20px;align-items:center;margin-bottom:18px">
       <div style="text-align:center;min-width:80px">
         <div style="font-family:var(--font-d);font-size:2.8rem;line-height:1">${a.probability}%</div>

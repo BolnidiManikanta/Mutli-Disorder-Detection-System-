@@ -22,6 +22,7 @@ window.APP = { user: null, userDoc: null };
     <ul class="nav-links">
       <li><a class="nav-link" href="${root}index.html">Home</a></li>
       <li><a class="nav-link" href="${root}pages/assess.html">🧠 AI Screening</a></li>
+      <li><a class="nav-link" href="${root}pages/multimodal-dashboard.html">🧬 Multimodal Hub</a></li>
       <li class="nav-item nav-dropdown">
         <a class="nav-link nav-dropdown-toggle" href="${root}pages/learning-assessment.html">🎓 Learning Suite</a>
         <div class="nav-dropdown-menu">
@@ -79,10 +80,13 @@ window.APP = { user: null, userDoc: null };
     <div class="drawer-section-title">Core Platform</div>
     <a href="${root}index.html">🏠 Home</a>
     <a href="${root}pages/assess.html">🧠 AI Clinical Screening</a>
+    <a href="${root}pages/multimodal-dashboard.html">🧬 Multimodal AI Hub</a>
+    <a href="${root}pages/speech-analysis.html">🎙️ Speech Biomarkers</a>
+    <a href="${root}pages/drawing-analysis.html">✏️ Drawing &amp; CDT Kinematics</a>
+    <a href="${root}pages/cognitive-battery.html">⚡ Cognitive Battery</a>
     <a href="${root}pages/media-analysis.html">📤 Upload &amp; Detect</a>
     <a href="${root}pages/doctor-chat.html">👨‍⚕️ AI Doctor Chat</a>
     <a href="${root}pages/chat.html">🤖 AI Assistant (ASD &amp; Copilot)</a>
-    <a href="${root}pages/speech-analysis.html">🎙️ Speech AI Analysis</a>
     <a href="${root}pages/emotion-detect.html">👁️ Emotion Detection</a>
 
     <div class="drawer-section-title">Learning Development Suite</div>
@@ -118,9 +122,9 @@ window.APP = { user: null, userDoc: null };
         <h5>Platform</h5>
         <ul>
           <li><a href="${root}pages/assess.html">AI Disorder Screening</a></li>
-          <li><a href="${root}pages/learning-assessment.html">Learning Development</a></li>
-          <li><a href="${root}pages/doctor-chat.html">AI Doctor Chat</a></li>
-          <li><a href="${root}pages/media-analysis.html">Media Analysis</a></li>
+          <li><a href="${root}pages/multimodal-dashboard.html">Multimodal AI Hub</a></li>
+          <li><a href="${root}pages/drawing-analysis.html">Drawing &amp; CDT Kinematics</a></li>
+          <li><a href="${root}pages/cognitive-battery.html">Cognitive Battery</a></li>
           <li><a href="${root}pages/speech-analysis.html">Speech Biomarkers</a></li>
         </ul>
       </div>

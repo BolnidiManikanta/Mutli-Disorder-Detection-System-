@@ -63,27 +63,35 @@
 
     /* Drop-zone button row */
     .dz-btn-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;flex-wrap:wrap}
-    .dz-analyze-btn{background:linear-gradient(135deg,#2d6a4f,#1b4332)!important;box-shadow:0 4px 14px rgba(45,106,79,.3)}
+    .dz-analyze-btn{background:linear-gradient(135deg,#2d6a4f,#1b4332)!important;box-shadow:0 4px 14px rgba(45,106,79,.3);color:#fff!important;font-weight:800!important}
     .dz-analyze-btn:hover{background:linear-gradient(135deg,#40916c,#2d6a4f)!important;transform:translateY(-1px);box-shadow:0 6px 18px rgba(45,106,79,.4)}
 
     /* Media ready banner right under drop zone */
-    .media-ready-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,#e8f5e9,#f0faf3);border:1.5px solid rgba(45,106,79,.3);border-radius:var(--r-sm);padding:10px 14px;margin-top:14px;animation:fadeUp .25s ease}
+    .media-ready-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,#e8f5e9,#f0faf3);border:1.5px solid rgba(45,106,79,.35);border-radius:var(--r-sm);padding:12px 16px;margin-top:14px;animation:fadeUp .25s ease;box-shadow:0 2px 10px rgba(45,106,79,.1)}
     .mrb-info{display:flex;align-items:center;gap:10px}
-    .mrb-icon{font-size:1.2rem}
-    .mrb-title{font-size:.83rem;font-weight:700;color:var(--primary)}
-    .mrb-sub{font-size:.72rem;color:var(--muted)}
-    .mrb-btn{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;border:none;border-radius:var(--r-sm);padding:8px 16px;font-size:.82rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 3px 10px rgba(45,106,79,.25);transition:all .2s;white-space:nowrap}
-    .mrb-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(45,106,79,.35)}
+    .mrb-icon{font-size:1.3rem}
+    .mrb-title{font-size:.86rem;font-weight:800;color:var(--primary)}
+    .mrb-sub{font-size:.74rem;color:var(--muted)}
+    .mrb-btn{background:linear-gradient(135deg,#1b4d3e,#2d6a4f);color:#fff;border:none;border-radius:var(--r-sm);padding:10px 18px;font-size:.85rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 3px 12px rgba(27,77,62,.3);transition:all .2s;white-space:nowrap}
+    .mrb-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(27,77,62,.45);background:linear-gradient(135deg,#164033,#245741)}
+
+    /* Post-upload Action Bar */
+    .post-upload-action{margin-top:14px;padding:4px 0}
+    .action-analyze-btn{width:100%;padding:14px 20px;background:linear-gradient(135deg,#1b4d3e,#2d6a4f);color:#ffffff;border:1.5px solid rgba(255,255,255,0.25);border-radius:var(--r-sm);font-size:.96rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 18px rgba(45,106,79,.32);transition:all .2s ease;letter-spacing:.01em}
+    .action-analyze-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(45,106,79,.48);background:linear-gradient(135deg,#164033,#245741)}
+    .action-analyze-sym{font-size:1.3rem;line-height:1;display:inline-block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.2))}
 
     /* Summary analyze button */
-    .summary-analyze-btn{margin-left:auto;background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;border:none;border-radius:50px;padding:6px 16px;font-size:.78rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(45,106,79,.25);transition:all .2s}
-    .summary-analyze-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(45,106,79,.35)}
+    .summary-analyze-btn{margin-left:auto;background:linear-gradient(135deg,#1b4d3e,#2d6a4f);color:#fff;border:none;border-radius:50px;padding:8px 18px;font-size:.82rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 3px 10px rgba(45,106,79,.28);transition:all .2s}
+    .summary-analyze-btn:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(45,106,79,.4)}
 
     /* Analyze button */
-    .analyze-area{padding:0 22px 20px}
-    .analyze-btn{width:100%;padding:16px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;border:none;font-size:.95rem;font-weight:800;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:.01em}
-    .analyze-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(45,106,79,.35)}
-    .analyze-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+    .analyze-area{padding:4px 22px 28px}
+    .analyze-btn{width:100%;padding:16px;border-radius:var(--r-sm);background:linear-gradient(135deg,#1b4d3e,#2d6a4f);color:#fff;border:1.5px solid rgba(255,255,255,.2);font-size:.98rem;font-weight:800;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:.01em;box-shadow:0 4px 16px rgba(27,77,62,.25)}
+    .analyze-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 30px rgba(45,106,79,.42);background:linear-gradient(135deg,#164033,#245741)}
+    .analyze-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;background:#94a3b8}
+    .analyze-btn.ready-pulse{animation:analyzePulse 2s infinite}
+    @keyframes analyzePulse{0%,100%{box-shadow:0 4px 16px rgba(27,77,62,.3)}50%{box-shadow:0 0 0 4px rgba(45,106,79,.3),0 8px 28px rgba(45,106,79,.5)}}
     .analyze-btn .spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
     .analyze-btn.loading .spinner{display:block}
     .analyze-btn.loading .btn-text{display:none}
@@ -274,7 +282,9 @@
             Analyzed for: facial expressions · eye contact · emotional response</div>
           <div class="dz-btn-row" onclick="event.stopPropagation()">
             <button class="dz-btn" type="button" onclick="document.getElementById('input-img').click()">📁 Choose Images</button>
-            <button class="dz-btn dz-analyze-btn" id="dz-analyze-img" type="button" onclick="runAnalysis()" style="display:none">⚡ Analyze Image(s)</button>
+            <button class="dz-btn dz-analyze-btn" id="dz-analyze-img" type="button" onclick="runAnalysis()" style="display:none">
+              <span style="font-size:1.15rem;margin-right:6px">🔍</span> Analyze for Autism Indicators
+            </button>
           </div>
         </div>
         <input type="file" id="input-img" class="file-input" accept="image/*" multiple onchange="addFiles('img',this.files)"/>
@@ -284,13 +294,21 @@
             <span class="mrb-icon">✅</span>
             <div>
               <div class="mrb-title"><span id="mrb-cnt-img">0</span> image(s) uploaded and ready</div>
-              <div class="mrb-sub">Click Analyze to detect facial expressions, gaze stability & affect</div>
+              <div class="mrb-sub">Click below to detect facial affect, eye gaze stability & biomarkers</div>
             </div>
           </div>
-          <button class="mrb-btn" type="button" onclick="runAnalysis()">⚡ Analyze Images Now</button>
+          <button class="mrb-btn" type="button" onclick="runAnalysis()">
+            <span style="font-size:1.2rem">🔍</span> Analyze for Autism Indicators
+          </button>
         </div>
 
         <div class="preview-grid" id="preview-img"></div>
+
+        <div class="post-upload-action" id="post-upload-img" style="display:none">
+          <button class="action-analyze-btn" type="button" onclick="runAnalysis()">
+            <span class="action-analyze-sym">🔍</span> Analyze for Autism Indicators
+          </button>
+        </div>
       </div>
 
       <!-- Video pane -->
@@ -304,7 +322,9 @@
             Analyzed for: behavior patterns · movement · social interaction · eye gaze</div>
           <div class="dz-btn-row" onclick="event.stopPropagation()">
             <button class="dz-btn" type="button" onclick="document.getElementById('input-vid').click()">📁 Choose Videos</button>
-            <button class="dz-btn dz-analyze-btn" id="dz-analyze-vid" type="button" onclick="runAnalysis()" style="display:none">⚡ Analyze Video(s)</button>
+            <button class="dz-btn dz-analyze-btn" id="dz-analyze-vid" type="button" onclick="runAnalysis()" style="display:none">
+              <span style="font-size:1.15rem;margin-right:6px">🔍</span> Analyze for Autism Indicators
+            </button>
           </div>
         </div>
         <input type="file" id="input-vid" class="file-input" accept="video/*" multiple onchange="addFiles('vid',this.files)"/>
@@ -314,13 +334,21 @@
             <span class="mrb-icon">✅</span>
             <div>
               <div class="mrb-title"><span id="mrb-cnt-vid">0</span> video(s) uploaded and ready</div>
-              <div class="mrb-sub">Click Analyze to track repetitive motor behaviors & joint attention</div>
+              <div class="mrb-sub">Click below to track repetitive motor behaviors & joint attention</div>
             </div>
           </div>
-          <button class="mrb-btn" type="button" onclick="runAnalysis()">⚡ Analyze Videos Now</button>
+          <button class="mrb-btn" type="button" onclick="runAnalysis()">
+            <span style="font-size:1.2rem">🔍</span> Analyze for Autism Indicators
+          </button>
         </div>
 
         <div class="preview-grid" id="preview-vid"></div>
+
+        <div class="post-upload-action" id="post-upload-vid" style="display:none">
+          <button class="action-analyze-btn" type="button" onclick="runAnalysis()">
+            <span class="action-analyze-sym">🔍</span> Analyze for Autism Indicators
+          </button>
+        </div>
       </div>
 
       <!-- Audio pane -->
@@ -334,7 +362,9 @@
             Analyzed for: speech patterns · tone · prosody · repetitiveness · delays</div>
           <div class="dz-btn-row" onclick="event.stopPropagation()">
             <button class="dz-btn" type="button" onclick="document.getElementById('input-aud').click()">📁 Choose Audio</button>
-            <button class="dz-btn dz-analyze-btn" id="dz-analyze-aud" type="button" onclick="runAnalysis()" style="display:none">⚡ Analyze Audio</button>
+            <button class="dz-btn dz-analyze-btn" id="dz-analyze-aud" type="button" onclick="runAnalysis()" style="display:none">
+              <span style="font-size:1.15rem;margin-right:6px">🔍</span> Analyze for Autism Indicators
+            </button>
           </div>
         </div>
         <input type="file" id="input-aud" class="file-input" accept="audio/*" multiple onchange="addFiles('aud',this.files)"/>
@@ -344,13 +374,21 @@
             <span class="mrb-icon">✅</span>
             <div>
               <div class="mrb-title"><span id="mrb-cnt-aud">0</span> audio file(s) uploaded and ready</div>
-              <div class="mrb-sub">Click Analyze to evaluate acoustic prosody & speech latency</div>
+              <div class="mrb-sub">Click below to evaluate acoustic prosody, formant shifts & latency</div>
             </div>
           </div>
-          <button class="mrb-btn" type="button" onclick="runAnalysis()">⚡ Analyze Audio Now</button>
+          <button class="mrb-btn" type="button" onclick="runAnalysis()">
+            <span style="font-size:1.2rem">🔍</span> Analyze for Autism Indicators
+          </button>
         </div>
 
         <div id="preview-aud" style="margin-top:16px;display:flex;flex-direction:column;gap:10px"></div>
+
+        <div class="post-upload-action" id="post-upload-aud" style="display:none">
+          <button class="action-analyze-btn" type="button" onclick="runAnalysis()">
+            <span class="action-analyze-sym">🔍</span> Analyze for Autism Indicators
+          </button>
+        </div>
       </div>
 
       <!-- File summary + analyze -->
@@ -359,14 +397,17 @@
         <span class="file-pill fp-vid" id="pill-vid" style="display:none">🎥 <span id="pill-vid-n">0</span> video(s)</span>
         <span class="file-pill fp-aud" id="pill-aud" style="display:none">🎙️ <span id="pill-aud-n">0</span> audio file(s)</span>
         <button class="summary-analyze-btn" id="summaryAnalyzeBtn" type="button" onclick="runAnalysis()">
-          ⚡ Click to Analyze Media (<span id="summary-total-files">0</span>)
+          <span style="font-size:1.05rem">🔍</span> Analyze for Autism Indicators (<span id="summary-total-files">0</span>)
         </button>
       </div>
 
       <div class="analyze-area">
         <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()" disabled>
           <div class="spinner"></div>
-          <span class="btn-text">🔍 Analyze for Autism Indicators</span>
+          <span class="btn-text" style="display:inline-flex;align-items:center;justify-content:center;gap:10px">
+            <span style="font-size:1.4rem;line-height:1;display:inline-block">🔍</span>
+            <span style="font-size:1.05rem;font-weight:800;letter-spacing:.02em">Analyze for Autism Indicators</span>
+          </span>
         </button>
         <p style="margin-top:8px;font-size:.73rem;color:var(--muted);text-align:center">
           AI analysis powered by NeuroScan Multi-Modal Engine · Results saved to MongoDB
@@ -625,8 +666,8 @@ function renderPreviews(type) {
           <div class="preview-audio-name">${f.name}</div>
           <audio src="${URL.createObjectURL(f)}" controls></audio>
           <div style="font-size:.68rem;color:var(--muted);text-align:center">${(f.size/1024/1024).toFixed(1)} MB · ${f.type}</div>
-          <button class="item-analyze-btn full-width" type="button" onclick="event.stopPropagation(); runAnalysis()" title="Analyze this audio">
-            ⚡ Analyze Audio Recording
+          <button class="item-analyze-btn full-width" type="button" onclick="event.stopPropagation(); runAnalysis()" title="Analyze for Autism Indicators">
+            <span style="font-size:.9rem;margin-right:4px">🔍</span> Analyze for Autism Indicators
           </button>
         </div>
         <div class="preview-remove" onclick="removeFile('aud',${i})" title="Remove">✕</div>
@@ -642,8 +683,18 @@ window.removeFile = function(type, idx) {
 
 function updateFileSummary() {
   const total = files.img.length + files.vid.length + files.aud.length;
-  document.getElementById('fileSummary').style.display = total > 0 ? 'flex' : 'none';
-  document.getElementById('analyzeBtn').disabled = total === 0;
+  const fileSummaryEl = document.getElementById('fileSummary');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+
+  if (fileSummaryEl) fileSummaryEl.style.display = total > 0 ? 'flex' : 'none';
+  if (analyzeBtn) {
+    analyzeBtn.disabled = total === 0;
+    if (total > 0) {
+      analyzeBtn.classList.add('ready-pulse');
+    } else {
+      analyzeBtn.classList.remove('ready-pulse');
+    }
+  }
 
   const summaryTotal = document.getElementById('summary-total-files');
   if (summaryTotal) summaryTotal.textContent = total;
@@ -655,12 +706,14 @@ function updateFileSummary() {
     const dzBtn = document.getElementById(`dz-analyze-${t}`);
     const banner = document.getElementById(`ready-banner-${t}`);
     const bannerN = document.getElementById(`mrb-cnt-${t}`);
+    const postAction = document.getElementById(`post-upload-${t}`);
 
     if (pill) pill.style.display = count > 0 ? 'flex' : 'none';
     if (pillN) pillN.textContent = count;
     if (dzBtn) dzBtn.style.display = count > 0 ? 'inline-flex' : 'none';
     if (banner) banner.style.display = count > 0 ? 'flex' : 'none';
     if (bannerN) bannerN.textContent = count;
+    if (postAction) postAction.style.display = count > 0 ? 'block' : 'none';
   });
 }
 

@@ -281,6 +281,16 @@
 <script src="../data/kaggle-dataset.js"></script>
 <script type="module" src="../js/shared.js"></script>
 <script>
+function safeSetHTML(id, html) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html;
+}
+
+function safeSetText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
 // ---- AQ10 ANSWERS STATE ----
 const answers = {A1:null,A2:null,A3:null,A4:null,A5:null,A6:null,A7:null,A8:null,A9:null,A10:null};
 
@@ -318,8 +328,8 @@ function buildQuestions() {
     dotsHTML += `<div class="q-dot" id="dot${key}"></div>`;
   });
 
-  container.innerHTML = html;
-  dotsEl.innerHTML = dotsHTML;
+  safeSetHTML('aqQuestions', html);
+  safeSetHTML('qDots', dotsHTML);
   buildFeatureBars();
 }
 
@@ -358,7 +368,6 @@ function selectAnswer(key, response) {
 
 // ---- BUILD FEATURE BARS ----
 function buildFeatureBars() {
-  const container = document.getElementById('featureBars');
   let html = '';
   Object.keys(AQ10_QUESTIONS).forEach(key => {
     const w = MODEL_WEIGHTS[key.replace('A','').length === 2 ? key : key] || MODEL_WEIGHTS[key.charAt(1)] || 0.5;
@@ -372,7 +381,7 @@ function buildFeatureBars() {
       <span class="feat-bar-val" id="fval-${key}" style="color:var(--muted)">—</span>
     </div>`;
   });
-  container.innerHTML = html;
+  safeSetHTML('featureBars', html);
 }
 
 // ---- RECALCULATE ----
@@ -450,13 +459,14 @@ function updatePredictionUI(result, answered, isFromRealML) {
     'Minimal': ['risk-low',  `✅ MINIMAL RISK (${prob}%) — AQ-10 Score: ${aqSum}/10. Very few indicators detected.`],
   };
   const [cls, txt] = riskMap[riskLevel] || riskMap['Low'];
-  riskEl.className = `risk-box ${cls}`;
-  riskEl.textContent = txt;
+  if (riskEl) {
+    riskEl.className = `risk-box ${cls}`;
+    riskEl.textContent = txt;
+  }
 
   // SHAP / Feature contributions
-  const shapEl = document.getElementById('shapContributions');
   if (result.shap_values && result.shap_values.length > 0) {
-    shapEl.innerHTML = result.shap_values.slice(0, 5).map(sv => {
+    const shapHtml = result.shap_values.slice(0, 5).map(sv => {
       const isPositive = sv.shap_value > 0;
       const color = isPositive ? '#c44b1b' : 'var(--primary)';
       const sign = sv.shap_value > 0 ? '+' : '';
@@ -467,6 +477,7 @@ function updatePredictionUI(result, answered, isFromRealML) {
         </div>
       `;
     }).join('');
+    safeSetHTML('shapContributions', shapHtml);
   }
 
   // Feature bars
@@ -491,21 +502,22 @@ function updatePredictionUI(result, answered, isFromRealML) {
     : `Partial result based on ${answered}/10 questions. `;
   if (aqSum >= 6) summary += `Your AQ-10 score of ${aqSum} meets or exceeds the clinical referral threshold of 6.`;
   else summary += `Your AQ-10 score of ${aqSum} is below the referral threshold of 6.`;
-  document.getElementById('summaryText').textContent = summary;
+  safeSetText('summaryText', summary);
 
   // Similar cases
   if (answeredFull) {
     const input = {
       ...answers,
-      age: parseInt(document.getElementById('demoAge').value) || 30,
-      gender: document.getElementById('demoGender').value || 'm',
-      jaundice: document.getElementById('demoJaundice').value === 'yes',
-      family: document.getElementById('demoFamily').value === 'yes'
+      age: parseInt(document.getElementById('demoAge')?.value) || 30,
+      gender: document.getElementById('demoGender')?.value || 'm',
+      jaundice: document.getElementById('demoJaundice')?.value === 'yes',
+      family: document.getElementById('demoFamily')?.value === 'yes'
     };
     const cases = findSimilarCases(input);
     if (cases.length > 0) {
-      document.getElementById('similarCasesBox').style.display = 'block';
-      document.getElementById('similarCasesList').innerHTML = cases.map(c => `
+      const similarBox = document.getElementById('similarCasesBox');
+      if (similarBox) similarBox.style.display = 'block';
+      safeSetHTML('similarCasesList', cases.map(c => `
         <div class="similar-case ${c.asd ? 'sc-asd' : 'sc-no'}">
           <span class="sc-score" style="color:${c.asd?'#c44b1b':'var(--primary)'}">${c.aq_sum}</span>
           <div style="flex:1;font-size:.76rem">
@@ -513,9 +525,10 @@ function updatePredictionUI(result, answered, isFromRealML) {
             <div style="color:var(--muted)">Jaundice: ${c.jaundice} · AQ Score: ${c.result}</div>
           </div>
           <span class="sev ${c.asd ? 'sev-high':'sev-low'}">${c.asd ? 'ASD +':'ASD −'}</span>
-        </div>`).join('');
+        </div>`).join(''));
     }
-    document.getElementById('reportBtn').style.display = 'block';
+    const reportBtn = document.getElementById('reportBtn');
+    if (reportBtn) reportBtn.style.display = 'block';
     buildReportContent(result, input);
   }
 }
@@ -541,10 +554,9 @@ function buildReportContent(result, input) {
   const rColor  = prob >= 75 ? '#c44b1b' : prob >= 50 ? '#7a5c00' : 'var(--primary)';
   const rLabel  = result.risk_level;
 
-  document.getElementById('reportDate').textContent =
-    new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  safeSetText('reportDate', new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}));
 
-  document.getElementById('reportContent').innerHTML = `
+  safeSetHTML('reportContent', `
     <div style="background:linear-gradient(135deg,var(--primary),var(--primary-l));border-radius:var(--r-sm);padding:22px;color:#fff;display:flex;gap:24px;align-items:center;margin-bottom:18px">
       <div style="text-align:center;min-width:90px">
         <div style="font-family:var(--font-d);font-size:3rem;line-height:1">${prob}%</div>

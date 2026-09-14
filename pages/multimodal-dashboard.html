@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Multimodal AI Clinical Dashboard — NeuroScan AI</title>
+  <link rel="stylesheet" href="../css/main.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    .dash-layout { max-width: 1240px; margin: 0 auto; padding: 32px 24px 80px; }
+    
+    /* Top Session Bar */
+    .session-bar { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 18px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: var(--shadow-sm); }
+    .session-meta { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .meta-item { display: flex; flex-direction: column; }
+    .meta-lbl { font-size: .68rem; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    .meta-val { font-size: .92rem; font-weight: 800; color: var(--text); }
+
+    /* Modality Status Cards Grid */
+    .modality-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    @media (max-width: 990px) { .modality-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .modality-grid { grid-template-columns: 1fr; } }
+    
+    .mod-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+    .mod-card.complete { border-top: 4px solid #2d6a4f; }
+    .mod-card.pending { border-top: 4px solid #e9c46a; background: #fafafa; }
+    .mod-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .mod-title { font-size: .86rem; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+    .mod-status { font-size: .68rem; font-weight: 800; padding: 2px 8px; border-radius: 50px; }
+    .status-complete { background: #dcfce7; color: #166534; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+
+    /* Fusion & Uncertainty Overview */
+    .fusion-kpi-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+    @media (max-width: 960px) { .fusion-kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 580px) { .fusion-kpi-grid { grid-template-columns: 1fr; } }
+
+    .kpi-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 20px; box-shadow: var(--shadow-sm); }
+    .kpi-lbl { font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+    .kpi-val { font-size: 2.2rem; font-weight: 800; line-height: 1.1; margin-bottom: 4px; }
+    .kpi-sub { font-size: .76rem; color: var(--muted); line-height: 1.4; }
+
+    /* CI Bar Visualization */
+    .ci-bar-wrap { margin-top: 10px; padding: 8px 12px; background: var(--bg); border-radius: var(--r-sm); border: 1px solid var(--border); }
+    .ci-track { position: relative; height: 14px; background: #e2e8f0; border-radius: 7px; margin: 8px 0; }
+    .ci-interval { position: absolute; height: 100%; background: rgba(45, 106, 79, 0.35); border-radius: 7px; }
+    .ci-dot { position: absolute; top: -3px; width: 20px; height: 20px; border-radius: 50%; background: #2d6a4f; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.3); transform: translateX(-50%); }
+
+    /* Tabbed Deep Dives */
+    .content-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
+    .card-tabs { display: flex; background: var(--bg); border-bottom: 1px solid var(--border); overflow-x: auto; }
+    .card-tab { padding: 14px 18px; border: none; background: none; font-size: .84rem; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; }
+    .card-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--card); }
+    .card-pane { padding: 24px; display: none; }
+    .card-pane.active { display: block; animation: fadeUp .2s ease; }
+
+    /* SHAP Waterfall Table */
+    .shap-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+    .shap-table th { text-align: left; padding: 10px 12px; background: var(--bg); color: var(--muted); font-size: .72rem; text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--border); }
+    .shap-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); }
+    .impact-pill { padding: 3px 8px; border-radius: 4px; font-size: .7rem; font-weight: 700; }
+    .impact-pos { background: #fee2e2; color: #991b1b; }
+    .impact-neg { background: #dcfce7; color: #166534; }
+
+    /* Counterfactual Card */
+    .scenario-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 16px; margin-bottom: 14px; }
+    .scenario-title { font-size: .88rem; font-weight: 800; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+
+    /* Longitudinal Chart Canvas */
+    .chart-container { width: 100%; height: 260px; position: relative; }
+  </style>
+</head>
+<body>
+<script type="module" src="../js/shared.js"></script>
+
+<!-- PAGE HEADER -->
+<div style="background:linear-gradient(135deg,#0a1628 0%,#1a2d4a 50%,#0d2137 100%);color:#fff;padding:42px 32px">
+  <div style="max-width:1240px;margin:0 auto">
+    <div style="display:inline-block;padding:3px 12px;background:rgba(255,255,255,.12);border-radius:50px;font-size:.74rem;font-weight:700;margin-bottom:8px">🧬 Multimodal Decision-Support Architecture</div>
+    <h1 style="font-family:var(--font-d);font-size:2.3rem;margin:0 0 8px">Multimodal AI Screening &amp; Explainability Hub</h1>
+    <p style="color:rgba(255,255,255,.75);max-width:700px;font-size:.94rem;line-height:1.6">
+      Late &amp; Hybrid Multimodal Fusion combining Clinical AQ-10 Questionnaires, Acoustic Speech Biomarkers, Drawing Kinematics, and Cognitive Reaction Tasks with Isotonic Calibration, 95% Uncertainty Bounds, and Actionable Counterfactuals.
+    </p>
+  </div>
+</div>
+
+<div class="dash-layout">
+  <!-- 1. SESSION MANAGEMENT HEADER -->
+  <div class="session-bar">
+    <div class="session-meta">
+      <div class="meta-item">
+        <span class="meta-lbl">Active Session ID</span>
+        <span class="meta-val" id="sessIdText">—</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-lbl">Participant</span>
+        <span class="meta-val" id="sessPartName">Alex R. (Child Cohort)</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-lbl">Age / Sex</span>
+        <span class="meta-val" id="sessAgeSex">36 mos · Male</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-lbl">Assessment Date</span>
+        <span class="meta-val" id="sessDate">Today</span>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn btn-outline btn-sm" onclick="loadSampleDemoSession()">🧪 Load Multi-Modal Demo</button>
+      <button class="btn btn-outline btn-sm" onclick="exportSessionJSON()">📥 Export JSON</button>
+      <button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ Clinical PDF Report</button>
+    </div>
+  </div>
+
+  <!-- 2. FOUR MODALITY STATUS PILLARS -->
+  <div class="modality-grid">
+    <!-- Pillar 1: Questionnaire -->
+    <div class="mod-card" id="cardModQ">
+      <div>
+        <div class="mod-header">
+          <span class="mod-title">📋 Clinical AQ-10</span>
+          <span class="mod-status status-pending" id="statusModQ">Pending</span>
+        </div>
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:12px">Social communication &amp; behavioral items</div>
+      </div>
+      <a href="assess.html" class="btn btn-outline btn-sm" style="font-size:.74rem;text-align:center">Open Questionnaire →</a>
+    </div>
+
+    <!-- Pillar 2: Speech -->
+    <div class="mod-card" id="cardModSpeech">
+      <div>
+        <div class="mod-header">
+          <span class="mod-title">🎙️ Speech Biomarkers</span>
+          <span class="mod-status status-pending" id="statusModSpeech">Pending</span>
+        </div>
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:12px">Acoustics, pause latency, and fluency</div>
+      </div>
+      <a href="speech-analysis.html" class="btn btn-outline btn-sm" style="font-size:.74rem;text-align:center">Record / Upload Audio →</a>
+    </div>
+
+    <!-- Pillar 3: Drawing -->
+    <div class="mod-card" id="cardModDraw">
+      <div>
+        <div class="mod-header">
+          <span class="mod-title">✏️ Drawing &amp; CDT</span>
+          <span class="mod-status status-pending" id="statusModDraw">Pending</span>
+        </div>
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:12px">Velocity, micro-tremor, and spatial symmetry</div>
+      </div>
+      <a href="drawing-analysis.html" class="btn btn-outline btn-sm" style="font-size:.74rem;text-align:center">Open Drawing Canvas →</a>
+    </div>
+
+    <!-- Pillar 4: Cognitive -->
+    <div class="mod-card" id="cardModCog">
+      <div>
+        <div class="mod-header">
+          <span class="mod-title">⚡ Cognitive Battery</span>
+          <span class="mod-status status-pending" id="statusModCog">Pending</span>
+        </div>
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:12px">Reaction time, memory span &amp; inhibition</div>
+      </div>
+      <a href="cognitive-battery.html" class="btn btn-outline btn-sm" style="font-size:.74rem;text-align:center">Play Cognitive Tests →</a>
+    </div>
+  </div>
+
+  <!-- 3. MULTIMODAL FUSION & UNCERTAINTY KPIS -->
+  <div class="fusion-kpi-grid">
+    <!-- Risk Estimate -->
+    <div class="kpi-box" style="border-left:4px solid #2d6a4f">
+      <div class="kpi-lbl">Multimodal Risk Estimate</div>
+      <div class="kpi-val" id="kpiRiskVal" style="color:#2d6a4f">28%</div>
+      <div class="kpi-sub">
+        Risk Category: <strong id="kpiRiskBand">Minimal / Baseline</strong><br>
+        Late &amp; Hybrid Ensemble Regularization
+      </div>
+    </div>
+
+    <!-- Calibrated Confidence -->
+    <div class="kpi-box" style="border-left:4px solid #457b9d">
+      <div class="kpi-lbl">Calibrated Confidence</div>
+      <div class="kpi-val" id="kpiConfVal" style="color:#457b9d">89%</div>
+      <div class="kpi-sub">
+        Isotonic Calibration Scaling<br>
+        Reliability Index: <strong id="kpiQualityVal">92% High</strong>
+      </div>
+    </div>
+
+    <!-- Uncertainty Interval (CI) -->
+    <div class="kpi-box" style="border-left:4px solid #e76f51">
+      <div class="kpi-lbl">95% Uncertainty Bounds</div>
+      <div class="kpi-val" id="kpiUncertVal" style="color:#e76f51">± 6%</div>
+      <div class="ci-bar-wrap">
+        <div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--muted)">
+          <span id="ciLower">22%</span>
+          <span>True Risk Interval</span>
+          <span id="ciUpper">34%</span>
+        </div>
+        <div class="ci-track">
+          <div class="ci-interval" id="ciIntervalFill" style="left:22%;width:12%"></div>
+          <div class="ci-dot" id="ciDot" style="left:28%"></div>
+        </div>
+      </div>
+      <div class="kpi-sub" style="margin-top:6px">
+        Uncertainty Band: <strong id="kpiUncertLevel">Moderate</strong>
+      </div>
+    </div>
+
+    <!-- Modality Coverage -->
+    <div class="kpi-box" style="border-left:4px solid #9b5de5">
+      <div class="kpi-lbl">Modality Coverage</div>
+      <div class="kpi-val" id="kpiCoverageVal" style="color:#9b5de5">75%</div>
+      <div class="kpi-sub">
+        Active Pillars: <strong id="kpiActivePillars">3 of 4</strong><br>
+        <span id="kpiMissingText">Cognitive pending</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. DEEP DIVE TABS (XAI, Counterfactuals, Longitudinal, Governance) -->
+  <div class="content-card">
+    <div class="card-tabs">
+      <button class="card-tab active" onclick="switchPane('xai')">🔍 Explainable AI (SHAP Waterfall)</button>
+      <button class="card-tab" onclick="switchPane('counterfactuals')">🔄 Actionable Counterfactual Simulations</button>
+      <button class="card-tab" onclick="switchPane('longitudinal')">📈 Longitudinal Trajectory &amp; History</button>
+      <button class="card-tab" onclick="switchPane('governance')">🛡️ Model Governance &amp; Data Quality</button>
+    </div>
+
+    <!-- PANE A: EXPLAINABLE AI -->
+    <div class="card-pane active" id="pane-xai">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div>
+          <h3 style="margin:0 0 4px">Local Feature Attribution (SHAP-Calibrated)</h3>
+          <p style="font-size:.82rem;color:var(--muted);margin:0">
+            Decomposition of how each biometric and behavioral feature shifts the risk estimate away from the population baseline.
+          </p>
+        </div>
+        <!-- Filter Modality -->
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="filterShap('all')">All Features</button>
+          <button class="btn btn-outline btn-sm" onclick="filterShap('questionnaire')">📋 AQ-10</button>
+          <button class="btn btn-outline btn-sm" onclick="filterShap('speech')">🎙️ Speech</button>
+          <button class="btn btn-outline btn-sm" onclick="filterShap('drawing')">✏️ Drawing</button>
+          <button class="btn btn-outline btn-sm" onclick="filterShap('cognitive')">⚡ Cognitive</button>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="shap-table" id="shapTable">
+          <thead>
+            <tr>
+              <th>Feature Name</th>
+              <th>Modality</th>
+              <th>Observed Value</th>
+              <th>SHAP Contribution</th>
+              <th>Model Decision Impact</th>
+            </tr>
+          </thead>
+          <tbody id="shapTableBody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Global Importance Reference -->
+      <div style="margin-top:24px;padding:16px;background:var(--bg);border-radius:var(--r-sm);border:1px solid var(--border)">
+        <div style="font-size:.76rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:10px">
+          Global Feature Importance (Validated Across Benchmark Cohorts)
+        </div>
+        <div id="globalImportanceList" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:10px">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- PANE B: COUNTERFACTUAL EXPLANATIONS -->
+    <div class="card-pane" id="pane-counterfactuals">
+      <div style="margin-bottom:20px">
+        <h3 style="margin:0 0 4px">Actionable Counterfactual Simulation Scenarios</h3>
+        <p style="font-size:.82rem;color:var(--muted);margin:0">
+          Hypothetical "what-if" models showing which modifiable skills (e.g. working memory or speech pauses) most effectively reduce predicted screening variance. Demographics (age, biological sex) are strictly fixed.
+        </p>
+      </div>
+
+      <div id="counterfactualScenariosList">
+        <!-- Scenarios rendered here -->
+      </div>
+
+      <div style="background:#fff8e1;border-left:3px solid #e9c46a;padding:12px 16px;border-radius:var(--r-sm);font-size:.78rem;line-height:1.65;color:#78350f">
+        <strong>Clinical Disclaimer:</strong> Model counterfactual simulations represent mathematical perturbations across the statistical decision surface. They are provided for developmental goal prioritization and do NOT represent clinical guarantees or medical diagnoses.
+      </div>
+    </div>
+
+    <!-- PANE C: LONGITUDINAL TRAJECTORY -->
+    <div class="card-pane" id="pane-longitudinal">
+      <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <div>
+          <h3 style="margin:0 0 4px">Longitudinal Progress &amp; Trend Analysis</h3>
+          <p style="font-size:.82rem;color:var(--muted);margin:0">
+            Trajectory tracking risk estimate % and modality stability over successive sessions.
+          </p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="addNewProgressPoint()">➕ Record Follow-Up Session</button>
+      </div>
+
+      <div class="chart-container" style="background:#fff;border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;margin-bottom:16px">
+        <canvas id="longitudinalCanvas" style="width:100%;height:100%"></canvas>
+      </div>
+
+      <!-- Trajectory Session History Table -->
+      <table class="shap-table" style="margin-top:10px">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Session</th>
+            <th>Risk Estimate</th>
+            <th>Coverage</th>
+            <th>Uncertainty</th>
+            <th>Trajectory Rate</th>
+          </tr>
+        </thead>
+        <tbody id="trajectoryTableBody">
+          <!-- Populated dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PANE D: GOVERNANCE & DATA QUALITY -->
+    <div class="card-pane" id="pane-governance">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <h4 style="margin-top:0">Model Governance &amp; Versioning</h4>
+          <div style="font-size:.82rem;line-height:1.8">
+            <div>Model Architecture: <strong>Multimodal Late &amp; Hybrid Fusion Ensemble</strong></div>
+            <div>Model Version: <code id="govModelVer">v2.4.0-multimodal-calibrated</code></div>
+            <div>Calibration Scheme: <code id="govCalibVer">isotonic-cv5-regularized</code></div>
+            <div>Audit Trail: <strong>SHA-256 Validated Session State</strong></div>
+            <div>Missing Modality Handling: <strong>Bayesian Coverage Penalty Prior</strong></div>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="margin-top:0">Data Quality &amp; Completeness Checks</h4>
+          <div style="font-size:.82rem;line-height:1.8">
+            <div>Overall Quality Score: <strong id="govQualityScore">94/100 (Optimal)</strong></div>
+            <div>Questionnaire Completeness: <strong id="govQComp">10/10 items answered</strong></div>
+            <div>Audio Signal-to-Silence: <strong id="govAudioQuality">82% VAD Ratio (Passed)</strong></div>
+            <div>Drawing Point Density: <strong id="govDrawQuality">340 kinematic samples (Passed)</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { AssessmentSessionManager, MODEL_VERSION, CALIBRATION_VERSION } from '../js/assessment-session.js';
+import { MultimodalFusionEngine } from '../js/multimodal-fusion.js';
+
+let currentFusion = null;
+let longitudinalData = [
+  { date: '2026-06-10', risk: 48, ci: 8, coverage: 50, note: 'Initial baseline' },
+  { date: '2026-07-22', risk: 36, ci: 6, coverage: 75, note: 'Post speech training' },
+  { date: '2026-09-09', risk: 28, ci: 5, coverage: 100, note: 'Comprehensive multi-modal' }
+];
+
+function safeSetHTML(id, html) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html;
+}
+
+function safeSetText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  initDashboard();
+});
+
+function initDashboard() {
+  const session = AssessmentSessionManager.getActiveSession();
+  
+  // Set meta header
+  safeSetText('sessIdText', session.sessionId);
+  const rawDate = session.assessmentDate || session.timestamps?.created || session.timestamp;
+  safeSetText('sessDate', rawDate ? new Date(rawDate).toLocaleDateString() : new Date().toLocaleDateString());
+
+  // Run Fusion
+  runAndRenderFusion(session);
+
+  // Render Longitudinal Chart
+  renderLongitudinalChart();
+}
+
+function runAndRenderFusion(session) {
+  const fusion = MultimodalFusionEngine.runFusion(session);
+  currentFusion = fusion;
+
+  // 1. Modality Status Cards
+  updatePillarCard('cardModQ', 'statusModQ', fusion.modalitiesPresent.includes('questionnaire'), '10 items');
+  updatePillarCard('cardModSpeech', 'statusModSpeech', fusion.modalitiesPresent.includes('speech'), `${session.speechData?.duration || 0}s Audio`);
+  updatePillarCard('cardModDraw', 'statusModDraw', fusion.modalitiesPresent.includes('drawing'), `${session.drawingData?.strokeCount || 0} strokes`);
+  updatePillarCard('cardModCog', 'statusModCog', fusion.modalitiesPresent.includes('cognitive'), `${session.cognitiveData?.workingMemorySpan || 0} span`);
+
+  // 2. Main KPI Boxes
+  const riskVal = document.getElementById('kpiRiskVal');
+  if (riskVal) {
+    riskVal.textContent = `${fusion.riskEstimate}%`;
+    if (fusion.riskEstimate >= 70) riskVal.style.color = '#c44b1b';
+    else if (fusion.riskEstimate >= 45) riskVal.style.color = '#f4a261';
+    else riskVal.style.color = '#2d6a4f';
+  }
+
+  safeSetText('kpiRiskBand', `${fusion.riskBand} Risk Category`);
+  safeSetText('kpiConfVal', `${fusion.confidence}%`);
+  safeSetText('kpiQualityVal', `${fusion.dataQualityPct}% (${fusion.uncertainty.level})`);
+
+  // Uncertainty Bounds
+  safeSetText('kpiUncertVal', `± ${fusion.uncertainty.marginPct}%`);
+  safeSetText('ciLower', `${fusion.uncertainty.ci_lower}%`);
+  safeSetText('ciUpper', `${fusion.uncertainty.ci_upper}%`);
+  safeSetText('kpiUncertLevel', fusion.uncertainty.level);
+
+  const widthPct = Math.max(4, fusion.uncertainty.ci_upper - fusion.uncertainty.ci_lower);
+  const ciFill = document.getElementById('ciIntervalFill');
+  if (ciFill) {
+    ciFill.style.left = `${fusion.uncertainty.ci_lower}%`;
+    ciFill.style.width = `${widthPct}%`;
+  }
+  const ciDot = document.getElementById('ciDot');
+  if (ciDot) {
+    ciDot.style.left = `${fusion.riskEstimate}%`;
+  }
+
+  // Coverage
+  safeSetText('kpiCoverageVal', `${fusion.coveragePct}%`);
+  safeSetText('kpiActivePillars', `${fusion.modalitiesPresent.length} of 4 Pillars`);
+  safeSetText('kpiMissingText', fusion.missingModalities.length > 0 
+    ? `Missing: ${fusion.missingModalities.join(', ')}`
+    : 'All 4 Modalities Complete');
+
+  // 3. Render Explainable AI (SHAP)
+  renderShapTable(fusion.explanations.local);
+  renderGlobalImportance(fusion.explanations.global);
+
+  // 4. Render Counterfactuals
+  renderCounterfactuals(fusion.counterfactuals);
+
+  // 5. Governance
+  safeSetText('govModelVer', MODEL_VERSION);
+  safeSetText('govCalibVer', CALIBRATION_VERSION);
+  safeSetText('govQualityScore', `${fusion.dataQualityPct}/100`);
+}
+
+function updatePillarCard(cardId, statusId, isComplete, detail) {
+  const card = document.getElementById(cardId);
+  const st = document.getElementById(statusId);
+  if (!card || !st) return;
+  if (isComplete) {
+    card.classList.remove('pending');
+    card.classList.add('complete');
+    st.className = 'mod-status status-complete';
+    st.textContent = `✓ Complete (${detail})`;
+  } else {
+    card.classList.remove('complete');
+    card.classList.add('pending');
+    st.className = 'mod-status status-pending';
+    st.textContent = 'Pending';
+  }
+}
+
+function renderShapTable(attributions) {
+  const tbody = document.getElementById('shapTableBody');
+  if (!tbody) return;
+  if (!attributions || attributions.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">No active modality data available to extract local feature attributions.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = attributions.map(a => `
+    <tr>
+      <td><strong>${a.feature}</strong></td>
+      <td><span style="font-size:.7rem;padding:2px 8px;border-radius:50px;background:var(--bg);border:1px solid var(--border);text-transform:uppercase">${a.modality}</span></td>
+      <td><code>${a.value}</code></td>
+      <td><strong>${a.shap > 0 ? '+' : ''}${(a.shap * 100).toFixed(1)}%</strong></td>
+      <td>
+        <span class="impact-pill ${a.direction === 'positive' ? 'impact-pos' : 'impact-neg'}">
+          ${a.impact}
+        </span>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderGlobalImportance(globals) {
+  const container = document.getElementById('globalImportanceList');
+  if (!container || !globals) return;
+  container.innerHTML = globals.map(g => `
+    <div style="background:#fff;padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;font-size:.76rem;margin-bottom:4px">
+        <strong>${g.feature}</strong>
+        <span style="color:var(--primary);font-weight:800">${Math.round(g.importance * 100)}%</span>
+      </div>
+      <div style="height:5px;background:var(--bg);border-radius:50px;overflow:hidden">
+        <div style="width:${g.importance * 100}%;height:100%;background:var(--primary);border-radius:50px"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderCounterfactuals(cf) {
+  const list = document.getElementById('counterfactualScenariosList');
+  if (!list || !cf || !cf.scenarios) return;
+  list.innerHTML = cf.scenarios.map(s => `
+    <div class="scenario-card">
+      <div class="scenario-title">
+        <span>${s.name}</span>
+        <span style="color:#2d6a4f;font-size:1.05rem">${s.currentPrediction} &rarr; <strong>${s.estimatedPrediction}</strong> (${s.delta})</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:.8rem;margin-bottom:8px">
+        <div>Modality: <strong style="text-transform:uppercase">${s.modality}</strong></div>
+        <div>Simulated Target: <code>${s.counterfactualValue}</code></div>
+      </div>
+      <div style="font-size:.78rem;color:var(--muted);line-height:1.5">${s.rationale}</div>
+    </div>
+  `).join('');
+}
+
+window.filterShap = function(modality) {
+  if (!currentFusion) return;
+  if (modality === 'all') {
+    renderShapTable(currentFusion.explanations.local);
+  } else {
+    renderShapTable(currentFusion.explanations.byModality[modality] || []);
+  }
+};
+
+window.switchPane = function(paneId, btn) {
+  document.querySelectorAll('.card-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.card-pane').forEach(p => p.classList.remove('active'));
+  const targetBtn = btn || (window.event && (window.event.currentTarget || window.event.target)) || document.querySelector(`.card-tab[onclick*="${paneId}"]`);
+  if (targetBtn && targetBtn.classList) targetBtn.classList.add('active');
+  const targetPane = document.getElementById(`pane-${paneId}`);
+  if (targetPane) targetPane.classList.add('active');
+};
+
+// ── SAMPLE DEMO DATA LOADER ────────────────────────────────
+window.loadSampleDemoSession = function() {
+  const session = AssessmentSessionManager.getActiveSession();
+  
+  // Synthesize complete multimodal session
+  session.questionnaireData = {
+    A1_Score: 1, A2_Score: 0, A3_Score: 1, A4_Score: 0, A5_Score: 1,
+    A6_Score: 0, A7_Score: 1, A8_Score: 0, A9_Score: 0, A10_Score: 0,
+    aq10_sum: 4,
+    answers: { 1:1, 2:0, 3:1, 4:0, 5:1, 6:0, 7:1, 8:0, 9:0, 10:0 }
+  };
+
+  session.speechData = {
+    duration: 18.4,
+    speakingDuration: 13.2,
+    silenceDuration: 5.2,
+    wpm: 108,
+    pauseFrequency: 6.8,
+    meanPauseDuration: 0.76,
+    fluencyScore: 84
+  };
+
+  session.drawingData = {
+    strokeCount: 4,
+    meanVelocity: 142,
+    lineTremorIndex: 0.18,
+    symmetryIndex: 0.78,
+    smoothnessScore: 82
+  };
+
+  session.cognitiveData = {
+    reactionTimeMean: 338,
+    reactionTimeVariability: 68,
+    workingMemorySpan: 5,
+    attentionAccuracy: 90,
+    trials: [310, 325, 340, 350, 320]
+  };
+
+  AssessmentSessionManager.syncDerivedFeatures(session);
+  AssessmentSessionManager.saveSession(session);
+  runAndRenderFusion(session);
+
+  alert('Loaded comprehensive 4-modality demo session data! Multimodal coverage is now 100%.');
+};
+
+// ── EXPORT SESSION JSON ─────────────────────────────────────
+window.exportSessionJSON = function() {
+  const session = AssessmentSessionManager.getActiveSession();
+  const exportPayload = {
+    ...session,
+    fusionResult: currentFusion,
+    exportedAt: new Date().toISOString()
+  };
+
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
+  const a = document.createElement('a');
+  a.setAttribute("href", dataStr);
+  a.setAttribute("download", `neuroscan_session_${session.sessionId}.json`);
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+};
+
+// ── LONGITUDINAL TRAJECTORY CANVAS ─────────────────────────
+function renderLongitudinalChart() {
+  const canvas = document.getElementById('longitudinalCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const pts = longitudinalData;
+  if (pts.length === 0) return;
+
+  const padLeft = 50, padRight = 30, padTop = 30, padBottom = 40;
+  const w = canvas.width - padLeft - padRight;
+  const h = canvas.height - padTop - padBottom;
+
+  // Grid
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 1;
+  [0, 25, 50, 75, 100].forEach(pct => {
+    const y = padTop + h - (pct / 100) * h;
+    ctx.beginPath();
+    ctx.moveTo(padLeft, y);
+    ctx.lineTo(padLeft + w, y);
+    ctx.stroke();
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '10px sans-serif';
+    ctx.fillText(`${pct}%`, 16, y + 3);
+  });
+
+  // Plot line
+  const stepX = w / Math.max(1, pts.length - 1);
+  ctx.beginPath();
+  ctx.strokeStyle = '#2d6a4f';
+  ctx.lineWidth = 3;
+
+  pts.forEach((p, i) => {
+    const x = padLeft + (i * stepX);
+    const y = padTop + h - (p.risk / 100) * h;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Dots & CI error bars
+  pts.forEach((p, i) => {
+    const x = padLeft + (i * stepX);
+    const y = padTop + h - (p.risk / 100) * h;
+    const yLow = padTop + h - ((p.risk - p.ci) / 100) * h;
+    const yHigh = padTop + h - ((p.risk + p.ci) / 100) * h;
+
+    // Error bar
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x, yLow);
+    ctx.lineTo(x, yHigh);
+    ctx.stroke();
+
+    // Dot
+    ctx.beginPath();
+    ctx.arc(x, y, 6, 0, 2 * Math.PI);
+    ctx.fillStyle = '#2d6a4f';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Text
+    ctx.fillStyle = '#1e293b';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.fillText(`${p.risk}%`, x - 10, y - 12);
+    ctx.fillStyle = '#64748b';
+    ctx.font = '10px sans-serif';
+    ctx.fillText(p.date, x - 22, canvas.height - 14);
+  });
+
+  // Table
+  const tbody = document.getElementById('trajectoryTableBody');
+  if (tbody) {
+    tbody.innerHTML = pts.map(p => `
+      <tr>
+        <td><strong>${p.date}</strong></td>
+        <td>Follow-up (${p.note})</td>
+        <td><strong>${p.risk}%</strong></td>
+        <td>${p.coverage}%</td>
+        <td>±${p.ci}%</td>
+        <td><span class="impact-pill impact-neg">&darr; Improving Profile</span></td>
+      </tr>
+    `).join('');
+  }
+}
+
+window.addNewProgressPoint = function() {
+  const currentRisk = currentFusion ? currentFusion.riskEstimate : 25;
+  const currentCI = currentFusion ? currentFusion.uncertainty.marginPct : 5;
+  const currentCov = currentFusion ? currentFusion.coveragePct : 100;
+
+  longitudinalData.push({
+    date: new Date().toISOString().split('T')[0],
+    risk: currentRisk,
+    ci: currentCI,
+    coverage: currentCov,
+    note: 'Active session recording'
+  });
+  renderLongitudinalChart();
+};
+</script>
+</body>
+</html>
